@@ -1,12 +1,16 @@
+{% extends "main.html" %}
+{% block content %}
+<article>
 <h1>Inbox</h1>
-<article><?php if($msgs): ?>
-<table>
-<?php foreach($msgs as $msg): ?>
-<td><?=$msg['sender']?></td><td><?=$msg['subject']?></td>
-</tr>
-<?php endforeach; ?>
-</table>
-<?php else: ?>
-<p>You have no messages.</p>
-<?php endif; ?>
+{% if not empty %}
+    <table>
+    {% for message in messages %}
+    <td>{{ message.sender }}</td><td><a href="{{ url_for('view_message', message_id=message.key) }}">{{ message.data['subject'] }}</a></td>
+    </tr>
+    {% endfor %}
+    </table>
+{% else %}
+    <p>No messages for you :'-(</p>
+{% endif %}
 </article>
+{% endblock %}

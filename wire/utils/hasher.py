@@ -11,9 +11,11 @@ class Hasher:
     def __init__(self, strength=16):
         self._strength = strength
 
-    def hash(self, password, salt=False):
+    def hash(self, password, salt=False, encode=True):
         if salt is False:
-            salt = b64encode(urandom(32))
+            salt = urandom(32)
+        if encode:
+            salt = b64encode(salt)
         return "$w$%s$%s$%s" % (
             self._strength,
             salt,

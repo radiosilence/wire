@@ -9,11 +9,11 @@ class Auth:
     def attempt(self, username, password):
         r = self.redis
         h = Hasher()
-        if not r.exists('usernames:%s' % username):
+        if not r.exists('username:%s' % username):
             raise AuthError()
 
-        key = r.get('usernames:%s' % username)
-        data = json.loads(r.get('users:%s' % key))
+        key = r.get('username:%s' % username)
+        data = json.loads(r.get('user:%s' % key))
         try:
             h.check(password, data['password'])
         except HashMismatch:

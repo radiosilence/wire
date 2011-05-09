@@ -29,20 +29,24 @@ def decrypt(key, data):
     msg = msg[16:len(msg) - 16]
     new_mac = HMAC.new(key, iv + msg).digest()
     if extracted_mac != new_mac:
-        return False
+        raise DecryptFailed()
     aes = AES.new(key, AES.MODE_CTR, iv, counter=ctr)
     return aes.decrypt(msg)
 
 def _derive_key(key, salt=get_random_bytes(32)):
     h = Hasher(16)
-    return h.hash(key, salt)[:32], salt
+    return h.hash(key, salt)[-32:], salt
 
 
+class DecryptFailed(Exception):
+    pass
 
 if __name__ == '__main__':
     enc = encrypt("moo", "LOREM")
     print enc
     dec = decrypt("moo", enc)
+    print dec
+    dec = decrypt("maoo", enc)
     print dec
 
 

@@ -1,6 +1,25 @@
-{% extends 'main.html' %}
-{% block content %}
-<article>
-<h1>{{ status }}</h1>
-<p>{{ message }}</p>
+{% extends "main.html" %}
+{% block content %}<article>
+{% if message.decrypted %}
+<h1>{{ message.data['subject'] }}</h1>
+<p><code>From: <strong>{{ message.data['sender'] }}</strong> On: <strong>{{ message.data['date'] }}</strong></code></p>
+<p><blockquote><pre class="blank">{{ message.data['content'] }}</pre></blockquote></p>
+</article><article>
+<form action="{{ url_for('view_message', message_id=message.key) }}" method="post">
+<input type="hidden" name="action" value="reply"/>
+<label for="msg-content"><h1>Reply</h1></label><textarea id="msg-content" name="content" style="width:95%; height: 100px">
+
+</textarea>
+{% if encryption_key %}<input type="hidden" name="encryption_key" value="{{ encryption_key }}"/>{% endif %}
+<input type="submit" value="Send"/>
+</form>
+{% else %}
+<h1>Encrypted Message</h1>
+<form method="POST" action="{{ url_for('view_message', message_id=message.key) }}">
+<input type="hidden" name="action" value="decrypt"/>
+<p>This message needs to be decrypted. To do this, enter the encryption key into the box below.</p>
+<p><input type="text" name="encryption_key" placeholder="Ex. hunter2" />&nbsp;<input type="submit" value="Decrypt"/></p>
+</form>
+{% endif %}
+</article>
 {% endblock %}

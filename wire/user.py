@@ -1,5 +1,5 @@
 import redis
-from utils.redis import autoinc
+from wire.utils.redis import autoinc
 import json
 from wire.utils.hasher import Hasher
 
@@ -47,8 +47,8 @@ class User:
             self.redis.lpush("list:users", self.key)
             self.redis.lpush("list:usernames", self.username)
                 
-        self.redis.set("usernames:%s" % self.username, self.key)
-        self.redis.set("users:%s" % self.key, json.dumps({
+        self.redis.set("username:%s" % self.username, self.key)
+        self.redis.set("user:%s" % self.key, json.dumps({
             'username': self.username,
             'password': self.data['password'],
             'avatar': self.data['avatar']
@@ -82,10 +82,10 @@ class User:
             raise UserExists()
 
     def load(self, key):
-        if not self.redis.exists('users:%s' % key):
+        if not self.redis.exists('user:%s' % key):
             return False
         self.key = key
-        data = json.loads(self.redis.get('users:%s' % key))
+        data = json.loads(self.redis.get('user:%s' % key))
         self.data = data
         self.username = data['username']
         if len(data['avatar']) > 0:
