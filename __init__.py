@@ -1,8 +1,8 @@
 from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash
 
-from wire import user, message
-from wire.utils.auth import Auth, AuthError
+import user, message
+from utils.auth import Auth, AuthError
 
 import redis
 
@@ -10,13 +10,11 @@ class _DefaultSettings(object):
     SECRET_KEY = 'default key'
     DEBUG = True
 
-app.config.from_object(_DefaultSettings)
-del _DefaultSettings
-
 
 app = Flask(__name__)
-app.config.from_object(__name__)
-app.config.from_envvar('FLASKR_SETTINGS', silent=True)
+
+app.config.from_object(_DefaultSettings)
+del _DefaultSettings
 
 @app.before_request
 def before_request():
