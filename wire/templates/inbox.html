@@ -1,0 +1,12 @@
+<h1>Inbox</h1>
+<article><?php if($msgs): ?>
+<table>
+<?php foreach($msgs as $msg): ?>
+<td><?=$msg['sender']?></td><td><?=$msg['subject']?></td>
+</tr>
+<?php endforeach; ?>
+</table>
+<?php else: ?>
+<p>You have no messages.</p>
+<?php endif; ?>
+</article>

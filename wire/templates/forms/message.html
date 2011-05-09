@@ -1,0 +1,23 @@
+{% extends "main.html" %}
+{% block javascript %}
+  <script src="{{ url_for('static', filename='js/message_form.js') }}" type="text/javascript"></script>
+{% endblock %}
+{% block content %}<h1>Wire a Message</h1>
+<form id="msg-form" method="POST" action="send">
+<input type="hidden" name="reponse" value="{ response }"/>
+<article>
+<p><label for="recv">Recipient(s)</label><br/><input id="recv" type="text" name="recv"/></p>
+<p><label for="subject">Subject</label><br/><input id="subject" type="text" name="subject"/></p>
+<p><label for="msg-content">Message</label><br/><textarea id="msg-content" name="content" style="width: 95%; height: 200px"></textarea></p>
+</article>
+<article>
+<h1>Security Options</h1>
+<p>If any of these are used, message is stored purely in memory and could potentially be subject to disappearing. Memory will be cleared after volatile events where arrests have been made.</p>
+<p><input type="checkbox" name="self_destruct" id="self-destruct"/> <label for="self-destruct">Self Destruct</label><br/>This means that the message will be destroyed when it is opened.</p>
+<p><label for="crypto-key">Crypto Key</label><br/>If you choose to encrypt your message, a key must be decided in person and memorised by the sender and reciever.<br/><input type="text" name="crypto_key" id="crypto-key" /></p>
+<p><label for="destruct-key">Destruct Key</label><br/>The destruct key, when used to attempt to decrypt the message, will destroy it. This is for situations where there is an attempt to forcibly identify a key by means of coercion.<br/><input type="text" name="destruct_key" id="destruct-key"></p>
+<p><input type="checkbox" name="destruct_cascade" id="destruct-cascade"/> <label for="destruct-cascade">Destruct Cascade</label><br/>(Use with caution). If a message is destroyed by a destruct key, this option will destroy all sent and recieved messages to this recipient. This is a last resort.</p>
+</article>
+<p><button>Send</button></p>
+</form>
+{% endblock %}

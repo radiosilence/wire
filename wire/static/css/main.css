@@ -1,0 +1,47 @@
+
+header h1 a {
+    display: block;
+    width: 435px;
+    height: 180px;
+    background: url('/img/head.png') no-repeat;
+    text-indent: -9999px;
+    font-family: PTSans;
+    font-weight: bold;
+    margin-left: -12px;
+}
+
+header h1 a {
+    font-size: 58pt;
+    font-family: WCROUGHTRAD;
+    font-weight: normal;
+}
+body {
+    background-image: url('/img/bg.png');
+}
+
+article p {
+}
+article img {
+}
+
+h1, h2, nav li a {
+    text-transform: lowercase;
+    font-family: WCROUGHTRAD !important;
+    font-weight: normal !important;
+/*    font-family: "Glass TTY VT220" !important;
+    font-weight: normal;*/
+}
+
+h1 {
+    font-size: 28pt !important;
+}
+nav li a {
+    font-size: 18pt !important;
+}
+
+#userbox h1 {
+    font-size: 22pt;
+}
+label {
+    font-size: 15pt;
+}
