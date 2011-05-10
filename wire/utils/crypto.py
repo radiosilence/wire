@@ -19,6 +19,7 @@ def encrypt(key, data):
 
 def decrypt(key, data):
     ctr = Counter.new(128)
+    print data
     msg = b64decode(data)
     salt = msg[:32]
     msg = msg[32:]
@@ -34,7 +35,7 @@ def decrypt(key, data):
     return aes.decrypt(msg)
 
 def _derive_key(key, salt=get_random_bytes(32)):
-    h = Hasher(16)
+    h = Hasher(10)
     return h.hash(key, salt)[-32:], salt
 
 

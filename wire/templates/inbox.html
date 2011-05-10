@@ -4,13 +4,13 @@
 <h1>Inbox</h1>
 {% if not empty %}
     <table>
-    {% for message in messages %}
-    <td>{{ message.sender }}</td><td><a href="{{ url_for('view_message', message_id=message.key) }}">{{ message.data['subject'] }}</a></td>
+    {% for thread in threads %}
+    <td>{{ thread.sender }}</td><td><a href="{{ url_for('view_thread', thread_id=thread.key) }}">{{ thread.subject }}</a></td>
     </tr>
     {% endfor %}
     </table>
 {% else %}
-    <p>No messages for you :'-(</p>
+    <p>No threads for you :'-(</p>
 {% endif %}
 </article>
 {% endblock %}

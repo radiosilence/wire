@@ -14,87 +14,69 @@ class Message:
         self.data = {}
         self.user = user
         self.recipient_usernames = []
+        self.recipients = False
         self.date = str(datetime.now())
         self.status = False
+        self.encrypted = False
+        self.decrypted = False
         if key:
             self.load()
 
     def send(self):
         r = self.redis
-        self._recipient_ids()
         self._validate()
-        if not self.thread:
-            self.thread = autoinc(self.redis, 'thread')
+
         if not self.key:
             self.key = autoinc(self.redis, 'message')
         
         data = {
             'sender': self.user.username,
             'date': self.date,
-            'subject': self.data['subject'],
             'content': self.data['content'],
-            'thread': self.thread
+            'thread': self.thread,
         }
 
-        if len(self.data['encryption_key']) >= 8:
-            data['content'] = encrypt(self.data['encryption_key'], data['content'])
-            data['encrypted'] = True
-        
-        if len(self.data['destruct_key']) > 0 and data['encrypted']:
-            h = Hasher(2)
-            data['destruct_key'] = h.hash(self.data['destruct_key'])
-
+        try:
+            if len(self.data['encryption_key']) >= 8:
+                data['content'] = encrypt(self.data['encryption_key'], data['content'])
+                self.encrypted = True
+                data['encrypted'] = True
+            if len(self.data['destruct_key']) > 0 and data['encrypted']:
+                h = Hasher(2)
+                data['destruct_key'] = h.hash(self.data['destruct_key'])
+        except KeyError:
+            pass
         r.set('message:%s' % self.key, json.dumps(data))
 
-        for recp in self.recipients:
-            r.lpush('user:%s:inbox' % recp, self.key)
-            r.lpush('user:%s:message:%s:status' % (recp, self.key), 'unread')
-            r.incr('user:%s:unread' % recp)
-        
-        r.lpush('thread:%s' % self.thread, self.key)
+    def delete(self):
+        r = self.redis
+        r.delete('message:%s' % self.key)
 
     def update(self, data, new=False):
         fields = [
             'date',
-            'subject',
             'content',
-            'recv',
             'encryption_key',
             'destruct_key',
             'self_destruct',
             'destruct_cascade'
         ]
-        self.recipient_usernames = [s.strip() for s in data['recv'].split(",")]
+
         for field in fields:
             try:
                 self.data[field] = data[field]
             except KeyError:
                 pass
-            
-    def delete(self):
-        print "cut my life into pieces"
-
-    def _recipient_ids(self):
-        self.invalid_recipients = []
-        self.recipients = []
-        if len(self.recipient_usernames) < 1:
-            raise Exception("No users.")
-        for recipient in self.recipient_usernames:
-            if self.redis.exists('username:%s' % recipient):
-                self.recipients.append(self.redis.get('username:%s' % recipient))
-            else:
-                self.invalid_recipients.append(recipient)
-        if len(self.invalid_recipients) > 0:
-            raise InvalidRecipients()
 
     def _validate(self):
         errors = []
         if len(self.data['content']) < 1:
             errors.append('Message must be set.')
-        if len(self.data['subject']) < 1:
-            errors.append('Subject must be set.')
-        if len(self.data['encryption_key']) > 0 and len(self.data['encryption_key']) < 8:
-            errors.append('Crypto Key must be at least eight characters.')
+        try:
+            if len(self.data['encryption_key']) > 0 and len(self.data['encryption_key']) < 8:
+                errors.append('Crypto Key must be at least eight characters.')
+        except KeyError:
+            pass
         if len(errors) > 0:
             self.validation_errors = errors
             raise ValidationError()
@@ -108,12 +90,13 @@ class Message:
         self.data = json.loads(m)
         self.thread = self.data['thread']
         self.sender = self.data['sender']
+
         try: 
             self.data['encrypted']
+            self.encrypted = True
             self.decrypted = False
         except KeyError:
-            print "plain"
-            self.decrypted = True
+            self.encrypted = False
     
     def decrypt(self, encryption_key):
         try:
@@ -122,13 +105,18 @@ class Message:
             self.delete()
         except (KeyError, HashMismatch):
             pass
-            
-        self.data['content'] = decrypt(encryption_key, self.data['content'])
+        
+        try:
+            self.data['content'] = decrypt(encryption_key, self.data['content'])
+        except TypeError:
+            print "WHY DOES THIS HAPPEN?"
         self.decrypted = True
+        self.encrypted = True
         
     def encrypt(self, encryption_key):
         self.data['content'] = encrypt(encryption_key, self.data['content'])
         self.decrypted = False
+        self.encrypted = True
 
 class ValidationError(Exception):
     pass
