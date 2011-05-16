@@ -1,0 +1,57 @@
+{% extends "main.html" %}
+{% block javascript %}
+<script src="{{ url_for('static', filename='js/thread.js') }}" type="text/javascript"></script>
+{% endblock %}
+{% block content %}
+
+{% if decrypted %}
+  <h1><a href="{{ url_for('view_thread', thread_id=thread.key) }}">{{ subject }}</a></h1>
+  {{ flashes() }}
+  <table class="thread">
+  {% for message in messages %}
+    <tr>
+      <td style="white-space: nowrap;">
+        {% if message.data['date_date'] != prevdate %}
+            {{ message.data['date_date'] }}
+        {% endif %}
+        {% set prevdate = message.data['date_date'] %}
+      </td>
+      <td style="white-space: nowrap;">
+        {% if message.data['date_time'] != prevtime %}
+            {{ message.data['date_time'] }}
+        {% endif %}
+        {% set prevtime = message.data['date_time'] %}
+      </td>
+      <td style="white-space: nowrap;">
+            &lt;{%-if message.data['sender'] == thread.sender -%}!{%- else %}&nbsp;{% endif -%}{{ message.data['sender'] }}&gt;
+      </td>
+      <td>
+        {{ message.data['content'] }}
+      </td>
+      <td class="delmsg" style="width: 20px">
+      {% if g.user.username == message.data['sender'] %}
+        <a href="{{ url_for('delete_message', thread_id=thread.key, message_id=message.key) }}">x</a>
+      {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  </table>
+{% else %}
+  <h1>Encrypted Thread</h1>
+    <form method="POST" action="{{ url_for('view_thread', thread_id=thread.key) }}">
+    <input type="hidden" name="action" value="decrypt"/>
+    <p>This message needs to be decrypted. To do this, enter the encryption key into the box below.</p>
+    <p><input type="text" name="encryption_key" placeholder="Ex. hunter2" />&nbsp;<input type="submit" value="Decrypt"/></p>
+  </form>
+{% endif %}
+<form action="{{ url_for('view_thread', thread_id=thread.key) }}" method="post">
+  <input type="hidden" name="action" value="reply"/>
+  <label for="msg-content"><h1>Reply</h1></label><textarea id="msg-content" name="content" style="width:95%; height: 100px">
+
+  </textarea>
+  {% if encryption_key %}
+    <input type="hidden" name="encryption_key" value="{{ encryption_key }}"/>
+  {% endif %}
+  <input type="submit" value="Send"/>
+</form>
+{% endblock %}

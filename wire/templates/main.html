@@ -1,5 +1,17 @@
 {% macro error(message) %}
-<div class="ui-state-error ui-corner-all response_error"><span class="ui-icon ui-icon-alert"></span>{{ message }}</div>
+{% endmacro %}
+{% macro flashes() %}
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        {% if category == 'error' %}
+          <div class="ui-state-error ui-corner-all response_error"><span class="ui-icon ui-icon-alert"></span>{{ message }}</div>
+        {% elif category == 'success' %}
+          <div class="ui-state-highlight ui-corner-all response_highlight"><span class="ui-icon ui-icon-info"></span>{{ message }}</div>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
 {% endmacro %}
 
 {%- if self.title() != "" %}
@@ -10,6 +22,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="utf-8" />
   <title>{% block title %}{% endblock %}{{ ndash }}wire &ndash; Privacy is a right.</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css_lib/subverse.css') }}" type="text/css"/> 
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" type="text/css"/> 
@@ -31,9 +44,12 @@
    <ul>
     <li id="news"><a href="{{ url_for('blog_entries') }}">Blog</a></li>
     <li id="events"><a href="{{ url_for('list_events') }}">Events</a></li>
-      <li id="sign_up"><a href="{{ url_for('new_user') }}">Sign Up</a></li>
-      <li id="create-event"><a href="{{ url_for('new_event') }}">Create Event</a></li>
-      <li id="send"><a href="{{ url_for('send_message') }}">Wire a Message</a></li>
+      {% if session.logged_in %}
+        <li id="create-event"><a href="{{ url_for('new_event') }}">Create Event</a></li>
+        <li id="send"><a href="{{ url_for('send_message') }}">Wire a Message</a></li>
+      {% else %}
+        <li id="sign_up"><a href="{{ url_for('new_user') }}">Sign Up</a></li>
+      {% endif %}
    </ul>
   </nav>
   <section class="grid_8" id="content">  

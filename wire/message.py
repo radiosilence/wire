@@ -2,7 +2,7 @@ import redis
 from wire.utils.redis import autoinc
 import json
 from datetime import datetime
-from wire.utils.crypto import encrypt, decrypt
+from wire.utils.crypto import encrypt, decrypt, DecryptFailed
 from wire.utils.hasher import Hasher, HashMismatch
 
 class Message:
@@ -85,11 +85,13 @@ class Message:
         if key:
             self.key = key
         if not self.redis.exists('message:%s' % self.key):
-            raise MessageError()
+            raise MessageError("404, message %s not found." % self.key)
         m = self.redis.get('message:%s' % self.key)
         self.data = json.loads(m)
         self.thread = self.data['thread']
         self.sender = self.data['sender']
+        self.data['date_date'] = self.data['date'][:10]
+        self.data['date_time'] = self.data['date'][11:16]
 
         try: 
             self.data['encrypted']
@@ -102,14 +104,14 @@ class Message:
         try:
             h = Hasher()
             h.check(encryption_key, self.data['destruct_key'])
-            self.delete()
+            raise DestructKey()
         except (KeyError, HashMismatch):
             pass
         
         try:
             self.data['content'] = decrypt(encryption_key, self.data['content'])
         except TypeError:
-            print "WHY DOES THIS HAPPEN?"
+            pass
         self.decrypted = True
         self.encrypted = True
         
@@ -121,8 +123,8 @@ class Message:
 class ValidationError(Exception):
     pass
 
-class InvalidRecipients(Exception):
+class MessageError(Exception):
     pass
 
-class MessageError(Exception):
+class DestructKey(DecryptFailed):
     pass

@@ -47,3 +47,17 @@ nav li a {
 label {
     font-size: 15pt;
 }
+
+table.thread td {
+    font-family: monospace;
+    border: 0px;
+}
+
+table.thread tr:hover {
+    background-color: rgba(20,20,20,.5);
+}
+
+table.thread td.delmsg a {
+    font-weight: bold;
+    text-decoration: none;
+}

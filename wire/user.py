@@ -78,7 +78,7 @@ class User:
             raise ValidationError()
 
     def _test_unique_user(self):
-        if self.redis.exists("usernames:"+self.username):
+        if self.redis.exists("username:"+self.username):
             raise UserExists()
 
     def load(self, key):
