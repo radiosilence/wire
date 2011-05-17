@@ -69,6 +69,7 @@ table.thread tr.mine:hover, table.inbox tr:hover, table.contacts tr:hover {
 
 td.opts {
     white-space: nowrap;
+    text-align: right;
 }
 
 td.opts a {

@@ -100,7 +100,6 @@ def view_thread(thread_id):
         
         if t.decrypted:
             t.reset_unread_count()
-
         return render_template('thread.html',
             messages=t.messages,
             thread=t,
@@ -122,17 +121,11 @@ def send_message():
     m = Message(redis=g.r, key=False, user=g.user)
     if request.method == 'POST':
         try:
-            print "setting t subject"
             t.subject = request.form['subject']
-            print "updating message with request data"
             m.update(request.form)
-            print "parsing recipients"
             t.parse_recipients(request.form['recipients'])
-            print "saving"
             t.save()
-            print "adding message"
             t.add_message(m)
-            print "sending message"
             m.send()
             flash('Your message has been successfully wired, \
                     and should arrive shortly.', 'success')

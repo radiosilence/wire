@@ -9,7 +9,8 @@ class Contacts:
         self._update()
 
     def _update(self):
-        self.contacts = self.redis.lrange(self.key, 0, -1)
+        self.contacts = [c.decode("UTF-8") for c in self.redis.lrange(self.key, 0, -1)]
+
 
     def add(self, username):
         r = self.redis
@@ -27,8 +28,9 @@ class Contacts:
 
     def search(self, part):
         results = []
-        for contact in self.redis.lrange('list:usernames', 0, -1):
-            contact = unicode(contact, errors='replace')
+        users = self.redis.lrange('list:usernames', 0, -1)
+        part = part.encode("UTF-8")
+        for contact in users:
             if part in contact:
                 results.append(contact)
         return results

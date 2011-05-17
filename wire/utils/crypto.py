@@ -7,6 +7,7 @@ from base64 import b64encode, b64decode
 from hasher import Hasher
 
 def encrypt(key, data):
+    key, data = key.encode("UTF-8"), data.encode("UTF-8")
     ctr = Counter.new(128)
     key, salt = _derive_key(key)
     iv = get_random_bytes(16)
@@ -18,8 +19,8 @@ def encrypt(key, data):
     return b64encode(msg)
 
 def decrypt(key, data):
+    key, data = key.encode("UTF-8"), data.encode("UTF-8")
     ctr = Counter.new(128)
-    print data
     msg = b64decode(data)
     salt = msg[:32]
     msg = msg[32:]

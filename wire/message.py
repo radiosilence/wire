@@ -19,6 +19,7 @@ class Message:
         self.status = False
         self.encrypted = False
         self.decrypted = False
+        self.enc_data = {}
         if key:
             self.load()
 
@@ -32,25 +33,36 @@ class Message:
         self._validate()
         
         self.get_key()
-        
+
         data = {
             'sender': self.user.username,
             'date': self.date,
             'content': self.data['content'],
             'thread': self.thread,
+            'encrypted': self.enc_data['encrypted'],
         }
+        try:
+            data['destruct_key'] = self.enc_data['destruct_key']
+        except KeyError:
+            data['destruct_key'] = False
 
+        r.set('message:%s' % self.key, json.dumps(data))
+
+    def _try_encrypt(self):
         try:
             if len(self.data['encryption_key']) >= 6:
-                data['content'] = encrypt(self.data['encryption_key'], data['content'])
+                self.data['content'] = encrypt(self.data['encryption_key'], self.data['content'])
                 self.encrypted = True
-                data['encrypted'] = True
+                self.enc_data['encrypted'] = True
+            else:
+                self.enc_data['encrypted'] = False
+
             if len(self.data['destruct_key']) > 0 and data['encrypted']:
-                h = Hasher(2)
-                data['destruct_key'] = h.hash(self.data['destruct_key'])
+                h = Hasher(4)
+                self.enc_data['destruct_key'] = h.hash(self.data['destruct_key'])
+
         except KeyError:
             pass
-        r.set('message:%s' % self.key, json.dumps(data))
 
     def delete(self):
         r = self.redis
@@ -71,6 +83,7 @@ class Message:
                 self.data[field] = data[field]
             except KeyError:
                 pass
+        self._try_encrypt()
 
     def _validate(self):
         errors = []
@@ -105,15 +118,15 @@ class Message:
             self.encrypted = False
     
     def decrypt(self, encryption_key):
+        if self.data['destruct_key']:
+            try:
+                h = Hasher()
+                h.check(encryption_key, self.data['destruct_key'])
+                raise DestructKey()
+            except (KeyError, HashMismatch):
+                pass
         try:
-            h = Hasher()
-            h.check(encryption_key, self.data['destruct_key'])
-            raise DestructKey()
-        except (KeyError, HashMismatch):
-            pass
-        
-        try:
-            self.data['content'] = decrypt(encryption_key, self.data['content'])
+            self.data['content'] = decrypt(encryption_key, self.data['content']).decode("UTF-8")
         except TypeError:
             pass
         self.decrypted = True

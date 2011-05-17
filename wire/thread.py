@@ -81,9 +81,7 @@ class Thread:
 
     def save(self):
         r = self.redis
-        print repr(self.key)
         if not self.key:
-            print "AUTOINCING KEY"
             self.key = autoinc(self.redis, 'thread')
 
         data = {
@@ -143,22 +141,29 @@ class Thread:
             self.decrypted = False
         for message_key in message_keys:
             m = Message(redis=self.redis, user=self.user)
-            m.load(message_key)
+            try:
+                m.load(message_key)
+            except MessageError:
+                pass
             self.messages.append(m)
-
-
-        self.sender = self.messages[0].data['sender']
+        if len(self.messages) < 1:
+            self.delete()
+            raise DestroyedThreadError
+        try:
+            self.sender = self.messages[0].data['sender']
+        except KeyError:
+            self.delete_message(self.messages[0])
 
     def delete(self, recipient=False):
         r = self.redis
-        print "deleting thread", self.key
         if recipient:
             r.lrem('user:%s:threads' % recipient.key, self.key, 0)
         if self.recipients:
             for recipient_key in self.recipients:
-                print "deleting thread", self.key, "from ", recipient_key
                 r.lrem('user:%s:threads' % recipient_key, self.key, 0)
                 r.delete('user:%s:thread:%s:unreads' % (recipient_key, self.key))
+
+        [m.delete() for m in self.messages]
 
         r.delete('thread:%s:data' % self.key)
         r.delete('thread:%s:recipients' % self.key)
@@ -170,23 +175,22 @@ class Thread:
         r.lrem('user:%s:threads' % self.user.key, self.key, 0)
         self._update_recipients()
         if len(self.recipients) < 1:
-            print "deleting thread", self.key
             self.delete()
 
     def decrypt(self, encryption_key):
         for message in self.messages:
             try:
                 message.decrypt(encryption_key)
+                self.decrypted = True
             except DestructKey:
                 self.delete_message(message)
                 raise DestroyedThreadError()
-
-        self.decrypted = True
 
 class DestroyedThreadError(Exception):
     pass
 class ThreadError(Exception):
     pass
+
 class ValidationError(Exception):
     pass
 
