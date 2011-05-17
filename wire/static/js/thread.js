@@ -9,7 +9,7 @@ $(function() {
     $.getJSON('/async/address-book', function(data) {
         $("#addrecip").autocomplete(data, {
             multiple: true,
-            mustMatch: true,
+            mustMatch: false,
             autoFill: true
         });        
     });
