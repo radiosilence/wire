@@ -10,7 +10,7 @@ class Thread:
         self.redis = redis
         self.subject = subject
         self.recipients = []
-        self.recipient_names = ""
+        self.recipient_usernames = []
         self.user = user
         self.key = False
         self.encrypted = False
@@ -26,6 +26,13 @@ class Thread:
             count = 0
         self.unread_count = count
         return count
+    
+    def get_form_recipients(self):
+        result = []
+        for recipient in self.recipient_usernames:
+            if recipient != self.user.username:
+                result.append(recipient)
+        return result
 
     def reset_unread_count(self):
         self.redis.set('user:%s:thread:%s:unreads' % (self.user.key, self.key), 0)
@@ -50,14 +57,17 @@ class Thread:
                 user_key = self.redis.get('username:%s' % recipient)
                 if user_key not in self.recipients:
                     self.recipients.append(user_key)
+                
             elif len(recipient) > 0:
                 self.invalid_recipients.append(recipient)
-        if len(self.invalid_recipients) > 0:
-            raise InvalidRecipients()
         
         if self.user.key not in self.recipients:
             self.recipients.append(self.user.key)
-
+        self.recipient_usernames.extend(usernames)
+        
+        if len(self.invalid_recipients) > 0:
+            raise InvalidRecipients()
+        
     def _validate(self):
         errors = []
         if len(self.data['subject']) < 1:

@@ -3,7 +3,7 @@ $(function() {
         console.log(data);
         $("#recipients").autocomplete(data, {
             multiple: true,
-            mustMatch: true,
+            mustMatch: false,
             autoFill: true
         });        
     });

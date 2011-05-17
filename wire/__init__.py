@@ -109,16 +109,25 @@ def view_thread(thread_id):
     except ThreadError:
          abort(404)
 
+@app.route('/send/<string:recipient>')
+def send_message_recipient(recipient):
+    return send_message(recipient=recipient)
+
 @app.route('/send', methods=['POST', 'GET'])
-def send_message():
+def send_message(recipient=False):
     try:
         g.user.username
     except AttributeError:
         abort(401)
     
-    print "instantiating t and m"
     t = Thread(redis=g.r, user=g.user)
     m = Message(redis=g.r, key=False, user=g.user)
+    if(recipient):
+        try:
+            t.parse_recipients(recipient)
+        except InvalidRecipients:
+            pass
+
     if request.method == 'POST':
         try:
             t.subject = request.form['subject']
@@ -134,13 +143,13 @@ def send_message():
             for error in m.validation_errors:
                 flash(error, 'error')
         except InvalidRecipients:
-            print "Invalid recipients", t.invalid_recipients
             for recipient in t.invalid_recipients:
                 flash('%s is not a valid recipient' % recipient, 'error')
     return render_template('forms/message.html',
         new=True,
         message=m,
-        thread=t)
+        thread=t,
+        recipients=t.get_form_recipients())
 
 @app.route('/delete-message/<int:message_id>/<int:thread_id>', methods=['POST', 'GET'])
 def delete_message(message_id, thread_id):
@@ -163,6 +172,10 @@ def delete_message(message_id, thread_id):
 
 @app.route('/unsubscribe-thread/<int:thread_id>', methods=['POST', 'GET'])
 def unsubscribe_thread(thread_id):
+    try:
+        g.user.username
+    except AttributeError:
+        abort(401)
     if request.method == "POST":
         t = Thread(redis=g.r, user=g.user)
         t.load(thread_id)
@@ -178,6 +191,12 @@ def unsubscribe_thread(thread_id):
 
 @app.route('/delete-thread/<int:thread_id>', methods=['POST', 'GET'])
 def del_thread(thread_id):
+    try:
+        g.user.username
+        if str(thread_id) not in g.user.get_threads():
+            abort(401)
+    except AttributeError:
+        abort(401)
     if request.method == "POST":
         t = Thread(redis=g.r, user=g.user)
         t.load(thread_id)
@@ -193,13 +212,18 @@ def del_thread(thread_id):
 
 @app.route('/add-recipient/<int:thread_id>', methods=['POST', 'GET'])
 def add_recipient(thread_id):
+    try:
+        g.user.username
+        if str(thread_id) not in g.user.get_threads():
+            abort(401)
+    except AttributeError:
+        abort(401)
     username = request.form['username']
     if request.form['confirm'] == '1':
         try:
             t = Thread(redis=g.r, user=g.user)
             t.load(thread_id)
             t.parse_recipients(username)
-            print t.recipients
             t.save()
             flash('Added recipient.', 'success')
         except InvalidRecipients:
@@ -215,6 +239,10 @@ def add_recipient(thread_id):
         
 @app.route('/address-book')
 def contacts(async=False):
+    try:
+        g.user.username
+    except AttributeError:
+        abort(401)
     c = Contacts(redis=g.r, user=g.user)
     if async:
         return json.dumps(c.contacts)
@@ -228,6 +256,10 @@ def async_contacts():
 
 @app.route('/add-contact/<string:contact>')
 def add_contact(contact):
+    try:
+        g.user.username
+    except AttributeError:
+        abort(401)
     try:
         c = Contacts(redis=g.r, user=g.user)
         c.add(contact)
@@ -247,11 +279,19 @@ def add_contact_post():
 
 @app.route('/async/contact/search/<string:part>')
 def async_contact_search(part):
+    try:
+        g.user.username
+    except AttributeError:
+        abort(401)
     c = Contacts(redis=g.r, user=g.user)
     return json.dumps(c.search(part))
 
 @app.route('/delete-contact/<string:contact>')
 def del_contact(contact):
+    try:
+        g.user.username
+    except AttributeError:
+        abort(401)
     c = Contacts(redis=g.r, user=g.user)
     c.delete(contact)
     flash('Deleted contact "%s".' % contact, 'success')

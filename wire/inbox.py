@@ -14,7 +14,6 @@ class Inbox:
                 self.threads.append(t)
             except ThreadError:
                 t.delete(recipient=self.user)
-                print "FAILED TO LOAD THREAD", thread_key, "DELETING"
     def unread_count(self, thread=False):
         r = self.redis
         count = 0
