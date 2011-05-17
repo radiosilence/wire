@@ -60,11 +60,15 @@ table td {
     border: 0px;
 }
 
+table td p {
+    margin-bottom: 0px;
+}
+
 table th {
     border-bottom: 1px solid rgba(20,20,20,.8);
 }
 table.thread tr.mine:hover, table.inbox tr:hover, table.contacts tr:hover {
-    background-color: rgba(20,20,20,.5);
+    background-color: rgba(20,20,20,.2);
 }
 
 td.opts {
@@ -72,12 +76,12 @@ td.opts {
     text-align: right;
 }
 
-td.opts a {
+.opts a {
     font-weight: bold;
     text-decoration: none;
     padding-left: 2px;
 }
-td.opts a:hover {
+.opts a:hover {
     text-decoration: underline;
 }
 
@@ -113,4 +117,36 @@ form.add_recp {
 }
 
 .username {
+}
+
+article.message {
+    border-top: 2px solid rgba(20,20,20,.5);
+}
+
+article.message .avatar {
+    float: left;
+    padding-right: 10px;
+}
+
+article.message header .opts a {
+    float: right;
+    font-size: 10pt;
+    font-family: monospace;
+}
+article.mine:hover {
+    background-color: rgba(20,20,20,.2);
+}
+
+article.message header {
+    font-size: 10pt;
+}
+
+article.message header a {
+    font-size: 12pt;
+    font-weight: bold;
+}
+article.message div.message {
+    padding-top: 0.5em;
+    display: block;
+    overflow: hidden;
 }

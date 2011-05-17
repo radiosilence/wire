@@ -12,6 +12,9 @@ class User:
         self.data = {}
         self.threads = []
 
+    def load_by_username(self, username):
+        self.load(self.redis.get('username:%s' % username))
+
     def update(self, data, new=False):  
         fields = [
             'username',

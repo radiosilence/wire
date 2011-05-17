@@ -8,7 +8,7 @@ from wire.thread import Thread, DestroyedThreadError, ThreadError, InvalidRecipi
 from wire.contacts import Contacts, ContactExistsError, ContactInvalidError
 from wire.utils.auth import Auth, AuthError, DeniedError
 from wire.utils.crypto import DecryptFailed
-
+from flaskext.markdown import Markdown
 import json
 import redis
 import os
@@ -19,7 +19,7 @@ SECRET_KEY = 'DEV KEYMO'
 app = Flask(__name__)
 app.config.from_object(__name__)
 app.config.from_envvar('FLASKR_SETTINGS', silent=True)
-
+Markdown(app)
 #csrf(app)
 
 redis_connection = redis.Redis(host="localhost", port=6379, db=0)
@@ -158,7 +158,7 @@ def delete_message(message_id, thread_id):
         t.load(thread_id)
         m = Message(redis=g.r, user=g.user, key=message_id)
         m.load()
-        if g.r.get('username:%s' % m.sender) != g.user.key:
+        if g.r.get('username:%s' % m.sender.username) != g.user.key:
             abort(401)
         t.delete_message(m)
         flash(u'Message deleted', 'success')

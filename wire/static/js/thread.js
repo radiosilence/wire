@@ -1,9 +1,9 @@
 $(function() {
-    $('table.thread td.opts a').hide();
-    $('table.thread tr').hover(function() {
-        $('.opts a', this).show();
+    $('article.message header .opts a').hide();
+    $('article.message').hover(function() {
+        $('header .opts a', this).show();
     }, function() {
-        $('.opts a', this).hide();
+        $('header .opts a', this).hide();
     })
 
     $.getJSON('/async/address-book', function(data) {

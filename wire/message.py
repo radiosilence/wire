@@ -4,6 +4,7 @@ import json
 from datetime import datetime
 from wire.utils.crypto import encrypt, decrypt, DecryptFailed
 from wire.utils.hasher import Hasher, HashMismatch
+from wire.user import User
 
 class Message:
     def __init__(self, redis, key=False, user=False):
@@ -54,15 +55,14 @@ class Message:
                 self.data['content'] = encrypt(self.data['encryption_key'], self.data['content'])
                 self.encrypted = True
                 self.enc_data['encrypted'] = True
-            else:
-                self.enc_data['encrypted'] = False
-
+            else: 
+                raise KeyError()
             if len(self.data['destruct_key']) > 0 and data['encrypted']:
                 h = Hasher(4)
                 self.enc_data['destruct_key'] = h.hash(self.data['destruct_key'])
 
         except KeyError:
-            pass
+            self.enc_data['encrypted'] = False
 
     def delete(self):
         r = self.redis
@@ -106,7 +106,9 @@ class Message:
         m = self.redis.get('message:%s' % self.key)
         self.data = json.loads(m)
         self.thread = self.data['thread']
-        self.sender = self.data['sender']
+        sender = User(redis=self.redis)
+        sender.load_by_username(self.data['sender'])
+        self.sender = sender
         self.data['date_date'] = self.data['date'][:10]
         self.data['date_time'] = self.data['date'][11:16]
 
