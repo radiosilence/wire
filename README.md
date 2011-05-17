@@ -10,7 +10,7 @@ A solution to government-comprimised messaging services, by providing a simple b
 
 * Python
 * Some sort of WSGI server (meinheld, gunicorn, gevent, etc)
-* My hashing extension ([https://github.com/radiosilence/python-whirlpool]
+* My hashing extension (https://github.com/radiosilence/python-whirlpool)
 * Redis
 
 ### Instructions
