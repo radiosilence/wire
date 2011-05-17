@@ -10,6 +10,9 @@ from wire.utils.crypto import DecryptFailed
 
 import redis
 import os
+
+from flaskext.csrf import csrf
+
 # configuration
 DEBUG = True
 SECRET_KEY = 'DEV KEYMO'
@@ -17,9 +20,13 @@ SECRET_KEY = 'DEV KEYMO'
 app = Flask(__name__)
 app.config.from_object(__name__)
 app.config.from_envvar('FLASKR_SETTINGS', silent=True)
+
+#csrf(app)
+
 redis_connection = redis.Redis(host="localhost", port=6379, db=0)
 @app.before_request
 def before_request():
+
     g.r = redis_connection
     g.auth = Auth(g.r)
     g.user = User(redis=g.r)
@@ -154,7 +161,7 @@ def delete_message(message_id, thread_id):
 
 @app.route('/events')
 def list_events():
-    return "events list"
+    return render_template('events.html')
 
 @app.route('/event/<int:event_id>')
 def view_event(event_id):
@@ -162,11 +169,11 @@ def view_event(event_id):
 
 @app.route('/create-event')
 def new_event():
-    return "creatin event"
+    return render_template('forms/event.html')
 
 @app.route('/blog')
 def blog_entries():
-    return "blog entries"
+    return render_template('blog.html')
 
 @app.route('/blog/<int:entry_id>')
 def view_blog_entry(entry_id):

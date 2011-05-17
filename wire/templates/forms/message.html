@@ -7,8 +7,9 @@
 
 {{ flashes() }}
 <form id="msg-form" method="POST" action="send">
+<input type="hidden" value="">
 <input type="hidden" name="reponse" value="{ response }"/>
-<p><label for="recipients">Recipient(s)</label><br/><input id="recipients" type="text" name="recipients" value="{{ request.form['recipients'] }}"/></p>
+<p><label for="recipients">Recipient(s)</label><br/>Send to multiple recipients by separating their usernames with a comma (User1, User2, etc)<br/><input id="recipients" type="text" name="recipients" value="{{ request.form['recipients'] }}"/></p>
 <p><label for="subject">Subject</label><br/><strong>NOTE:</strong> Message subjects are <strong>not</strong> encrypted. Do not put revealing information in message subjects.<br/><input id="subject" type="text" name="subject" value="{{ request.form['subject'] }}"/></p>
 <p><label for="msg-content">Message</label><br/><textarea id="msg-content" name="content" style="width: 95%; height: 200px">{{ message.data['content'] }}</textarea></p>
 </article>
@@ -18,8 +19,8 @@
 <p><input type="checkbox" name="self_destruct" id="self-destruct"/> <label for="self-destruct">Self Destruct</label><br/>This means that the message will be destroyed when it is opened.</p>
 <p><label for="crypto-key">Crypto Key</label><br/>If you choose to encrypt your message, a key must be decided in person and memorised by the sender and reciever.<br/><input type="text" name="encryption_key" id="crypto-key" /></p>
 <p><label for="destruct-key">Destruct Key</label><br/>The destruct key, when used to attempt to decrypt the message, will destroy it. This is for situations where there is an attempt to forcibly identify a key by means of coercion.<br/><input type="text" name="destruct_key" id="destruct-key"></p>
-<p><input type="checkbox" name="destruct_cascade" id="destruct-cascade"/> <label for="destruct-cascade">Destruct Cascade</label><br/>(Use with caution). If a message is destroyed by a destruct key, this option will destroy all sent and recieved messages to this recipient. This is a last resort.</p>
+<p style="text-align: center"><button style="font-size:24pt !important; font-weight: bold !important">Send</button></p>
+
 </article>
-<p><button>Send</button></p>
 </form>
 {% endblock %}
