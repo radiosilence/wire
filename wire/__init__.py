@@ -10,9 +10,6 @@ from wire.utils.crypto import DecryptFailed
 
 import redis
 import os
-
-from flaskext.csrf import csrf
-
 # configuration
 DEBUG = True
 SECRET_KEY = 'DEV KEYMO'
