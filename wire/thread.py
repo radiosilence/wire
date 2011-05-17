@@ -50,7 +50,7 @@ class Thread:
                 user_key = self.redis.get('username:%s' % recipient)
                 if user_key not in self.recipients:
                     self.recipients.append(user_key)
-            else:
+            elif len(recipient) > 0:
                 self.invalid_recipients.append(recipient)
         if len(self.invalid_recipients) > 0:
             raise InvalidRecipients()

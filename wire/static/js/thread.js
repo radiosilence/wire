@@ -5,4 +5,12 @@ $(function() {
     }, function() {
         $('.opts a', this).hide();
     })
+
+    $.getJSON('/async/address-book', function(data) {
+        $("#addrecip").autocomplete(data, {
+            multiple: true,
+            mustMatch: true,
+            autoFill: true
+        });        
+    });
 });

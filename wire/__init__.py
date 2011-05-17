@@ -214,11 +214,17 @@ def add_recipient(thread_id):
         )
         
 @app.route('/address-book')
-def contacts():
+def contacts(async=False):
     c = Contacts(redis=g.r, user=g.user)
-    return render_template('contacts.html',
-        contacts=c.contacts
-    )
+    if async:
+        return json.dumps(c.contacts)
+    else:
+        return render_template('contacts.html',
+            contacts=c.contacts
+        )
+@app.route('/async/address-book')
+def async_contacts():
+    return contacts(async=True)
 
 @app.route('/add-contact/<string:contact>')
 def add_contact(contact):
@@ -237,7 +243,7 @@ def add_contact(contact):
 @app.route('/add-contact', methods=['POST'])
 def add_contact_post():
     contact = request.form['username']
-    add_contact(contact)
+    return add_contact(contact)
 
 @app.route('/async/contact/search/<string:part>')
 def async_contact_search(part):

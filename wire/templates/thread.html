@@ -12,7 +12,7 @@
   {% for username in thread.recipient_usernames %}
     <a href="{{ url_for('add_contact', contact=username) }}">{{ username }}</a>,
   {% endfor %}
-  &nbsp;<input type="text" name="username"/><input type="submit" value="Add"/></span></form></p>
+  &nbsp;<input type="text" name="username" id="addrecip"/><input type="submit" value="Add"/></span></form></p>
   <table class="thread">
   {% for message in messages %}
     <tr
