@@ -47,31 +47,44 @@ nav li a {
     margin-top: 10px;
     font-size: 22pt;
 }
+
 label {
     font-size: 15pt;
 }
 
-table.thread, table.inbox {
+table{
     width: 100%;
 }
-table.thread td, table.inbox td {
+table td {
     font-family: monospace;
     border: 0px;
 }
 
-table.inbox th {
-    border-bottom: 2px solid rgba(20,20,20,.8);
+table th {
+    border-bottom: 1px solid rgba(20,20,20,.8);
 }
-table.thread tr.mine:hover, table.inbox tr:hover {
+table.thread tr.mine:hover, table.inbox tr:hover, table.contacts tr:hover {
     background-color: rgba(20,20,20,.5);
 }
 
-table.thread td.delmsg a, table.inbox td.delthread a {
-    font-weight: bold;
-    text-decoration: none;
+td.opts {
+    white-space: nowrap;
 }
 
-table.inbox tr.unread td {
+td.opts a {
+    font-weight: bold;
+    text-decoration: none;
+    padding-left: 2px;
+}
+td.opts a:hover {
+    text-decoration: underline;
+}
+
+td.delmesg, td.delthread, td.delcontact {
+    text-align: right;
+}
+
+tr.unread td {
     background-color: rgba(20,20,20,.5);
     font-weight: bold;
 }
@@ -82,4 +95,21 @@ table.inbox tr.unread td {
 
 .logo {
     font-family: WCROUGHTRAD, sans-serif;
+}
+
+form.add_recp input, form.add_contact input {
+    font-size: 10pt;
+    padding: 2px 2px;
+}
+
+form.add_recp:before {
+    font-size: 8pt;
+    content: "Between: ";
+}
+
+form.add_recp {
+    font-size: 10pt;
+}
+
+.username {
 }

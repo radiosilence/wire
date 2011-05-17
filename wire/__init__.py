@@ -5,9 +5,11 @@ from wire.user import User
 from wire.message import Message, MessageError
 from wire.inbox import Inbox
 from wire.thread import Thread, DestroyedThreadError, ThreadError, InvalidRecipients
+from wire.contacts import Contacts, ContactExistsError, ContactInvalidError
 from wire.utils.auth import Auth, AuthError, DeniedError
 from wire.utils.crypto import DecryptFailed
 
+import json
 import redis
 import os
 # configuration
@@ -78,18 +80,21 @@ def view_thread(thread_id):
             if request.form['action'] == 'reply':
                 m = Message(redis=g.r, key=False, user=g.user)
                 m.update(request.form)
-                m.send()
                 t.save()
                 t.add_message(m)
+                m.send()
                 t.load(thread_id)
             try:
                 encryption_key = request.form['encryption_key']
                 t.decrypt(encryption_key)
                 flash('Thread successfully decrypted.', 'success')
                 decrypted = True
-            except (DecryptFailed, DestroyedThreadError):
+            except DecryptFailed:
                 flash('Decryption was unsuccessful.', 'error')
                 return redirect(url_for('view_thread', thread_id=thread_id))
+            except DestroyedThreadError:
+                flash('System error. Message lost.', 'error')
+                return redirect(url_for('inbox'))
             except KeyError:
                 pass
         
@@ -112,16 +117,23 @@ def send_message():
     except AttributeError:
         abort(401)
     
+    print "instantiating t and m"
     t = Thread(redis=g.r, user=g.user)
     m = Message(redis=g.r, key=False, user=g.user)
     if request.method == 'POST':
         try:
+            print "setting t subject"
             t.subject = request.form['subject']
+            print "updating message with request data"
             m.update(request.form)
+            print "parsing recipients"
             t.parse_recipients(request.form['recipients'])
-            m.send()
+            print "saving"
             t.save()
+            print "adding message"
             t.add_message(m)
+            print "sending message"
+            m.send()
             flash('Your message has been successfully wired, \
                     and should arrive shortly.', 'success')
             return redirect(url_for('view_thread', thread_id=t.key))
@@ -156,6 +168,96 @@ def delete_message(message_id, thread_id):
             _cancel=url_for('view_thread', thread_id=thread_id)
         )
 
+@app.route('/unsubscribe-thread/<int:thread_id>', methods=['POST', 'GET'])
+def unsubscribe_thread(thread_id):
+    if request.method == "POST":
+        t = Thread(redis=g.r, user=g.user)
+        t.load(thread_id)
+        t.unsubscribe()
+        flash(u'Unsubscribed from thread.', 'success')
+        return redirect(url_for('inbox'))
+    else:
+        return render_template('confirm.html',
+            _message='Are you sure you wish to unsubscribe from this thread?',
+            _ok=url_for('unsubscribe_thread', thread_id=thread_id),
+            _cancel=url_for('inbox')
+        )
+
+@app.route('/delete-thread/<int:thread_id>', methods=['POST', 'GET'])
+def del_thread(thread_id):
+    if request.method == "POST":
+        t = Thread(redis=g.r, user=g.user)
+        t.load(thread_id)
+        t.delete()
+        flash(u'Deleted thread.', 'success')
+        return redirect(url_for('inbox'))
+    else:
+        return render_template('confirm.html',
+            _message='Are you sure you wish to DELETE this thread?',
+            _ok=url_for('del_thread', thread_id=thread_id),
+            _cancel=url_for('inbox')
+        )
+
+@app.route('/add-recipient/<int:thread_id>', methods=['POST', 'GET'])
+def add_recipient(thread_id):
+    username = request.form['username']
+    if request.form['confirm'] == '1':
+        try:
+            t = Thread(redis=g.r, user=g.user)
+            t.load(thread_id)
+            t.parse_recipients(username)
+            print t.recipients
+            t.save()
+            flash('Added recipient.', 'success')
+        except InvalidRecipients:
+            flash(u'Invalid recipient.', 'error')
+        return redirect(url_for('view_thread', thread_id=thread_id))
+    else:
+        return render_template('confirm.html',
+            _message='Are you sure you wish to add recipient %s to this thread?' % username,
+            _ok=url_for('add_recipient', thread_id=thread_id),
+            _cancel=url_for('view_thread', thread_id=thread_id),
+            _hiddens=[('username', username)]
+        )
+        
+@app.route('/address-book')
+def contacts():
+    c = Contacts(redis=g.r, user=g.user)
+    return render_template('contacts.html',
+        contacts=c.contacts
+    )
+
+@app.route('/add-contact/<string:contact>')
+def add_contact(contact):
+    try:
+        c = Contacts(redis=g.r, user=g.user)
+        c.add(contact)
+        flash('Added user "%s" to address book.' % contact, 'success')
+    except KeyError:
+        flash('No user specified.', 'error')
+    except ContactInvalidError:
+        flash('User "%s" does not exist.' % contact, 'error')
+    except ContactExistsError:
+        flash('User "%s" is already in your address book.' % contact, 'error')
+    return redirect(url_for('contacts'))
+
+@app.route('/add-contact', methods=['POST'])
+def add_contact_post():
+    contact = request.form['username']
+    add_contact(contact)
+
+@app.route('/async/contact/search/<string:part>')
+def async_contact_search(part):
+    c = Contacts(redis=g.r, user=g.user)
+    return json.dumps(c.search(part))
+
+@app.route('/delete-contact/<string:contact>')
+def del_contact(contact):
+    c = Contacts(redis=g.r, user=g.user)
+    c.delete(contact)
+    flash('Deleted contact "%s".' % contact, 'success')
+    return redirect(url_for('contacts'))
+
 @app.route('/events')
 def list_events():
     return render_template('events.html')
@@ -182,10 +284,11 @@ def new_user():
 
 @app.route('/edit-profile', methods=['POST', 'GET'])
 def edit_user(new=False):
-    try:
-        g.user.username
-    except AttributeError:
-        abort(401)
+    if not new:
+        try:
+            g.user.username
+        except AttributeError:
+            abort(401)
     
     if new:
         u = user.User(redis=g.r, key=False)
@@ -196,11 +299,9 @@ def edit_user(new=False):
         try:
             u.save()
             if new:
-                return render_template('status.html',
-                    _status="User Created",
-                    _message="""User %s created successfully.
-                        You may now log in.""" % u.username
-                )
+                flash('"User "%s" created successfully. \
+                    You may now log in.' % u.username, 'success')
+                return redirect(url_for('intro'))
         except user.ValidationError:
             for error in u.validation_errors:
                 flash(error, 'error')
@@ -225,13 +326,12 @@ def login():
 
 @app.route('/logout', methods=['POST', 'GET'])
 def logout():
-    session.pop('logged_in')
     try:
-        return render_template('status.html',
-            _status='Logged out',
-            _message='Goodbye, %s.' % g.user.username)
-    except AttributeError:
-        return "Logged out."
+        session.pop('logged_in')
+        flash('Logged out.', 'success')
+    except KeyError:
+        pass
+    return redirect(url_for('intro'))   
 
 if __name__ == '__main__':
     app.run()

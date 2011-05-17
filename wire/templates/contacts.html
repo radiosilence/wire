@@ -1,0 +1,33 @@
+{% extends 'main.html' %}
+{% block javascript %}
+<script src="{{ url_for('static', filename='js/contacts.js') }}" type="text/javascript"></script>
+{% endblock %}
+{% block content %}
+<h1>Address Book</h1>
+{{ flashes() }}
+<p>This will be used to auto-complete when sending messages.</p>
+ <table class="contacts">
+  <tr>
+   <form class="add_contact" action="{{ url_for('add_contact_post') }}" method="POST">
+   <td>
+    <input type="text" name="username" placeholder="Ex. mrcheese"/>
+   </td>
+   <td>
+    <input type="submit" value="Add Contact"/>
+   </td>
+   </form>
+  </tr>
+{% if contacts %}
+  {% for contact in contacts %}
+  <tr>
+   <td style="width: 100%">
+   {{ contact }}
+   </td>
+   <td class="opts">
+    <a href="{{ url_for('del_contact', contact=contact) }}">x</a>
+   </td>
+  </tr>
+  {% endfor %}
+ {% endif %}
+</table>
+{% endblock %}

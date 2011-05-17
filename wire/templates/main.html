@@ -1,6 +1,4 @@
-{% macro error(message) %}
-{% endmacro %}
-{% macro flashes() %}
+{%- macro flashes() %}
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
       {% for category, message in messages %}
@@ -12,14 +10,12 @@
       {% endfor %}
     {% endif %}
   {% endwith %}
-{% endmacro %}
-
-{%- if self.title() != "" %}
-  {% set ndash = ' \u2013 ' %}
-{% else %}
+{% endmacro -%}
+{%- if self.title() != "" -%}
+  {% set ndash = ' \u2013 ' -%}
+{%- else -%}
   {% set ndash = '' %}
-{% endif -%}
-<!DOCTYPE html>
+{%- endif -%}<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8" />
@@ -66,11 +62,12 @@
          <li><a href="{{ url_for('inbox') }}"
           {%- if g.unread_count > 0 %} class="inbox_unread"
           {%- endif %}>Inbox ({{ g.unread_count }})</a></li>
+         <li><a href="{{ url_for('contacts') }}">Address Book</a></li>
          <li><a href="{{ url_for('edit_user') }}">Edit Profile</a></li>
         </ul></p>
         <p><button id="logout_submit">Log Out</button></p>
         </form>
-      {% else %}
+      {% elif not hide_login %}
         <h1>Login</h1>
           {{ flashes() }}
           <form method="POST" action="{{ url_for('login') }}">

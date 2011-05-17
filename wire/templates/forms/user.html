@@ -1,4 +1,5 @@
-{% extends "main.html" %}
+{%- set hide_login=True -%}
+{%- extends "main.html" -%}
 {% block title %}{% if new %}Sign Up{% else %}User Details{% endif %}{% endblock %}
 {% block javascript %}
   <script src="{{ url_for('static', filename='js/user_form.js') }}" type="text/javascript"></script>

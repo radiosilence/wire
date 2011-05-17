@@ -7,6 +7,12 @@
 {% if decrypted %}
   <h1><a href="{{ url_for('view_thread', thread_id=thread.key) }}">{{ subject }}</a></h1>
   {{ flashes() }}
+  <p><form class="add_recp" method="POST" action="{{ url_for('add_recipient', thread_id=thread.key) }}">
+  <input type="hidden" name="confirm" value="0"/><span class="recp_list">
+  {% for username in thread.recipient_usernames %}
+    <a href="{{ url_for('add_contact', contact=username) }}">{{ username }}</a>,
+  {% endfor %}
+  &nbsp;<input type="text" name="username"/><input type="submit" value="Add"/></span></form></p>
   <table class="thread">
   {% for message in messages %}
     <tr
@@ -30,7 +36,7 @@
       <td style="width:100%">
         {{ message.data['content'] }}
       </td>
-      <td class="delmsg" style="width: 20px">
+      <td class="opts" style="width: 20px">
       {% if g.user.username == message.data['sender'] %}
         <a href="{{ url_for('delete_message', thread_id=thread.key, message_id=message.key) }}">x</a>
       {% endif %}

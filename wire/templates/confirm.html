@@ -2,6 +2,12 @@
 {% block content %}
 <h1>Confirm</h1>
 <form action="{{ _ok }}" method="POST">
+<input type="hidden" name="confirm" value="1" />
+{% if _hiddens %}
+    {% for hidden in _hiddens %}
+        <input type="hidden" name="{{ hidden[0] }}" value="{{ hidden[1] }}"/>
+    {% endfor %}
+{% endif %}
 <p>{{ _message }}</p>
 <p><input type="submit" value="Ok"/>
 <a class="button" href="{{ _cancel }}">Cancel</a></p>
