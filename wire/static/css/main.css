@@ -38,7 +38,10 @@ h1 {
 nav li a {
     font-size: 18pt !important;
 }
-#userbox {
+#userbox li {
+    margin-bottom: 0.4em;
+}
+#userbox li a {
 }
 #userbox h1 {
     margin-top: 10px;
@@ -48,16 +51,35 @@ label {
     font-size: 15pt;
 }
 
-table.thread td {
+table.thread, table.inbox {
+    width: 100%;
+}
+table.thread td, table.inbox td {
     font-family: monospace;
     border: 0px;
 }
 
-table.thread tr:hover {
+table.inbox th {
+    border-bottom: 2px solid rgba(20,20,20,.8);
+}
+table.thread tr.mine:hover, table.inbox tr:hover {
     background-color: rgba(20,20,20,.5);
 }
 
-table.thread td.delmsg a {
+table.thread td.delmsg a, table.inbox td.delthread a {
     font-weight: bold;
     text-decoration: none;
+}
+
+table.inbox tr.unread td {
+    background-color: rgba(20,20,20,.5);
+    font-weight: bold;
+}
+
+.inbox_unread {
+    font-weight: bold;
+}
+
+.logo {
+    font-family: WCROUGHTRAD, sans-serif;
 }

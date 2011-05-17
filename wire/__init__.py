@@ -5,7 +5,7 @@ from wire.user import User
 from wire.message import Message, MessageError
 from wire.inbox import Inbox
 from wire.thread import Thread, DestroyedThreadError, ThreadError, InvalidRecipients
-from wire.utils.auth import Auth, AuthError
+from wire.utils.auth import Auth, AuthError, DeniedError
 from wire.utils.crypto import DecryptFailed
 
 import redis
@@ -23,11 +23,16 @@ def before_request():
     g.r = redis_connection
     g.auth = Auth(g.r)
     g.user = User(redis=g.r)
+
     try:
         if session['logged_in']:
             g.user.load(session['logged_in'])
+            g.inbox = Inbox(user=g.user, redis=g.r)
+            g.unread_count = g.inbox.unread_count()
+    
     except KeyError:
         pass
+    
 
 @app.after_request
 def after_request(response):
@@ -39,10 +44,14 @@ def after_request(response):
 def intro():
     return render_template('intro.html')
 
+@app.route('/developers')
+def developers():
+    return render_template('developers.html')
+
 @app.route('/inbox')
 def inbox():
-    i = Inbox(user=g.user, redis=g.r)
-    i.load()
+    i = g.inbox
+    i.load_messages()
     if len(i.threads) == 0:
         empty = True
     else:
@@ -55,6 +64,9 @@ def inbox():
 def view_thread(thread_id):
     encryption_key = False
     decrypted = False
+    if str(thread_id) not in g.user.get_threads():
+        abort(401)
+
     t = Thread(redis=g.r, user=g.user)
     try:
         t.load(thread_id)
@@ -69,13 +81,16 @@ def view_thread(thread_id):
             try:
                 encryption_key = request.form['encryption_key']
                 t.decrypt(encryption_key)
-                flash('Decryption successful.', 'success')
+                flash('Thread successfully decrypted.', 'success')
                 decrypted = True
             except (DecryptFailed, DestroyedThreadError):
                 flash('Decryption was unsuccessful.', 'error')
                 return redirect(url_for('view_thread', thread_id=thread_id))
             except KeyError:
                 pass
+        
+        if t.decrypted:
+            t.reset_unread_count()
 
         return render_template('thread.html',
             messages=t.messages,
@@ -88,7 +103,11 @@ def view_thread(thread_id):
 
 @app.route('/send', methods=['POST', 'GET'])
 def send_message():
-    errors = []
+    try:
+        g.user.username
+    except AttributeError:
+        abort(401)
+    
     t = Thread(redis=g.r, user=g.user)
     m = Message(redis=g.r, key=False, user=g.user)
     if request.method == 'POST':
@@ -112,13 +131,26 @@ def send_message():
     return render_template('forms/message.html',
         new=True,
         message=m,
-        thread=t,
-        _errors=errors)
+        thread=t)
 
-@app.route('/delete-message/<int:message_id>/<int:thread_id>')
+@app.route('/delete-message/<int:message_id>/<int:thread_id>', methods=['POST', 'GET'])
 def delete_message(message_id, thread_id):
-    flash(u'Message deleted', 'success')
-    return redirect(url_for('view_thread', thread_id=thread_id))        
+    if request.method == 'POST':
+        t = Thread(redis=g.r, user=g.user)
+        t.load(thread_id)
+        m = Message(redis=g.r, user=g.user, key=message_id)
+        m.load()
+        if g.r.get('username:%s' % m.sender) != g.user.key:
+            abort(401)
+        t.delete_message(m)
+        flash(u'Message deleted', 'success')
+        return redirect(url_for('view_thread', thread_id=thread_id))
+    else:
+        return render_template('confirm.html',
+            _message='Are you sure you want to delete this message?',
+            _ok=url_for('delete_message', thread_id=thread_id, message_id=message_id),
+            _cancel=url_for('view_thread', thread_id=thread_id)
+        )
 
 @app.route('/events')
 def list_events():
@@ -146,7 +178,11 @@ def new_user():
 
 @app.route('/edit-profile', methods=['POST', 'GET'])
 def edit_user(new=False):
-    errors = []
+    try:
+        g.user.username
+    except AttributeError:
+        abort(401)
+    
     if new:
         u = user.User(redis=g.r, key=False)
     else:
@@ -167,8 +203,7 @@ def edit_user(new=False):
 
     return render_template('forms/user.html',
         new=new,
-        user=u,
-        _errors=errors
+        user=u
     )
 
 
@@ -179,12 +214,10 @@ def login():
         session['logged_in'] = g.auth.user.key
         g.user.load(g.auth.user.key)
     except (KeyError, AuthError):
-        return render_template('status.html',
-            _status='Fail',
-            _message='Incorrect username or password.')
-    return render_template('status.html',
-        _status='Success',
-        _message='Logged in as %s.' % request.form['username'])
+        flash('Incorrect username or password.', 'error')
+        return redirect(url_for('intro'))
+    flash('Successfully logged in.', 'success')
+    return redirect(url_for('inbox'))
 
 @app.route('/logout', methods=['POST', 'GET'])
 def logout():

@@ -2,10 +2,28 @@
 {% block content %}
 <article>
 <h1>Inbox</h1>
+{{ flashes() }}
 {% if not empty %}
-    <table>
+    <table class="inbox">
+    <th style="padding: 0px;"></th>
+    <th>Sender</th>
+    <th style="padding: 0px;"></th>
+    <th>Subject</th>
     {% for thread in threads %}
-    <td>{{ thread.sender }}</td><td><a href="{{ url_for('view_thread', thread_id=thread.key) }}">{{ thread.subject }}</a></td>
+    <tr
+    {%- if thread.unread_count > 0 %} class="unread"
+    {%- endif -%}>
+    <td style="width:10px; padding-right: 0px">{%- if thread.unread_count > 0 %}>
+    {%- endif -%}</td>
+    <td>{{ thread.sender }}</td>
+    <td style="width:10px; padding-right: 0px">
+    {% if thread.encrypted %}
+     <img src="{{ url_for('static', filename='img/lock.png') }}" />
+    {% endif %}
+    </td>
+    <td style="width:100%">
+    <a href="{{ url_for('view_thread', thread_id=thread.key) }}">
+    {{ thread.subject }}</a></td>
     </tr>
     {% endfor %}
     </table>

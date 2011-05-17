@@ -1,0 +1,8 @@
+{% extends 'main.html' %}
+{% block content %}
+<h1>Confirm</h1>
+<form action="{{ _ok }}" method="POST">
+<p>{{ _message }}</p>
+<p><input type="submit" value="Ok"/>
+<a class="button" href="{{ _cancel }}">Cancel</a></p>
+{% endblock %}

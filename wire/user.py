@@ -10,6 +10,7 @@ class User:
         self.redis = redis
         self.key = key
         self.data = {}
+        self.threads = []
 
     def update(self, data, new=False):  
         fields = [
@@ -30,6 +31,11 @@ class User:
                 self.username = data['username']
             except KeyError:
                 self.username = ""
+
+    def get_threads(self):
+        threads = self.redis.lrange('user:%s:threads' % self.key, 0, -1)
+        self.threads = threads
+        return threads
 
     def save(self):
         self._validate()

@@ -12,15 +12,25 @@ class Thread:
         self.key = False
         self.encrypted = False
         self.decrypted = True
+        self.unread_count = 0
 
     def get_unread_count(self, key=False):
         if not key:
             key = self.key
-        return self.redis.get('user:%s:thread:%s:unreads' % (self.user.key, key))
+        try:
+            count = int(self.redis.get('user:%s:thread:%s:unreads' % (self.user.key, key)))
+        except TypeError:
+            count = 0
+        self.unread_count = count
+        return count
 
+    def reset_unread_count(self):
+        self.redis.set('user:%s:thread:%s:unreads' % (self.user.key, self.key), 0)
+            
     def set_recipients(self, recipients):
         self.recipients = recipients
         self.recipients.append(self.user.key)
+
     def parse_recipients(self, usernames):
         usernames = [s.strip() for s in usernames.split(",")]
         self.invalid_recipients = []
@@ -87,9 +97,7 @@ class Thread:
     def delete_message(self, message):
         r = self.redis
         r.lrem('thread:%s:messages' % self.key, message.key, 0)
-        print "deleeting message", message.key
         self.messages = r.lrange('thread:%s:messages' % self.key, 0, -1)
-        print "x", self.messages, "x", len(self.messages)
         if not self.messages or len(self.messages) < 1:
             self.delete()
 

@@ -22,5 +22,11 @@ class Auth:
     def set_user(self, user):
         self.user = user
 
+    def action(self, action, id=False):
+        pass
+
 class AuthError(Exception):
+    pass
+
+class DeniedError(AuthError):
     pass

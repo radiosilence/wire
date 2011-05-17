@@ -50,6 +50,7 @@
       {% else %}
         <li id="sign_up"><a href="{{ url_for('new_user') }}">Sign Up</a></li>
       {% endif %}
+    <li id="developers"><a href="{{ url_for('developers') }}">Developers</a></li>
    </ul>
   </nav>
   <section class="grid_8" id="content">  
@@ -62,13 +63,16 @@
         <h1>{{ g.user.username }}</h1>
         <form action="{{ url_for('logout') }}" method="post">
         <p><ul>
-         <li><a href="{{ url_for('inbox') }}">Inbox</a></li>
+         <li><a href="{{ url_for('inbox') }}"
+          {%- if g.unread_count > 0 %} class="inbox_unread"
+          {%- endif %}>Inbox ({{ g.unread_count }})</a></li>
          <li><a href="{{ url_for('edit_user') }}">Edit Profile</a></li>
         </ul></p>
         <p><button id="logout_submit">Log Out</button></p>
         </form>
       {% else %}
         <h1>Login</h1>
+          {{ flashes() }}
           <form method="POST" action="{{ url_for('login') }}">
           <p><input type="text" name="username" id="login_username" placeholder="Username" class="login_field"/></p>
           <p><input type="password" name="password" id="login_password" placeholder="Password"  class="login_field"/></p>

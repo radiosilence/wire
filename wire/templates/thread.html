@@ -9,7 +9,9 @@
   {{ flashes() }}
   <table class="thread">
   {% for message in messages %}
-    <tr>
+    <tr
+    {%- if g.user.username == message.data['sender'] %} class="mine"
+    {%- endif %}>
       <td style="white-space: nowrap;">
         {% if message.data['date_date'] != prevdate %}
             {{ message.data['date_date'] }}
@@ -25,7 +27,7 @@
       <td style="white-space: nowrap;">
             &lt;{%-if message.data['sender'] == thread.sender -%}!{%- else %}&nbsp;{% endif -%}{{ message.data['sender'] }}&gt;
       </td>
-      <td>
+      <td style="width:100%">
         {{ message.data['content'] }}
       </td>
       <td class="delmsg" style="width: 20px">
@@ -38,6 +40,7 @@
   </table>
 {% else %}
   <h1>Encrypted Thread</h1>
+  {{ flashes() }}
     <form method="POST" action="{{ url_for('view_thread', thread_id=thread.key) }}">
     <input type="hidden" name="action" value="decrypt"/>
     <p>This message needs to be decrypted. To do this, enter the encryption key into the box below.</p>
