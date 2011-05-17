@@ -22,12 +22,16 @@ class Message:
         if key:
             self.load()
 
+    def get_key(self):
+        if not self.key:
+            self.key = autoinc(self.redis, 'message')
+        return self.key
+
     def send(self):
         r = self.redis
         self._validate()
-
-        if not self.key:
-            self.key = autoinc(self.redis, 'message')
+        
+        self.get_key()
         
         data = {
             'sender': self.user.username,
@@ -37,7 +41,7 @@ class Message:
         }
 
         try:
-            if len(self.data['encryption_key']) >= 8:
+            if len(self.data['encryption_key']) >= 6:
                 data['content'] = encrypt(self.data['encryption_key'], data['content'])
                 self.encrypted = True
                 data['encrypted'] = True

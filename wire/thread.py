@@ -1,13 +1,16 @@
 from wire.message import Message, MessageError, DestructKey
 import redis, json
 from wire.utils.redis import autoinc
+import copy
+
 class Thread:
-    def __init__(self, subject=False, recipients=False, redis=False, user=False):
+    def __init__(self, subject=False, redis=False, user=False):
         self.messages = []
         self.queued_messages = []
         self.redis = redis
         self.subject = subject
-        self.recipients = recipients
+        self.recipients = []
+        self.recipient_names = ""
         self.user = user
         self.key = False
         self.encrypted = False
@@ -27,6 +30,12 @@ class Thread:
     def reset_unread_count(self):
         self.redis.set('user:%s:thread:%s:unreads' % (self.user.key, self.key), 0)
             
+    def _update_recipients(self):
+        r = self.redis
+        self.recipients = []
+        self.recipients = r.lrange('thread:%s:recipients' % self.key, 0, -1)
+        self.recipient_usernames = [json.loads(r.get('user:%s' % rec))['username'] for rec in self.recipients]
+
     def set_recipients(self, recipients):
         self.recipients = recipients
         self.recipients.append(self.user.key)
@@ -34,19 +43,21 @@ class Thread:
     def parse_recipients(self, usernames):
         usernames = [s.strip() for s in usernames.split(",")]
         self.invalid_recipients = []
-        self.recipients = []
         if len(usernames) < 1:
             raise Exception("No users.")
         for recipient in usernames:
             if self.redis.exists('username:%s' % recipient):
-                self.recipients.append(self.redis.get('username:%s' % recipient))
+                user_key = self.redis.get('username:%s' % recipient)
+                if user_key not in self.recipients:
+                    self.recipients.append(user_key)
             else:
                 self.invalid_recipients.append(recipient)
         if len(self.invalid_recipients) > 0:
             raise InvalidRecipients()
+        
+        if self.user.key not in self.recipients:
+            self.recipients.append(self.user.key)
 
-        self.recipients.append(self.user.key)
-    
     def _validate(self):
         errors = []
         if len(self.data['subject']) < 1:
@@ -54,25 +65,40 @@ class Thread:
         if len(errors) > 0:
             self.validation_errors = errors
             raise ValidationError()
+
+
+    def _sync_recipients(self):
+        r = self.redis
+        new_recipients = copy.deepcopy(self.recipients)
+        self._update_recipients()
+        for recipient in new_recipients:
+            if recipient not in self.recipients:
+                r.rpush('thread:%s:recipients' % self.key, recipient)
+                r.lpush('user:%s:threads' % recipient, self.key)
+                r.incr('user:%s:thread:%s:unreads' % (recipient, self.key), len(self.messages))
+        
+        del new_recipients
+
     def save(self):
         r = self.redis
-        new = False
+        print repr(self.key)
         if not self.key:
-            new = True
+            print "AUTOINCING KEY"
             self.key = autoinc(self.redis, 'thread')
-        d = {
+
+        data = {
             'subject': self.subject,
             'encrypted': self.encrypted
         }
-        r.set('thread:%s:data' % self.key, json.dumps(d))
-        if new:
-            for recipient in self.recipients:
-                r.lpush('thread:%s:recipients' % self.key, recipient)
-                r.lpush('user:%s:threads' % recipient, self.key)
+
+        r.set('thread:%s:data' % self.key, json.dumps(data))
+
+        self._sync_recipients()
         for message in self.queued_messages:
             self._commit_message(message)
     
     def add_message(self, m):
+        m.get_key()
         if len(self.messages) == 0:
             self.encrypted = m.encrypted
             self.save()
@@ -80,13 +106,14 @@ class Thread:
             raise ThreadError("Messages in same thread must have same encryption.")
     
         if self.key:
+            m.thread = self.key
             self.messages.append(m)
             self._commit_message(m)
         else:
             self.queued_messages.append(m)
 
     def _commit_message(self, message):
-        self.redis.rpush('thread:%s:messages' % self.key, message.key)
+        self.redis.rpush('thread:%s:messages' % self.key, message.get_key())
         self._incr_unreads()
         
     def _incr_unreads(self):
@@ -105,7 +132,7 @@ class Thread:
         self.messages = []
         self.key = key
         message_keys = self.redis.lrange('thread:%s:messages' % key, 0, -1)
-        self.recipients = self.redis.lrange('thread:%s:recipients' % key, 0, -1)
+        self._update_recipients()
         data = self.redis.get('thread:%s:data' % key)
         if not data:
             raise ThreadError("Thread %s data doesn't exist." % self.key)
@@ -137,6 +164,14 @@ class Thread:
         r.delete('thread:%s:recipients' % self.key)
         r.delete('thread:%s:messages' % self.key)
 
+    def unsubscribe(self):
+        r = self.redis
+        r.lrem('thread:%s:recipients' % self.key, self.user.key, 0)
+        r.lrem('user:%s:threads' % self.user.key, self.key, 0)
+        self._update_recipients()
+        if len(self.recipients) < 1:
+            print "deleting thread", self.key
+            self.delete()
 
     def decrypt(self, encryption_key):
         for message in self.messages:
