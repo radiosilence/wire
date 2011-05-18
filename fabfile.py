@@ -10,17 +10,28 @@ APP_NAME='wire'
 DEFAULT_USER= getpass.getuser()
 DEFAULT_DIRECTORY='/srv/%s' % APP_NAME
 
+env.summary = ['SUMMARY FOR [%s] DEPLOYMENT' % APP_NAME]
+
 def deploy(**kwargs):
     production(**kwargs)
     deploy_pip()
     conf_supervisor()
     start()
+    show_config()
+
+    print "\n\n"
+    print " *************************************************************************"
+    print " * "+env.summary.pop(0)
+    print " *************************************************************************"
+    print " *\n *  - "+"\n *  - ".join(env.summary)
+    print " *\n *************************************************************************"
 
 def production(socket=False, **kwargs):
     default_envs(**kwargs)
     if not socket:
         socket = '/tmp/gunicorn_%s.sock' % env.name
-    env.socket = socket 
+    env.socket = socket
+    env.summary.append("Configured for production.")
 
 def default_envs(directory=DEFAULT_DIRECTORY, user=DEFAULT_USER):
     env.deploy_user = user
@@ -37,6 +48,7 @@ def debug(**kwargs):
 def user_add():
     with settings(warn_only=True):
         sudo('useradd -m %s' % env.deploy_user)
+    env.summary.append('Added user "%s".' % env.deploy_user)
 
 def make_dir():
     with settings(warn_only=True):
@@ -56,7 +68,9 @@ def conf_supervisor(gunicorn_config='/etc/gunicorn.conf.py'):
         }
         path = '/etc/supervisor.d/%s.conf' % env.name
         upload_template('skeletons/supervisor.skel', path, skel_data, use_sudo=True)
-        print "Written supervisor config for %s." % env.name
+
+    env.summary.append('Written supervisor config to "%s".' % path)
+    
 
 def start():
     with settings(hide('warnings'), warn_only=True):
@@ -64,6 +78,7 @@ def start():
         sudo('supervisorctl stop %s' % env.name)
         sudo('rm %s -f' % env.socket)
         sudo('supervisorctl start %s' % env.name)
+    env.summary.append('Started process with supervisor.')
 
 def virtualenv(command):
     with cd(env.directory):
@@ -87,11 +102,19 @@ def git_pull():
 def make_virt():
     sudo('mkdir -p %s; mkdir -p /home/%s/.tmp' %
         (env.virt_path, env.deploy_user))
-    sudo('export TMPDIR=/home/%s/.tmp && virtualenv %s --no-site-packages --clear'
+    sudo('export TMPDIR=/home/%s/.tmp && virtualenv %s --no-site-packages'
         % (env.deploy_user, env.virt_path), user=env.deploy_user)
+    env.summary.append('Created virtualenv in "%s".' % env.virt_path)
 
 def pip_install_req():
     virtualenv('pip install -r %s/REQUIREMENTS' % env.directory)
+    env.summary.append('Pip installed requirements from "%s/REQUIREMENTS".' % env.directory)
+
+def show_config():
+    if not exists("%s/config.py" % env.directory):
+        sudo('cp %s/config.py.sample %s/config.py' % (env.directory, env.directory), user=env.deploy_user)
+        env.summary.append('Created new config file "%s/config.py". Please edit and then run "fab start"'
+            % env.directory)
 
 def deploy_pip():
     local('git push origin master')
