@@ -3,4 +3,7 @@ redis
 pycrypto
 Flask-Markdown
 Flask-Uploads
-python-whirlpool
+Whirlpool
+Markdown
+gunicorn
+meinheld
