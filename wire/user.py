@@ -12,6 +12,7 @@ class User:
         self.data = {}
         self.threads = []
         self.avatar = False
+        self._updating_password = False
 
     def load_by_username(self, username):
         self.load(self.redis.get('username:%s' % username))
@@ -45,11 +46,11 @@ class User:
         h = Hasher()
 
         if len(self.data['password']) >= 6:
-            self.data['password'] = h.hash(self.data['password'])
+            self.password = h.hash(self.data['password'])
         del self.data['password_confirm']
 
-        if len(self.data['avatar']) < 1:
-            self.data['avatar'] = 'default.png'
+        if not self.avatar:
+            self.avatar = 'default.png'
 
         if not self.key:
             self.key = autoinc(self.redis, 'user')
@@ -59,7 +60,7 @@ class User:
         self.redis.set("username:%s" % self.username, self.key)
         self.redis.set("user:%s" % self.key, json.dumps({
             'username': self.username,
-            'password': self.data['password'],
+            'password': self.password,
             'avatar': self.avatar
         }))
 
@@ -73,14 +74,15 @@ class User:
                 self._test_unique_user()
             except UserExists:
                 errors.append("User exists.")
-            if len(self.data['password']) < 6:
-                errors.append("Password must be at least 6 characters.")
 
-        try:
-            if self.data['password'] != self.data['password_confirm']:
-                errors.append("Passwords must match.")
-        except KeyError:
-            pass
+        if len(self.data['password']) < 6 and (len(self.data['password']) > 0 or not self.key):
+            errors.append("Password must be at least 6 characters.")
+
+            try:
+                if self.data['password'] != self.data['password_confirm']:
+                    errors.append("Passwords must match.")
+            except KeyError:
+                pass
 
         if len(errors) > 0:
             self.validation_errors = errors
@@ -96,6 +98,7 @@ class User:
         self.key = key
         data = json.loads(self.redis.get('user:%s' % key))
         self.data = data
+        self.password = data['password']
         self.username = data['username']
         if len(data['avatar']) > 0:
             self.avatar = data['avatar']

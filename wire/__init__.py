@@ -338,11 +338,12 @@ def edit_user(new=False):
             abort(401)
     
     if new:
-        u = user.User(redis=g.r, key=False)
+        u = user.User(redis=g.r)
     else:
         u = g.user
-    u.update(request.form, new=new)
     if request.method == 'POST':
+        u.update(request.form, new=new)
+        
         try:
             avatar = request.files.get('avatar')
             if avatar:
@@ -351,16 +352,19 @@ def edit_user(new=False):
                     flash("Upload successful.", 'success')
                 except UploadNotAllowed:
                     flash("Upload not allowed.", 'error')
-
             u.save()
             if new:
                 flash('"User "%s" created successfully. \
                     You may now log in.' % u.username, 'success')
                 return redirect(url_for('intro'))
+            else:
+                flash('Profile updated.', 'success')
+                print u.data
+                return redirect(url_for('edit_user'))
         except user.ValidationError:
             for error in u.validation_errors:
                 flash(error, 'error')
-
+    
     return render_template('forms/user.html',
         new=new,
         user=u
