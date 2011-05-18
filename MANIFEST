@@ -83,7 +83,6 @@ wire/static/js/message_form.js
 wire/static/js/thread.js
 wire/static/js/user_form.js
 wire/static/js_lib/common.js
-wire/static/js_lib/crypted
 wire/static/js_lib/fileuploader.js
 wire/static/js_lib/jquery-lightbox.js
 wire/static/js_lib/jquery-markitup.js

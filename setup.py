@@ -23,5 +23,20 @@ setup(
     packages=['wire', 'wire.models', 'wire.utils'],
     license = "MIT",
     scripts = ["debug"],
-    package_data = {'wire': files}
+    package_data = {'wire': files},
+    classifiers= [
+      'Development Status :: 2 - Pre-Alpha',
+      'Environment :: Web Environment',
+      'Framework :: Flask',
+      'Intended Audience :: Developers',
+      'Intended Audience :: Activists',
+      'License :: OSI Approved :: MIT License',
+      'Natural Language :: English',
+      'Operating System :: POSIX :: Linux',
+      'Programming Language :: Python',
+      'Topic :: Communications :: BBS',
+      'Topic :: Communications :: Chat',
+      'Topic :: Internet :: WWW/HTTP :: Dynamic Content :: Message Boards',
+      'Topic :: Security'
+      ]
     )

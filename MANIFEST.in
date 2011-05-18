@@ -1,5 +1,5 @@
 include debug README.md fabfile.py config.py.sample REQUIREMENTS
-recursive-include wire/static/js_lib *
+recursive-include wire/static/js_lib *.js
 recursive-include wire/static/img_lib *
 recursive-include wire/static/js *
 recursive-include wire/static/font_lib WC_RoughTrad-webfont.*
