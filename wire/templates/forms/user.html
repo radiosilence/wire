@@ -23,7 +23,7 @@
     {% else %}
       <input type="hidden" name="id" value="{{ user.id }}"/>
     {% endif %}
-      <p><img src="img/avatar/{{ user.avatar }}" class="avatar"id="avafile_img" style="display:{% if user.avatar %}block{% else %}none{% endif %}; float:left; margin: .7em 1em 1em 0em "/>
+      <p><img src="{{ url_for('static', filename='img/avatar/'+user.avatar) }}" class="avatar"id="avafile_img" style="display:{% if user.avatar %}block{% else %}none{% endif %}; float:left; margin: .7em 1em 1em 0em "/>
       <label for="avatar">Avatar</label>&nbsp; 
       <input type="file" id="avatar" name="avatar" /><br/>This can be any picture, it will be visible to others and cropped/resized. It is not recommended to use a picture that is personally identifiable.</p>
       <input type="hidden" name="avatar" id="avafile" value="{{ user.avatar }}"/>
