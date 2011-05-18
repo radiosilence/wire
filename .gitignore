@@ -3,3 +3,4 @@ wire/static/img/avatar
 deploy/
 !wire/static/img/avatar/default.png
 config.py
+dist

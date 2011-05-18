@@ -5,18 +5,23 @@ providing a simple buy powerful user interface to communicate
 messages and events between activists and groups.
 """
 
-from setuptools import setup, find_packages
-name='wire'
+from distutils.core import setup
+
+NAME='wire'
+doclines = __doc__.split("\n")
+
+files = ['static/*', 'templates/*']
+
 setup(
-    name=name,
-    version='0.1',
+    name=NAME,
+    version = "0.1",
+    description = doclines[0],
+    long_description = "\n".join(doclines[2:]),
     url='https://github.com/radiosilence/wire',
     author='James E. Cleveland',
     author_email='jamescleveland@gmail.com',
-    package_dir = {'': 'src'},
-    packages=find_packages('src'),
-    namespace_packages=['wire',],
-    include_package_data = True,
-    install_requires=['setuptools'],
-    zip_safe = False,
+    packages=['wire', 'wire.models', 'wire.utils'],
+    license = "MIT",
+    scripts = ["debug"],
+    package_data = {'wire': files}
     )
