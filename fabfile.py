@@ -10,32 +10,27 @@ APP_NAME='wire'
 DEFAULT_USER= getpass.getuser()
 DEFAULT_DIRECTORY='/srv/%s' % APP_NAME
 
-def install(user=DEFAULT_USER, socket=False, directory=DEFAULT_DIRECTORY):
-    env.hosts = ['localhost']
-    deploy(user=DEFAULT_USER, socket=False, directory=DEFAULT_DIRECTORY)
-
-def deploy(user=DEFAULT_USER, socket=False, directory=DEFAULT_DIRECTORY):
-    production(user=user, socket=socket, directory=directory)
+def deploy(**kwargs):
+    production(**kwargs)
     deploy_pip()
     conf_supervisor()
     start()
 
-def production(user=DEFAULT_USER, socket=False, directory=DEFAULT_DIRECTORY):
-    env.deploy_user = user
-    default_envs(directory)
+def production(socket=False, **kwargs):
+    default_envs(**kwargs)
     if not socket:
         socket = '/tmp/gunicorn_%s.sock' % env.name
     env.socket = socket 
 
-def default_envs(directory):
+def default_envs(directory=DEFAULT_DIRECTORY, user=DEFAULT_USER):
+    env.deploy_user = user
     env.name = APP_NAME
     env.directory = directory
     env.virt_path = '/home/%s/.virt_env/%s' % (env.deploy_user,  env.name)
     env.activate = 'source %s/bin/activate' % env.virt_path
     
-def debug(directory=DEFAULT_DIRECTORY, user=DEFAULT_USER):
-    env.deploy_user = user
-    default_envs(directory)
+def debug(**kwargs):
+    default_envs(**kwargs)
     env.name = 'wire'
     virtualenv('python debug.py')
     
