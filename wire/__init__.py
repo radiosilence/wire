@@ -6,6 +6,7 @@ from wire.models.message import Message, MessageError
 from wire.models.inbox import Inbox
 from wire.models.thread import Thread, DestroyedThreadError, ThreadError, InvalidRecipients
 from wire.models.contacts import Contacts, ContactExistsError, ContactInvalidError
+from wire.models.event import Event
 from wire.utils.auth import Auth, AuthError, DeniedError
 from wire.utils.crypto import DecryptFailed
 
@@ -324,7 +325,14 @@ def view_event(event_id):
 
 @app.route('/create-event')
 def new_event():
-    return render_template('forms/event.html')
+    e = Event(redis=g.r, user=g.user)
+    return render_template('forms/event.html',
+        event=e
+    )
+
+@app.route('/save-event')
+def save_event():
+    pass
 
 @app.route('/blog')
 def blog_entries():
