@@ -6,7 +6,7 @@
 {% endblock %}
 {% block content %}
 <article>
-<form id="user-form" method="POST" action="
+<form id="user-form" method="POST" enctype="multipart/form-data" action="
   {%- if new -%}
     {{ url_for('new_user') }}
   {%- else -%}
@@ -23,14 +23,9 @@
     {% else %}
       <input type="hidden" name="id" value="{{ user.id }}"/>
     {% endif %}
-      <p><img src="img/avatar/{{ user.avatar }}" id="avafile_img" style="display:{% if user.avatar %}block{% else %}none{% endif %}; float:left; margin: 0em 1em 1em 0em "/>
-      <label>Avatar</label><br/>This can be any picture, it will be visible to others and cropped/resized. Obviously don't use something personally identifiable.<br/>
-        </p>
-      <div id="avafile-uploader">    
-        <noscript>      
-          <p>Please enable JavaScript to use file uploader.</p>
-        </noscript>         
-      </div>
+      <p><img src="img/avatar/{{ user.avatar }}" class="avatar"id="avafile_img" style="display:{% if user.avatar %}block{% else %}none{% endif %}; float:left; margin: .7em 1em 1em 0em "/>
+      <label for="avatar">Avatar</label>&nbsp; 
+      <input type="file" id="avatar" name="avatar" /><br/>This can be any picture, it will be visible to others and cropped/resized. It is not recommended to use a picture that is personally identifiable.</p>
       <input type="hidden" name="avatar" id="avafile" value="{{ user.avatar }}"/>
       <p><label for="password">Password</label><br/>
       <input type="password" name="password" id="password" placeholder="{% if new %}Ex: hunter2{% else %}No change{% endif %}"/></p>

@@ -8,19 +8,27 @@ from wire.thread import Thread, DestroyedThreadError, ThreadError, InvalidRecipi
 from wire.contacts import Contacts, ContactExistsError, ContactInvalidError
 from wire.utils.auth import Auth, AuthError, DeniedError
 from wire.utils.crypto import DecryptFailed
+
 from flaskext.markdown import Markdown
+from flaskext.uploads import (UploadSet, configure_uploads, IMAGES,
+                              UploadNotAllowed)
+
 import json
 import redis
-import os
+import os, uuid, subprocess, shlex
+
 # configuration
 DEBUG = True
 SECRET_KEY = 'DEV KEYMO'
+UPLOADED_AVATARS_DEST = 'wire/static/img/avatar'
 
 app = Flask(__name__)
 app.config.from_object(__name__)
-app.config.from_envvar('FLASKR_SETTINGS', silent=True)
+app.config.from_envvar('WIRE_SETTINGS', silent=True)
 Markdown(app)
-#csrf(app)
+
+uploaded_avatars = UploadSet('avatars', IMAGES)
+configure_uploads(app, uploaded_avatars)
 
 redis_connection = redis.Redis(host="localhost", port=6379, db=0)
 @app.before_request
@@ -336,6 +344,14 @@ def edit_user(new=False):
     u.update(request.form, new=new)
     if request.method == 'POST':
         try:
+            avatar = request.files.get('avatar')
+            if avatar:
+                try:
+                    u.avatar = upload_avatar(avatar)
+                    flash("Upload successful.", 'success')
+                except UploadNotAllowed:
+                    flash("Upload not allowed.", 'error')
+
             u.save()
             if new:
                 flash('"User "%s" created successfully. \
@@ -350,6 +366,26 @@ def edit_user(new=False):
         user=u
     )
 
+def upload_avatar(avatar):
+    ext = avatar.filename.split(".")[-1]
+    filename = uploaded_avatars.save(avatar, name="%s.%s" % (unique_id(), ext))
+    path = "%s/%s" % (UPLOADED_AVATARS_DEST, filename)
+    args = [
+        'convert',
+        path,
+        '-resize',
+        '80x80^',
+        '-gravity',
+        'center',
+        '-extent',
+        '80x80',
+        path
+    ]
+    p = subprocess.Popen(args)
+    return filename
+
+def unique_id():
+    return hex(uuid.uuid4().time)[2:-1]
 
 @app.route('/login', methods=['POST'])
 def login():

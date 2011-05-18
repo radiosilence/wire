@@ -128,6 +128,14 @@ article.message .avatar {
     padding-right: 10px;
 }
 
+.avatar {
+    width: 80px;
+    height: 80px;
+}
+.newmessagebutton {
+    margin-top: -10px !important;
+}
+
 article.message header .opts a {
     float: right;
     font-size: 10pt;

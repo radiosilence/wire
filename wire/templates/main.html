@@ -59,7 +59,7 @@
     <section id="userbox" class="grid_4">
       {% block user_box %}
       {% if session.logged_in %}
-        <img src="/img/avatar/default.png" style="float: right;"/>
+        <img src="{{ url_for('static', filename='img/avatar/%s' % g.user.avatar) }}" class="avatar" style="float: right;"/>
         <h1>{{ g.user.username }}</h1>
         <form action="{{ url_for('logout') }}" method="post">
         <p><ul>

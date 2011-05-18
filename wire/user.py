@@ -11,6 +11,7 @@ class User:
         self.key = key
         self.data = {}
         self.threads = []
+        self.avatar = False
 
     def load_by_username(self, username):
         self.load(self.redis.get('username:%s' % username))
@@ -18,7 +19,6 @@ class User:
     def update(self, data, new=False):  
         fields = [
             'username',
-            'avatar',
             'password',
             'password_confirm'
         ]
@@ -60,7 +60,7 @@ class User:
         self.redis.set("user:%s" % self.key, json.dumps({
             'username': self.username,
             'password': self.data['password'],
-            'avatar': self.data['avatar']
+            'avatar': self.avatar
         }))
 
     def _validate(self):

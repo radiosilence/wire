@@ -4,8 +4,10 @@
 {% endblock %}
 {% block content %}
 <article>
+<div style="display: block; width: 500px; float:right; padding-top: 10px"><p><a class="button newmessagebutton" href="{{ url_for('send_message') }}">New Message</a></p></div>
 <h1>Inbox</h1>
 {{ flashes() }}
+
 {% if not empty %}
     <table class="inbox">
     <th style="white-space: nowrap;padding: 0px;"></th>
