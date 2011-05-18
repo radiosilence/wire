@@ -1,6 +1,7 @@
 *.pyc
 wire/static/img/avatar
 deploy/
+build/
 !wire/static/img/avatar/default.png
 config.py
 dist
