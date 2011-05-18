@@ -1,5 +1,30 @@
 {% extends "main.html" %}
+{% block javascript %}
+  <script src="{{ url_for('static', filename='js/event_form.js') }}" type="text/javascript"></script>
+{% endblock %}
 {% block content %}
-<h1>Create Event</h1>
-<p>Moo</p>
+<article>
+  <h1>Create Event</h1>
+  {{ flashes() }}
+
+  <form id="event-form" method="POST" action="{{ url_for('new_event') }}">
+    <p><label for="name">Event Name</label><br/>
+        <input type="text" name="name" id="name" placeholder="Ex. My Awesome March" value="{{ event.data['title'] }}"/>
+    </p>
+    <p><label for="date">Date</label><br/>
+        <input type="text" name="date" id="date" class="datepick" placeholder="Ex. 1981-05-11" value="{{ event.data['date'] }}"/>
+    </p>
+    <p><label for="time">Time</label><br/>
+        <input type="text" name="time" id="time" class="timepick" placeholder="Ex. 13:37" value="{{ event.data['time'] }}"/>
+    </p>
+    <p><label for="image">Image</label><br/>
+        <input type="file" name="image" id="image"/>
+    </p>
+    <p><label for="description">Description</label><br/>
+        <textarea id="description" name="description" style="width:95%; height:200px" placeholder="Ex. We are doing something and it will be excellent because...">{{ event.data['description'] }}</textarea>
+    </p>
+    <p><button style="font-size:24pt !important; font-weight: bold !important">Create Event</button></p>
+
+  </form>
+</article>
 {% endblock %}
