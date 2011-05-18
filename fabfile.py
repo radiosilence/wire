@@ -5,7 +5,6 @@ from fabric.contrib.files import upload_template, exists
 
 def production(deploy_user='deploy', socket=False):
     env.name = 'wire'
-    env.hosts = ['james@localhost']
     env.deploy_user = deploy_user
     if not socket:
         socket = '/tmp/gunicorn_%s.sock' % env.name
