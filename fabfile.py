@@ -29,10 +29,10 @@ def git_pull():
         sudo('git clone git://github.com/radiosilence/wire.git wire || (cd wire && git pull origin master)', user=env.deploy_user)
 
 def make_virt():
-    sudo('virtualenv %s --no-site-packages' % env.virt_path, user=env.deploy_user)
+    sudo('virtualenv %s --no-site-packages --clear' % env.virt_path, user=env.deploy_user)
 
 def pip_install_req():
-    virtualenv('pip install -U -r -q %s/REQUIREMENTS' % env.directory)
+    virtualenv('pip install -U -q -r %s/REQUIREMENTS' % env.directory)
 
 def deploy_pip():
     local('git push origin master')
