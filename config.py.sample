@@ -1,0 +1,6 @@
+DEBUG                   = True
+SECRET_KEY              = 'TEST KEY'
+UPLOADED_AVATARS_DEST   = 'wire/static/img/avatar'
+REDIS_HOST              = 'localhost'
+REDIS_PORT              = 6379
+REDIS_DB                = 0

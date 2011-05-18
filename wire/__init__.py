@@ -17,10 +17,13 @@ import json
 import redis
 import os, uuid, subprocess, shlex
 
-# configuration
-DEBUG = True
-SECRET_KEY = 'DEV KEYMO'
-UPLOADED_AVATARS_DEST = 'wire/static/img/avatar'
+# Default Configuration
+DEBUG                   = True
+SECRET_KEY              = 'TEST KEY'
+UPLOADED_AVATARS_DEST   = 'wire/static/img/avatar'
+REDIS_HOST              = 'localhost'
+REDIS_PORT              = 6379
+REDIS_DB                = 0
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -28,9 +31,15 @@ app.config.from_envvar('WIRE_SETTINGS', silent=True)
 Markdown(app)
 
 uploaded_avatars = UploadSet('avatars', IMAGES)
+
+redis_connection = redis.Redis(
+    host=app.config['REDIS_HOST'],
+    port=app.config['REDIS_PORT'],
+    db=app.config['REDIS_DB']
+)
+
 configure_uploads(app, uploaded_avatars)
 
-redis_connection = redis.Redis(host="localhost", port=6379, db=0)
 @app.before_request
 def before_request():
 

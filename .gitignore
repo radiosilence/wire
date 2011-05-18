@@ -1,3 +1,4 @@
 *.pyc
 wire/static/img/avatar
 !wire/static/img/avatar/default.png
+config.py
