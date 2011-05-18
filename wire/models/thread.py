@@ -1,4 +1,4 @@
-from wire.message import Message, MessageError, DestructKey
+from wire.models.message import Message, MessageError, DestructKey
 import redis, json
 from wire.utils.redis import autoinc
 import copy

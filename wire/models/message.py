@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 from wire.utils.crypto import encrypt, decrypt, DecryptFailed
 from wire.utils.hasher import Hasher, HashMismatch
-from wire.user import User
+from wire.models.user import User
 
 class Message:
     def __init__(self, redis, key=False, user=False):

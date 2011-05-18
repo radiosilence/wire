@@ -1,11 +1,11 @@
 from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash
 
-from wire.user import User
-from wire.message import Message, MessageError
-from wire.inbox import Inbox
-from wire.thread import Thread, DestroyedThreadError, ThreadError, InvalidRecipients
-from wire.contacts import Contacts, ContactExistsError, ContactInvalidError
+from wire.models.user import User
+from wire.models.message import Message, MessageError
+from wire.models.inbox import Inbox
+from wire.models.thread import Thread, DestroyedThreadError, ThreadError, InvalidRecipients
+from wire.models.contacts import Contacts, ContactExistsError, ContactInvalidError
 from wire.utils.auth import Auth, AuthError, DeniedError
 from wire.utils.crypto import DecryptFailed
 

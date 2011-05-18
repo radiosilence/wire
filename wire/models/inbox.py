@@ -1,4 +1,4 @@
-from wire.thread import Thread, ThreadError
+from wire.models.thread import Thread, ThreadError
 class Inbox:
     def __init__(self, user=False, redis=False):
         self.user = user

@@ -1,6 +1,6 @@
 import json
 from wire.utils.hasher import Hasher, HashMismatch
-from wire.user import User
+from wire.models.user import User
 
 class Auth:
     def __init__(self, redis):

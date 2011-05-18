@@ -1,4 +1,5 @@
 import redis
+from wire.models.user import User
 
 class Contacts:
     def __init__(self, redis=False, user=False):
