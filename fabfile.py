@@ -2,18 +2,39 @@ from __future__ import with_statement
 from fabric.api import *
 from fabric.contrib.console import confirm
 from fabric.contrib.files import upload_template, exists
+import getpass
 
-def production(deploy_user='deploy', socket=False):
-    env.name = 'wire'
-    env.deploy_user = deploy_user
+env.key_filename = "/home/%s/.ssh/id_rsa" % getpass.getuser()
+
+APP_NAME='wire'
+DEFAULT_USER= getpass.getuser()
+DEFAULT_DIRECTORY='/srv/%s' % APP_NAME
+
+def install(user=DEFAULT_USER, socket=False, directory=DEFAULT_DIRECTORY):
+    production(user=user, socket=socket, directory=directory)
+    deploy_pip()
+    conf_supervisor()
+    start()
+
+def production(user=DEFAULT_USER, socket=False, directory=DEFAULT_DIRECTORY):
+    env.deploy_user = user
+    default_envs(directory)
     if not socket:
         socket = '/tmp/gunicorn_%s.sock' % env.name
     env.socket = socket 
-    env.parent_directory = '/var/www/apps'
-    env.directory = '%s/%s' % (env.parent_directory, env.name)
+
+def default_envs(directory):
+    env.name = APP_NAME
+    env.directory = directory
     env.virt_path = '/home/%s/.virt_env/%s' % (env.deploy_user,  env.name)
     env.activate = 'source %s/bin/activate' % env.virt_path
-
+    
+def debug(directory=DEFAULT_DIRECTORY, user=DEFAULT_USER):
+    env.deploy_user = user
+    default_envs(directory)
+    env.name = 'wire'
+    virtualenv('python debug.py')
+    
 def user_add():
     with settings(warn_only=True):
         sudo('useradd -m %s' % env.deploy_user)
@@ -31,7 +52,8 @@ def conf_supervisor(gunicorn_config='/etc/gunicorn.conf.py'):
             'user': env.deploy_user,
             'app': env.name+':app',
             'gunicorn_config': gunicorn_config,
-            'socket': env.socket
+            'socket': env.socket,
+            'directory': env.directory
         }
         path = '/etc/supervisor.d/%s.conf' % env.name
         upload_template('skeletons/supervisor.skel', path, skel_data, use_sudo=True)

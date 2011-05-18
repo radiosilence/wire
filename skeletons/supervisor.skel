@@ -1,6 +1,6 @@
 [program:%(name)s]
 command=/usr/local/bin/gunicorn %(app)s -c /etc/gunicorn.conf.py -b unix:%(socket)s
-directory=/var/www/apps/%(name)s
+directory=%(directory)s
 user=%(user)s
 autostart=true
 autorestart=true
