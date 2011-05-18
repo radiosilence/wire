@@ -7,7 +7,7 @@ messages and events between activists and groups.
 
 from distutils.core import setup
 
-NAME='wire'
+NAME='wire-bbs'
 doclines = __doc__.split("\n")
 
 files = ['static/*', 'templates/*']
@@ -24,12 +24,20 @@ setup(
     license = "MIT",
     scripts = ["debug"],
     package_data = {'wire': files},
+    requires = [
+      'Flask',
+      'redis',
+      'json',
+      'flaskext.markdown',
+      'flaskext.uploads',
+      'os', 'uuid', 'subprocess', 'shlex',
+      'Crypto', 'base64'
+    ],
     classifiers= [
       'Development Status :: 2 - Pre-Alpha',
       'Environment :: Web Environment',
-      'Framework :: Flask',
       'Intended Audience :: Developers',
-      'Intended Audience :: Activists',
+      'Intended Audience :: End Users/Desktop',
       'License :: OSI Approved :: MIT License',
       'Natural Language :: English',
       'Operating System :: POSIX :: Linux',
