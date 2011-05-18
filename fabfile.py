@@ -11,6 +11,10 @@ DEFAULT_USER= getpass.getuser()
 DEFAULT_DIRECTORY='/srv/%s' % APP_NAME
 
 def install(user=DEFAULT_USER, socket=False, directory=DEFAULT_DIRECTORY):
+    env.hosts = ['localhost']
+    deploy(user=DEFAULT_USER, socket=False, directory=DEFAULT_DIRECTORY)
+
+def deploy(user=DEFAULT_USER, socket=False, directory=DEFAULT_DIRECTORY):
     production(user=user, socket=socket, directory=directory)
     deploy_pip()
     conf_supervisor()
