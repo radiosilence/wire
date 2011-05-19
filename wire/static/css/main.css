@@ -148,6 +148,8 @@ article.mine:hover {
 
 article.message header {
     font-size: 10pt;
+    max-height: 1.1em;
+    overflow: hidden;
 }
 
 article.message header a {
@@ -163,6 +165,8 @@ article.message div.message {
 
 article.event header {
     font-size: 10pt;
+    max-height: 1.1em;
+    overflow: hidden;
 }
 
 article.event h1 {
