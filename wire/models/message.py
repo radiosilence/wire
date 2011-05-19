@@ -57,7 +57,7 @@ class Message:
                 self.enc_data['encrypted'] = True
             else: 
                 raise KeyError()
-            if len(self.data['destruct_key']) > 0 and data['encrypted']:
+            if len(self.data['destruct_key']) > 0 and self.enc_data['encrypted']:
                 h = Hasher(4)
                 self.enc_data['destruct_key'] = h.hash(self.data['destruct_key'])
 
