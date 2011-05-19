@@ -37,6 +37,20 @@
       </p>
      </div>
     </div>
+    <div class="parallelements">
+     <div>
+      <p>
+       <label for="location">Location</label><br/>
+       <input type="text" name="location" id="location" placeholder="Ex. Trafalgar Square, London" value="{{ event.data['location'] }}"/>
+      </p>
+     </div>
+      <p>
+       <label for="meeting_place">Meeting Place</label><br/>
+       <input type="text" name="meeting_place" id="meeting_place" placeholder="Ex. Soho Square, London" value="{{ event.data['meeting_place'] }}"/>
+      </p>
+     <div>
+     </div>
+    </div>
     <p>
         <div style="overflow:hidden">
             <img src="{{ url_for('static', filename='img/event/%s' % event.data['image']) }}" class="event_edit"/>

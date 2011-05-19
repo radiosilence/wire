@@ -6,7 +6,7 @@ class Event:
         self.redis = redis
         self.user = user
         self.data = {
-            'image': 'default.png',
+            'image': 'default.png'
         }
         self.validation_errors = []
         self.key = False
@@ -29,14 +29,16 @@ class Event:
             'name',
             'date',
             'time',
-            'description'
+            'location',
+            'meeting_place',
+            'description',
         ]
         for field in form_fields:
             try:
                 self.data[field] = data[field]
             except KeyError:
                 self.data[field] = ""
-    
+        
     def save(self):
         r = self.redis
         self._validate()
@@ -46,7 +48,9 @@ class Event:
             self.key = autoinc(self.redis, 'event')
             r.lpush('_list:events', self.key)
             r.lpush('user:%s:events' % self.user.key, self.key)
-        
+        if len(self.data['location']) < 1:
+            self.data['location'] = 'Undisclosed Location'
+
         r.set('event:%s' % self.key, json.dumps(self.data))
 
     def load(self, event_id):
