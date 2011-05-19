@@ -198,9 +198,9 @@ article.event div.box p.creator {
     background-color: rgba(0,0,0,.5);
     font-style: italic;
     font-size: 10pt;
-    -moz-box-shadow: 5px 5px 5px #ccc;
+    -moz-box-shadow: 0px -5px 5px rgba(0,0,0,.5);
     -webkit-box-shadow: 0px -5px 5px rgba(0,0,0,.5);
-    
+    box-shadow: 0px -5px 5px rgba(0,0,0,.5);
 }
 article.event div.box p.creator a {
     font-size: 12pt;
