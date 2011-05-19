@@ -105,6 +105,8 @@ def view_thread(thread_id):
                 t.add_message(m)
                 m.send()
                 t.load(thread_id)
+                flash("Reply has been sent.", 'success')
+                return redirect(url_for('view_thread', thread_id=t.key))
             try:
                 encryption_key = request.form['encryption_key']
                 t.decrypt(encryption_key)
@@ -350,7 +352,7 @@ def save_event(event_id=False, new=False):
     if not new:
         try:
             e.load(event_id)
-        except EventNotFoundError():
+        except EventNotFoundError:
             abort(404)
         print e.data
         if e.data['creator'] != g.user.username:
@@ -490,6 +492,20 @@ def logout():
     except KeyError:
         pass
     return redirect(url_for('intro'))   
+
+@app.errorhandler(401)
+def unauthorized(error):
+    return _status(error), 401
+
+def _status(error):
+    status = [x.strip() for x in str(error).split(":")]
+    return render_template('status.html',
+        _status=status[0],
+        _message=status[1]
+        )
+@app.errorhandler(404)
+def not_found(error):
+    return _status(error), 404
 
 if __name__ == '__main__':
     app.run()
