@@ -14,7 +14,7 @@
   {%- endif -%}
   ">
 <input type="hidden" value="">
-    <div class="fieldset" id="fieldset-user">
+  <div class="fieldset" id="fieldset-user">
     <h1>{{ self.title() }}</h1>
     {{ flashes() }}
     {% if new %}
@@ -27,10 +27,19 @@
       <label for="avatar">Avatar</label>&nbsp; 
       <input type="file" id="avatar" name="avatar" /><br/>This can be any picture, it will be visible to others and cropped/resized. It is not recommended to use a picture that is personally identifiable.</p>
       <input type="hidden" name="avatar" id="avafile" value="{{ user.avatar }}"/>
-      <p><label for="password">Password</label><br/>
-      <input type="password" name="password" id="password" placeholder="{% if new %}Ex: hunter2{% else %}No change{% endif %}"/></p>
-      <p><label for="password_confirm">Password (Confirm)</label><br/>
-      <input type="password" name="password_confirm" id="password_confirm" placeholder="{% if new %}Ex: hunter2{% else %}No change{% endif %}"/></p>
+      <div class="parallelements">
+        <div>
+          <p>
+            <label for="password">Password</label><br/>
+            <input type="password" name="password" id="password" placeholder="{% if new %}Ex: hunter2{% else %}No change{% endif %}"/>
+          </p>
+        </div>
+        <div>
+          <p>
+            <label for="password_confirm">Password (Confirm)</label><br/>
+            <input type="password" name="password_confirm" id="password_confirm" placeholder="{% if new %}Ex: hunter2{% else %}No   change{% endif %}"/></p>
+        </div>
+      </div>
   </div>
   <p class="submit"><button class="submit" id="submit_user_form">{% if new %}Create{% else %}Save{% endif %}</button></p>
 </form>

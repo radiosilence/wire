@@ -7,7 +7,7 @@
 </article>
 {% for event in events %}
 <article class="event">
-  <img src="{{ url_for('static', filename='img/event/%s' % event.data['image']) }}" class="event"/>
+  <a href="{{ url_for('view_event', event_id=event.key) }}"><img src="{{ url_for('static', filename='img/event/%s' % event.data['image']) }}" class="event"/></a>
   <header>
     <div class="opts">
       <a href="#">a</a>
@@ -16,14 +16,14 @@
   </header>
   <div class="box">
     <div>
-    <h1>{{ event.data['name'] }}</h1>
+    <h1><a href="{{ url_for('view_event', event_id=event.key) }}">{{ event.data['name'] }}</a></h1>
     {{ event.data['description']|markdown }}
     </div>
     <p class="creator">
       {% if g.user.username == event.data['creator'] %}
         Created by you. <a href="{{ url_for('edit_event', event_id=event.key) }}">Edit this event</a>.
       {% else %}
-        Created by <a href="{{ url_for('send_message_recipient', recipient=event.data['creator']) }}">{{ event.data['creator'] }}
+        Created by <a href="{{ url_for('send_message_recipient', recipient=event.data['creator']) }}">{{ event.data['creator'] }}</a>
       {% endif %}
     </p>
 

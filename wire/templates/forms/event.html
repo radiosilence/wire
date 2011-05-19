@@ -19,16 +19,24 @@
     {{ url_for('edit_event', event_id=event.key) }}
   {%- endif -%}
   ">
-    <p><label for="name">Event Name</label><br/>
+    <div class="parallelements">
+     <div>
+      <p><label for="name">Event Name</label><br/>
         <input type="text" name="name" id="name" placeholder="Ex. My Awesome March" value="{{ event.data['name'] }}"/>
-    </p>
-    <p><label for="date">Date</label><br/>
-        <input type="text" name="date" id="date" class="datepick" placeholder="Ex. 1981-05-11" value="{{ event.data['date'] }}"/>
-    </p>
-    <p></p>
-    <label for="time">Time</label><br/>
-        <input type="text" name="time" id="time" class="timepick" placeholder="Ex. 13:37" value="{{ event.data['time'] }}"/>
-    </p>
+      </p>
+     </div>
+     <div>
+      <p><label for="date">Date</label><br/>
+          <input type="text" name="date" id="date" class="datepick" placeholder="Ex. 1981-05-11" value="{{ event.data['date'] }}"/>
+      </p>
+     </div>
+     <div>
+      <p>
+       <label for="time">Time</label><br/>
+          <input type="text" name="time" id="time" class="timepick" placeholder="Ex. 13:37"   value="{{ event.data['time'] }}"/>
+      </p>
+     </div>
+    </div>
     <p>
         <div style="overflow:hidden">
             <img src="{{ url_for('static', filename='img/event/%s' % event.data['image']) }}" class="event_edit"/>

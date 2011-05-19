@@ -172,6 +172,9 @@ article.event h1 {
     word-wrap: break-word;
 }
 
+article.event h1 a {
+    text-decoration: none;
+}
 article.event header a {
     font-size: 12pt;
     font-weight: bold;
@@ -187,7 +190,7 @@ article.event div.box div {
     white-space: normal;
     text-overflow: ellipsis;
     overflow: hidden;
-    max-height: 200px;
+    max-height: 200px;;
 }
 
 article.event div.box p.creator {
@@ -203,6 +206,14 @@ article.event div.box p.creator a {
     font-size: 12pt;
 }
 
+div.parallelements div {
+    float: left;
+    padding-right: 20px
+}
+
+div.parallelements {
+    overflow: hidden;
+}
 img.event {
     width: 160px;
     height: 160px;
