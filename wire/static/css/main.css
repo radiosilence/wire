@@ -123,20 +123,21 @@ article.message {
     border-top: 2px solid rgba(20,20,20,.5);
 }
 
-article.message .avatar {
+article.message img.avatar {
     float: left;
     padding-right: 10px;
 }
 
-.avatar {
+img.avatar {
     width: 80px;
     height: 80px;
 }
+
 .newmessagebutton {
     margin-top: -10px !important;
 }
 
-article.message header .opts a {
+header .opts a {
     float: right;
     font-size: 10pt;
     font-family: monospace;
@@ -157,4 +158,41 @@ article.message div.message {
     padding-top: 0.5em;
     display: block;
     overflow: hidden;
+}
+
+
+article.event header {
+    font-size: 10pt;
+}
+
+article.event h1 {
+    margin-bottom: 0px !important;
+}
+
+article.event header a {
+    font-size: 12pt;
+    font-weight: bold;
+}
+article.event div.description {
+    padding-top: 0.5em;
+    display: block;
+    overflow: hidden;
+}
+
+article.event div.description p.creator {
+    font-style: italic;
+    font-size: 10pt;
+}
+article.event div.description p.creator a {
+    font-size: 12pt;
+}
+
+img.event {
+    width: 160px;
+    height: 160px;
+}
+
+article.event img.event, img.event_edit {
+    float: left;
+    padding-right: 10px
 }

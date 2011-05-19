@@ -1,5 +1,24 @@
 {% extends "main.html" %}
 {% block content %}
-<h1>Events</h1>
-<p>Listings of up and coming events.</p>
+<article>
+  <h1>Events</h1>
+  <p>Listings of up and coming events.</p>
+  <p>Displaying {{ count }} events.</p>
+</article>
+{% for event in events %}
+<article class="event">
+  <img src="{{ url_for('static', filename='img/event/%s' % event.data['image']) }}" class="event"/>
+  <header>
+    <div class="opts">
+      <a href="#">a</a>
+    </div>
+    {{ event.data['date'] }} at {{ event.data['time'] }}
+  </header>
+  <h1>{{ event.data['name'] }}</h1>
+  <div class="description">
+    {{ event.data['description']|markdown }}
+    <p class="creator">Created by <a href="{{ url_for('send_message_recipient', recipient=event.data['creator']) }}">{{ event.data['creator'] }}</p>
+  </div>
+</article>
+{% endfor %}
 {% endblock %}

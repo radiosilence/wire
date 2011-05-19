@@ -29,8 +29,12 @@
     <label for="time">Time</label><br/>
         <input type="text" name="time" id="time" class="timepick" placeholder="Ex. 13:37" value="{{ event.data['time'] }}"/>
     </p>
-    <p><div style="overflow:hidden"><img src="{{ url_for('static', filename='img/event/%s' % event.data['image']) }}" style="float: left; margin-right: 10px"/><label for="image">Image</label><br/>
-        <input type="file" name="image" id="image"/></div>
+    <p>
+        <div style="overflow:hidden">
+            <img src="{{ url_for('static', filename='img/event/%s' % event.data['image']) }}" class="event_edit"/>
+            <label for="image">Image</label><br/>
+            <input type="file" name="image" id="image"/>
+        </div>
     </p>
     <p><label for="description">Description</label><br/>
         <textarea id="description" name="description" style="width:95%; height:200px" placeholder="Ex. We are doing something and it will be excellent because...">{{ event.data['description'] }}</textarea>

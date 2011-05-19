@@ -11,6 +11,19 @@ class Event:
         self.validation_errors = []
         self.key = False
 
+    def list(self, limit=-1, start=0):
+        if limit > 0:
+            limit = start+limit
+
+        keys = self.redis.lrange('_list:events', start, limit)
+        count = self.redis.llen('_list:events')
+        events = []
+        for key in keys:
+            e = Event(redis=self.redis, user=self.user)
+            e.load(key)
+            events.append(e)
+        return events, count
+
     def update(self, data):
         form_fields = [
             'name',

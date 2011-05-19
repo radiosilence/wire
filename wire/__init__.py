@@ -320,7 +320,12 @@ def del_contact(contact):
 
 @app.route('/events')
 def list_events():
-    return render_template('events.html')
+    e = Event(redis=g.r, user=g.user)
+    events, count = e.list()
+    return render_template('events.html',
+        events=events,
+        count=count
+    )
 
 @app.route('/event/<int:event_id>')
 def view_event(event_id):
