@@ -11,7 +11,7 @@ class User:
         self.key = key
         self.data = {}
         self.threads = []
-        self.avatar = False
+        self.avatar = 'default.png'
         self._updating_password = False
 
     def load_by_username(self, username):
@@ -48,9 +48,6 @@ class User:
         if len(self.data['password']) >= 6:
             self.password = h.hash(self.data['password'])
         del self.data['password_confirm']
-
-        if not self.avatar:
-            self.avatar = 'default.png'
 
         if not self.key:
             self.key = autoinc(self.redis, 'user')

@@ -14,10 +14,19 @@
     </div>
     {{ event.data['date'] }} at {{ event.data['time'] }}
   </header>
-  <h1>{{ event.data['name'] }}</h1>
-  <div class="description">
+  <div class="box">
+    <div>
+    <h1>{{ event.data['name'] }}</h1>
     {{ event.data['description']|markdown }}
-    <p class="creator">Created by <a href="{{ url_for('send_message_recipient', recipient=event.data['creator']) }}">{{ event.data['creator'] }}</p>
+    </div>
+    <p class="creator">
+      {% if g.user.username == event.data['creator'] %}
+        Created by you. <a href="{{ url_for('edit_event', event_id=event.key) }}">Edit this event</a>.
+      {% else %}
+        Created by <a href="{{ url_for('send_message_recipient', recipient=event.data['creator']) }}">{{ event.data['creator'] }}
+      {% endif %}
+    </p>
+
   </div>
 </article>
 {% endfor %}

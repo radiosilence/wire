@@ -410,7 +410,7 @@ def edit_user(new=False):
             abort(401)
     
     if new:
-        u = user.User(redis=g.r)
+        u = User(redis=g.r)
     else:
         u = g.user
     if request.method == 'POST':

@@ -166,24 +166,40 @@ article.event header {
 }
 
 article.event h1 {
-    margin-bottom: 0px !important;
+    padding-top: 5px;
+    margin-bottom: 5px !important;
+    font-size: 20pt !important;
+    word-wrap: break-word;
 }
 
 article.event header a {
     font-size: 12pt;
     font-weight: bold;
 }
-article.event div.description {
-    padding-top: 0.5em;
+article.event div.box {
+    padding-top: 0em;
     display: block;
     overflow: hidden;
 }
 
-article.event div.description p.creator {
+article.event div.box div {
+
+    white-space: normal;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-height: 200px;
+}
+
+article.event div.box p.creator {
+    border-top: 1px solid #0e0e0e;
+    background-color: rgba(0,0,0,.5);
     font-style: italic;
     font-size: 10pt;
+    -moz-box-shadow: 5px 5px 5px #ccc;
+    -webkit-box-shadow: 0px -5px 5px rgba(0,0,0,.5);
+    
 }
-article.event div.description p.creator a {
+article.event div.box p.creator a {
     font-size: 12pt;
 }
 
