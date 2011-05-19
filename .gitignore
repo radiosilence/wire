@@ -1,7 +1,8 @@
 *.pyc
-wire/static/img/avatar
-deploy/
-build/
+wire/static/img/avatar/
 !wire/static/img/avatar/default.png
+wire/static/img/event/
+!wire/static/img/event/default.png
+build/
+dist/
 config.py
-dist
