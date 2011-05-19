@@ -1,6 +1,7 @@
 [program:%(name)s]
-command=export WIRE_SETTINGS=%(directory)s/config.py && /usr/local/bin/gunicorn %(app)s -c /etc/gunicorn.conf.py -b unix:%(socket)s
+command=/usr/local/bin/gunicorn %(app)s -c /etc/gunicorn.conf.py -b unix:%(socket)s
 directory=%(directory)s
+environment=WIRE_SETTINGS=%(directory)s/config.pyp
 user=%(user)s
 autostart=true
 autorestart=true
