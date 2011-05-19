@@ -4,12 +4,23 @@
 {% endblock %}
 {% block content %}
 <article>
-  <h1>Create Event</h1>
+  <h1>
+  {%- if new -%}
+    Create
+  {%- else -%}
+    Edit
+  {%- endif %} Event</h1>
   {{ flashes() }}
 
-  <form id="event-form" method="POST" action="{{ url_for('new_event') }}">
+  <form id="event-form" method="POST" enctype="multipart/form-data" action="
+  {%- if new -%}
+    {{ url_for('new_event') }}
+  {%- else -%}
+    {{ url_for('edit_event', event_id=event.key) }}
+  {%- endif -%}
+  ">
     <p><label for="name">Event Name</label><br/>
-        <input type="text" name="name" id="name" placeholder="Ex. My Awesome March" value="{{ event.data['title'] }}"/>
+        <input type="text" name="name" id="name" placeholder="Ex. My Awesome March" value="{{ event.data['name'] }}"/>
     </p>
     <p><label for="date">Date</label><br/>
         <input type="text" name="date" id="date" class="datepick" placeholder="Ex. 1981-05-11" value="{{ event.data['date'] }}"/>
@@ -23,7 +34,12 @@
     <p><label for="description">Description</label><br/>
         <textarea id="description" name="description" style="width:95%; height:200px" placeholder="Ex. We are doing something and it will be excellent because...">{{ event.data['description'] }}</textarea>
     </p>
-    <p><button style="font-size:24pt !important; font-weight: bold !important">Create Event</button></p>
+    <p><button style="font-size:24pt !important; font-weight: bold !important">
+  {%- if new -%}
+    Create Event
+  {%- else -%}
+    Save
+  {%- endif %}</button></p>
 
   </form>
 </article>

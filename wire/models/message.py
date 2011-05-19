@@ -139,7 +139,7 @@ class Message:
         self.decrypted = False
         self.encrypted = True
 
-class ValidationError(Exception):
+class MessageValidationError(Exception):
     pass
 
 class MessageError(Exception):

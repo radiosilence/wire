@@ -1,12 +1,12 @@
 from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash
 
-from wire.models.user import User
-from wire.models.message import Message, MessageError
+from wire.models.user import User, UserValidationError
+from wire.models.message import Message, MessageError, MessageValidationError
 from wire.models.inbox import Inbox
 from wire.models.thread import Thread, DestroyedThreadError, ThreadError, InvalidRecipients
 from wire.models.contacts import Contacts, ContactExistsError, ContactInvalidError
-from wire.models.event import Event
+from wire.models.event import Event, EventValidationError, EventNotFoundError
 from wire.utils.auth import Auth, AuthError, DeniedError
 from wire.utils.crypto import DecryptFailed
 
@@ -22,6 +22,7 @@ import os, uuid, subprocess, shlex
 DEBUG                   = True
 SECRET_KEY              = 'TEST KEY'
 UPLOADED_AVATARS_DEST   = 'wire/static/img/avatar'
+UPLOADED_IMAGES_DEST    = 'wire/static/img/event'
 REDIS_HOST              = 'localhost'
 REDIS_PORT              = 6379
 REDIS_DB                = 0
@@ -32,6 +33,7 @@ app.config.from_envvar('WIRE_SETTINGS', silent=True)
 Markdown(app)
 
 uploaded_avatars = UploadSet('avatars', IMAGES)
+uploaded_images = UploadSet('images', IMAGES)
 
 redis_connection = redis.Redis(
     host=app.config['REDIS_HOST'],
@@ -40,6 +42,7 @@ redis_connection = redis.Redis(
 )
 
 configure_uploads(app, uploaded_avatars)
+configure_uploads(app, uploaded_images)
 
 @app.before_request
 def before_request():
@@ -157,7 +160,7 @@ def send_message(recipient=False):
             flash('Your message has been successfully wired, \
                     and should arrive shortly.', 'success')
             return redirect(url_for('view_thread', thread_id=t.key))
-        except message.ValidationError:
+        except MessageValidationError:
             for error in m.validation_errors:
                 flash(error, 'error')
         except InvalidRecipients:
@@ -323,16 +326,63 @@ def list_events():
 def view_event(event_id):
     return "viewing event", event_id
 
-@app.route('/create-event')
+@app.route('/create-event', methods=['POST', 'GET'])
 def new_event():
+    return save_event(new=True)
+
+@app.route('/edit-event/<int:event_id>', methods=['POST', 'GET'])
+def edit_event(event_id):
+    return save_event(new=False, event_id=event_id)
+
+def save_event(event_id=False, new=False):
+    try:
+        g.user.username
+    except AttributeError:
+        abort(401)
+
     e = Event(redis=g.r, user=g.user)
+    
+    if not new:
+        try:
+            e.load(event_id)
+        except EventNotFoundError():
+            abort(404)
+        print e.data
+        if e.data['creator'] != g.user.username:
+            abort(401)
+    
+    if request.method == 'POST':
+        e.update(request.form)
+        try:
+            image = request.files.get('image')
+            if image:
+                try:
+                    e.data['image'] = upload_event_image(image)
+                    flash("Upload successful.", 'success')
+                except UploadNotAllowed:
+                    flash("Upload not allowed.", 'error')
+            e.save()
+            if new:
+                flash("Event created.", 'success')
+            else:
+                flash("Changes saved.", 'success')
+            return redirect(url_for('edit_event', event_id=e.key))
+        except EventValidationError:
+            for error in e.validation_errors:
+                flash(error, 'error')  
+
     return render_template('forms/event.html',
+        new=new,
         event=e
     )
 
-@app.route('/save-event')
-def save_event():
-    pass
+
+def upload_event_image(image):
+    ext = image.filename.split(".")[-1]
+    filename = uploaded_images.save(image, name="%s.%s" % (unique_id(), ext))
+    path = "%s/%s" % (UPLOADED_IMAGES_DEST, filename)
+    resize_image(path, 160)
+    return filename
 
 @app.route('/blog')
 def blog_entries():
@@ -376,9 +426,8 @@ def edit_user(new=False):
                 return redirect(url_for('intro'))
             else:
                 flash('Profile updated.', 'success')
-                print u.data
                 return redirect(url_for('edit_user'))
-        except user.ValidationError:
+        except UserValidationError:
             for error in u.validation_errors:
                 flash(error, 'error')
     
@@ -391,19 +440,27 @@ def upload_avatar(avatar):
     ext = avatar.filename.split(".")[-1]
     filename = uploaded_avatars.save(avatar, name="%s.%s" % (unique_id(), ext))
     path = "%s/%s" % (UPLOADED_AVATARS_DEST, filename)
+    resize_image(path, 80)
+    return filename
+
+def resize_image(path, x, y=False):
+    if not y:
+        y = x
     args = [
         'convert',
         path,
         '-resize',
-        '80x80^',
+        '%sx%s^' % (x, y),
         '-gravity',
         'center',
         '-extent',
-        '80x80',
+        '%sx%s' % (x, y),
+        '-quality',
+        '100',
         path
     ]
-    p = subprocess.Popen(args)
-    return filename
+    print "rezied", path
+    return subprocess.check_output(args)
 
 def unique_id():
     return hex(uuid.uuid4().time)[2:-1]

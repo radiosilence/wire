@@ -105,7 +105,7 @@ class User:
         else:
             self.avatar = 'default.png'
 
-class ValidationError(Exception):
+class UserValidationError(Exception):
     pass
 
 class UserExists(Exception):
