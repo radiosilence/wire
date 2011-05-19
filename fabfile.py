@@ -117,7 +117,6 @@ def show_config():
             % env.directory)
 
 def deploy_pip():
-    local('git push origin master')
     git_pull()
     make_virt()
     pip_install_req()
