@@ -1,7 +1,7 @@
 *.pyc
-wire/static/img/avatar/
+wire/static/img/avatar/*.*
 !wire/static/img/avatar/default.png
-wire/static/img/event/
+wire/static/img/event/*.*
 !wire/static/img/event/default.png
 build/
 dist/
