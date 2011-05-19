@@ -96,7 +96,7 @@ class Message:
             pass
         if len(errors) > 0:
             self.validation_errors = errors
-            raise ValidationError()
+            raise MessageValidationError()
     
     def load(self, key=False):
         if key:

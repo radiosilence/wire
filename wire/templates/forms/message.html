@@ -8,14 +8,14 @@
 {{ flashes() }}
 <form id="msg-form" method="POST" action="{{ url_for('send_message') }}">
     <p><label for="recipients">Recipient(s)</label><br/>
-        <textarea id="recipients" style="width:95%; height: 3em" name="recipients">{{ ', '.join(recipients) }}</textarea><br/>Send to multiple recipients by separating their usernames with a comma (User1, User2, etc)
+        <textarea id="recipients" class="fullwidth" style="height: 3em" name="recipients">{{ ', '.join(recipients) }}</textarea><br/>Send to multiple recipients by separating their usernames with a comma (User1, User2, etc)
     </p>
     <p><label for="subject">Subject</label><br/>
-        <input id="subject" type="text" name="subject" style="width:95%;" value="{{ request.form['subject'] }}"/><br/>
+        <input id="subject" type="text" name="subject" class="fullwidth" value="{{ request.form['subject'] }}"/><br/>
         <strong>NOTE:</strong> Message subjects are <strong>not</strong> encrypted. Do not put revealing information in message subjects.
     </p>
     <p><label for="msg-content">Message</label><br/>
-        <textarea id="msg-content" name="content" placeholder="Ex. Blah blah blah..." style="width: 95%; height: 200px">{{ message.data['content'] }}</textarea>
+        <textarea id="msg-content" name="content" placeholder="Ex. Blah blah blah..." class="fullwidth decentheight" >{{ message.data['content'] }}</textarea>
     </p>
   </article>
   <article>

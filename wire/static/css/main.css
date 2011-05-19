@@ -227,3 +227,11 @@ article.event img.event, img.event_edit {
     float: left;
     padding-right: 10px
 }
+
+.fullwidth {
+    width:606px;
+}
+
+.decentheight {
+    height: 200px;
+}
