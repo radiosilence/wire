@@ -71,7 +71,7 @@ table.thread tr.mine:hover, table.inbox tr:hover, table.contacts tr:hover {
     background-color: rgba(20,20,20,.5);
 }
 
-td.opts {
+div.opts {
     white-space: nowrap;
     text-align: right;
 }
@@ -80,6 +80,7 @@ td.opts {
     font-weight: bold;
     text-decoration: none;
     padding-left: 2px;
+    padding-right: 5px;
 }
 .opts a:hover {
     text-decoration: underline;
@@ -114,6 +115,15 @@ form.add_recp:before {
 
 form.add_recp {
     font-size: 10pt;
+}
+
+div.parallelements div {
+    float: left;
+    padding-right: 20px
+}
+
+div.parallelements {
+    overflow: hidden;
 }
 
 .username {
@@ -189,7 +199,7 @@ article.event div.box {
     overflow: hidden;
 }
 
-article.event div.box div {
+article.listing div.box div {
 
     white-space: normal;
     text-overflow: ellipsis;
@@ -210,13 +220,25 @@ article.event div.box p.creator a {
     font-size: 12pt;
 }
 
-div.parallelements div {
-    float: left;
-    padding-right: 20px
+article div.attendbar {
+    padding: 7px 10px 5px 15px;
+    border: 1px solid #1a1a1a;
+    margin-bottom: 10px;
+    background-color: rgba(10,10,10,.5);
+    border-radius: 5px;
 }
 
-div.parallelements {
-    overflow: hidden;
+article div.attendbar div.parallelements div:last-child p {
+    text-align: right;
+}
+
+article div.attendbar div.parallelements div {
+    margin: 0px;
+    padding: 0px;
+    width: 50%;
+}
+article div.attendbar div p {
+    margin: 0px;
 }
 img.event {
     width: 160px;
@@ -228,6 +250,9 @@ article.event img.event, img.event_edit {
     padding-right: 10px
 }
 
+article article.creator:hover {
+    background-color: rgba(20,20,20,.2);
+}
 .fullwidth {
     width:606px;
 }

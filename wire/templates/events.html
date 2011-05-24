@@ -6,13 +6,13 @@
   <p>Displaying {{ count }} events.</p>
 </article>
 {% for event in events %}
-<article class="event">
+<article class="event listing">
   <a href="{{ url_for('view_event', event_id=event.key) }}"><img src="{{ url_for('static', filename='img/event/%s' % event.data['image']) }}" class="event"/></a>
   <header>
     <div class="opts">
-      <a href="#">a</a>
+
     </div>
-    {{ event.data['date'] }} at {{ event.data['time'] }}, {{ event.data['location'] }}
+    {{ event.data['date'] }} at {{ event.data['time'] }}, {{ event.data['location'] }}, <strong>{{ event.attendees_count }}</strong> attendee(s), <strong>{{ event.maybes_count }}</strong> maybe(s)
   </header>
   <div class="box">
     <div>

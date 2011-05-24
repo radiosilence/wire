@@ -102,6 +102,31 @@ class User:
         else:
             self.avatar = 'default.png'
 
+    def set_attending(self, event_id):
+        r = self.redis
+        r.lpush('user:%s:attending' % self.key, event_id)
+        r.lrem('user:%s:maybe' % self.key, event_id, 0)
+    def set_maybe(self, event_id):
+        r = self.redis
+        r.lpush('user:%s:maybe' % self.key, event_id)
+        r.lrem('user:%s:attending' % self.key, event_id, 0)
+    def set_unattending(self, event_id):
+        r = self.redis
+        r.lrem('user:%s:attending' % self.key, event_id, 0)
+        r.lrem('user:%s:maybe' % self.key, event_id, 0)
+
+    def get_event_state(self, event_id):
+        r = self.redis
+        event_id = str(event_id)
+        print r.lrange('user:%s:attending' % self.key, 0, -1), event_id
+        print event_id in r.lrange('user:%s:attending' % self.key, 0, -1)
+        if event_id in r.lrange('user:%s:attending' % self.key, 0, -1):
+            return 'attending'
+        elif event_id in r.lrange('user:%s:maybe' % self.key, 0, -1):
+            return 'maybe'
+        else:
+            return 'unattending'
+
 class UserValidationError(Exception):
     pass
 

@@ -1,5 +1,7 @@
 import redis, json
 from wire.utils.redis import autoinc
+from wire.models.user import User
+from datetime import datetime
 
 class Event:
     def __init__(self, redis=False, user=False):
@@ -8,8 +10,15 @@ class Event:
         self.data = {
             'image': 'default.png'
         }
+        self.date = str(datetime.now())
         self.validation_errors = []
         self.key = False
+        self.comments = []
+        self.comment_count = 0
+        self.attendees = []
+        self.attendees_count = 0
+        self.maybes = []
+        self.maybes_count = 0
 
     def list(self, limit=-1, start=0):
         if limit > 0:
@@ -42,7 +51,7 @@ class Event:
     def save(self):
         r = self.redis
         self._validate()
-
+        
         if not self.key:
             self.data['creator'] = self.user.username
             self.key = autoinc(self.redis, 'event')
@@ -53,6 +62,30 @@ class Event:
 
         r.set('event:%s' % self.key, json.dumps(self.data))
 
+    def add_comment(self, message):
+        if not self.key:
+            raise EventMustLoadError()
+        r = self.redis
+        if len(message) < 1:
+            raise EventCommentError("Message must be at least one character.")
+        comment_id = autoinc(r, 'comment')
+        r.set('comment:%s' % comment_id, json.dumps({
+            'user': self.user.key,
+            'text': message,
+            'date': self.date
+        }))
+        r.lpush('event:%s:comments' % self.key, comment_id)
+
+    def del_comment(self, comment_id):
+        r = self.redis
+        r.lrem('event:%s:comments' % self.key, comment_id, 0)
+        r.delete('comment:%s' % comment_id)
+    
+    def comment_user(self, comment_id):
+        r = self.redis
+        c = json.loads(r.get('comment:%s' % comment_id))
+        return c['user']
+
     def load(self, event_id):
         r = self.redis
 
@@ -61,6 +94,68 @@ class Event:
             self.data = json.loads(r.get('event:%s' % self.key))
         else:
             raise EventNotFoundError()
+        
+        self._load_attendees_count()
+        self._load_maybes_count()
+        self._reload_comments()
+
+    def _reload_comments(self):
+        r = self.redis
+        self.comments_count = r.llen('event:%s:comments' % self.key)
+        for key in r.lrange('event:%s:comments' % self.key, 0, -1):
+            comment = json.loads(r.get('comment:%s' % key))
+            u = User(redis=self.redis)
+            u.load(comment['user'])
+            comment['user'] = u
+            comment['date_date'] = comment['date'][:10]
+            comment['date_time'] = comment['date'][11:16]
+            comment['key'] = key
+            self.comments.append(comment)
+
+    def load_attendees(self):
+        r = self.redis
+        for key in r.lrange('event:%s:attendees' % self.key):
+            u = User(redis=self.redis)
+            u.load(key)
+            self.attendees.append(u)
+        self._load_attendees_count()
+
+    def load_maybes(self):
+        r = self.redis
+        for key in r.lrange('event:%s:maybes' % self.key):
+            u = User(redis=self.redis)
+            u.load(key)
+            self.maybes.append(u)
+        self._load_maybes_count()
+    
+    def set_attending(self):
+        if self.user.get_event_state(self.key) == 'attending':
+            return False
+        r = self.redis
+        r.lpush('event:%s:attendees' % self.key, self.user.key)
+        r.lrem('event:%s:maybes' % self.key, self.user.key, 0)
+        self.user.set_attending(self.key)
+    
+    def set_unattending(self):    
+        if self.user.get_event_state(self.key) == 'unattending':
+            return False
+        r = self.redis
+        r.lrem('event:%s:attendees' % self.key, self.user.key, 0)
+        r.lrem('event:%s:maybes' % self.key, self.user.key, 0)
+        self.user.set_unattending(self.key)
+    def set_maybe(self):
+        if self.user.get_event_state(self.key) == 'maybe':
+            return False
+        r = self.redis
+        r.lpush('event:%s:maybes' % self.key, self.user.key)
+        r.lrem('event:%s:attendees' % self.key, self.user.key, 0)
+        self.user.set_maybe(self.key)
+
+    def _load_attendees_count(self):
+        self.attendees_count = self.redis.llen('event:%s:attendees' % self.key)
+
+    def _load_maybes_count(self):
+        self.maybes_count = self.redis.llen('event:%s:maybes' % self.key)
 
     def _validate(self):
         if len(self.data['name']) < 1:
@@ -72,4 +167,8 @@ class Event:
 class EventNotFoundError(Exception):
     pass
 class EventValidationError(Exception):
+    pass
+class EventCommentError(Exception):
+    pass
+class EventMustLoadError(Exception):
     pass

@@ -6,7 +6,7 @@ from wire.models.message import Message, MessageError, MessageValidationError
 from wire.models.inbox import Inbox
 from wire.models.thread import Thread, DestroyedThreadError, ThreadError, InvalidRecipients
 from wire.models.contacts import Contacts, ContactExistsError, ContactInvalidError
-from wire.models.event import Event, EventValidationError, EventNotFoundError
+from wire.models.event import Event, EventValidationError, EventNotFoundError, EventCommentError
 from wire.utils.auth import Auth, AuthError, DeniedError
 from wire.utils.crypto import DecryptFailed
 
@@ -44,22 +44,24 @@ redis_connection = redis.Redis(
 configure_uploads(app, uploaded_avatars)
 configure_uploads(app, uploaded_images)
 
+static_types = [
+    'jpg', 'jpeg', 'png', 'css', 'woff', 'ttf', 'js'
+]
+
 @app.before_request
 def before_request():
-
     g.r = redis_connection
     g.auth = Auth(g.r)
     g.user = User(redis=g.r)
-
-    try:
-        if session['logged_in']:
-            g.user.load(session['logged_in'])
-            g.inbox = Inbox(user=g.user, redis=g.r)
-            g.unread_count = g.inbox.unread_count()
-    
-    except KeyError:
-        pass
-    
+    if request.path.split('.')[-1] not in static_types:
+        try:
+            if session['logged_in']:
+                g.user.load(session['logged_in'])
+                g.inbox = Inbox(user=g.user, redis=g.r)
+                g.unread_count = g.inbox.unread_count()
+        
+        except KeyError:
+            pass
 
 @app.after_request
 def after_request(response):
@@ -331,7 +333,12 @@ def list_events():
 
 @app.route('/event/<int:event_id>')
 def view_event(event_id):
-    return "viewing event", event_id
+    e = Event(redis=g.r, user=g.user)
+    e.load(event_id)
+    return render_template('event.html',
+        event=e,
+        state=g.user.get_event_state(event_id)
+    )
 
 @app.route('/create-event', methods=['POST', 'GET'])
 def new_event():
@@ -390,6 +397,59 @@ def upload_event_image(image):
     path = "%s/%s" % (UPLOADED_IMAGES_DEST, filename)
     resize_image(path, 160)
     return filename
+
+@app.route('/event/<int:event_id>/add-comment', methods=['POST'])
+def event_add_comment(event_id):
+    e = Event(redis=g.r, user=g.user)
+    e.load(event_id)
+    try:
+        e.add_comment(request.form['text'])
+        flash("Comment has been added.", 'success')
+    except EventCommentError as detail:
+        flash(detail, 'error')
+    return redirect(url_for('view_event', event_id=event_id)+'#comments')
+
+@app.route('/event/<int:event_id>/delete-comment/<int:comment_id>')
+def event_del_comment(event_id, comment_id):
+    e = Event(redis=g.r, user=g.user)
+    e.load(event_id)
+    user = e.comment_user(comment_id)
+    if user != g.user.key and e.data['creator'] != g.user.username:
+        return 401
+    
+    e.del_comment(comment_id)
+    flash("Comment has been deleted.", 'success')
+    return redirect(url_for('view_event', event_id=event_id)+'#comments')
+
+@app.route('/event/<int:event_id>/attend')
+def event_set_attend(event_id):
+    if not g.user.username:
+        return 401
+    e = Event(redis=g.r, user=g.user)
+    e.load(event_id)
+    e.set_attending()
+    flash("You have been marked as attending.", 'success')
+    return redirect(url_for('view_event', event_id=event_id))
+
+@app.route('/event/<int:event_id>/unattend')
+def event_set_unattend(event_id):
+    if not g.user.username:
+        return 401
+    e = Event(redis=g.r, user=g.user)
+    e.load(event_id)
+    e.set_unattending()
+    flash("You have been marked as not attending.", 'success')
+    return redirect(url_for('view_event', event_id=event_id))
+
+@app.route('/event/<int:event_id>/maybe')
+def event_set_maybe(event_id):
+    if not g.user.username:
+        return 401
+    e = Event(redis=g.r, user=g.user)
+    e.load(event_id)
+    e.set_maybe()
+    flash("You have been marked as maybe attending.", 'success')
+    return redirect(url_for('view_event', event_id=event_id))
 
 @app.route('/blog')
 def blog_entries():
