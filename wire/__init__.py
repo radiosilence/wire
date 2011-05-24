@@ -27,7 +27,16 @@ REDIS_HOST              = 'localhost'
 REDIS_PORT              = 6379
 REDIS_DB                = 0
 
-app = Flask(__name__, static_path='/')
+if DEBUG:
+    app = Flask(__name__)
+    static_types = []
+else:
+    app = Flask(__name__, static_path='/')
+    static_types = [
+        'gif', 'jpg', 'jpeg', 'css', 'gif', 'woff', 'ttf', 'ico', 'js'
+    ]
+
+
 app.config.from_object(__name__)
 app.config.from_envvar('WIRE_SETTINGS', silent=True)
 Markdown(app)
@@ -44,17 +53,12 @@ redis_connection = redis.Redis(
 configure_uploads(app, uploaded_avatars)
 configure_uploads(app, uploaded_images)
 
-static_types = [
-    'gif', 'jpg', 'jpeg', 'css', 'gif', 'woff', 'ttf', 'ico'
-]
-
 @app.before_request
 def before_request():
     if request.path.split('.')[-1] in static_types:
         return False
     
     g.r = redis_connection
-    g.r.get("++++++++"+request.path)
     g.auth = Auth(g.r)
     g.user = User(redis=g.r)
 
