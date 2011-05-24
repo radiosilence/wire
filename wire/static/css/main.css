@@ -260,3 +260,9 @@ article article.creator:hover {
 .decentheight {
     height: 200px;
 }
+
+div.comments {
+    padding-top: 1em;
+    overflow: hidden;
+    width: 100%;
+}

@@ -64,7 +64,10 @@
         Created by <a href="{{ url_for('send_message_recipient', recipient=event.data['creator']) }}">{{ event.data['creator'] }}</a>
       {% endif %}
     </p>
-    <h2>Comments</h2>
+    
+  </div>
+  <div class="comments">
+  <h2>Comments</h2>
     <a name="comments" />
     {% for comment in event.comments %}
       <article class="message
