@@ -19,6 +19,7 @@ class Event:
         self.attendees_count = 0
         self.maybes = []
         self.maybes_count = 0
+        self.creator = User(redis=redis)
 
     def list(self, limit=-1, start=0):
         if limit > 0:
@@ -51,7 +52,7 @@ class Event:
     def save(self):
         r = self.redis
         self._validate()
-        
+
         if not self.key:
             self.data['creator'] = self.user.username
             self.key = autoinc(self.redis, 'event')
@@ -59,8 +60,11 @@ class Event:
             r.lpush('user:%s:events' % self.user.key, self.key)
         if len(self.data['location']) < 1:
             self.data['location'] = 'Undisclosed Location'
-
+        self._load_creator()
         r.set('event:%s' % self.key, json.dumps(self.data))
+
+    def _load_creator(self):
+        self.creator.load_by_username(self.data['creator'])
 
     def add_comment(self, message):
         if not self.key:
@@ -98,6 +102,7 @@ class Event:
         self._load_attendees_count()
         self._load_maybes_count()
         self._reload_comments()
+        self._load_creator()
 
     def _reload_comments(self):
         r = self.redis
