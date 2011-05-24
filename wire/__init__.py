@@ -9,6 +9,7 @@ from wire.models.contacts import Contacts, ContactExistsError, ContactInvalidErr
 from wire.models.event import Event, EventValidationError, EventNotFoundError, EventCommentError
 from wire.utils.auth import Auth, AuthError, DeniedError
 from wire.utils.crypto import DecryptFailed
+from wire.utils.skipper import ignore_ico
 
 from flaskext.markdown import Markdown
 from flaskext.uploads import (UploadSet, configure_uploads, IMAGES,
@@ -29,7 +30,9 @@ REDIS_DB                = 0
 
 if DEBUG:
     app = Flask(__name__)
-    static_types = []
+    static_types = [
+        'ico'
+    ]
 else:
     app = Flask(__name__, static_path='/')
     static_types = [
@@ -39,6 +42,7 @@ else:
 
 app.config.from_object(__name__)
 app.config.from_envvar('WIRE_SETTINGS', silent=True)
+app.wsgi_app = ignore_ico(app.wsgi_app, static_types)
 Markdown(app)
 
 uploaded_avatars = UploadSet('avatars', IMAGES)
@@ -55,8 +59,6 @@ configure_uploads(app, uploaded_images)
 
 @app.before_request
 def before_request():
-    if request.path.split('.')[-1] in static_types:
-        return False
     
     g.r = redis_connection
     g.auth = Auth(g.r)
