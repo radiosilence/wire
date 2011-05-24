@@ -27,7 +27,7 @@ REDIS_HOST              = 'localhost'
 REDIS_PORT              = 6379
 REDIS_DB                = 0
 
-app = Flask(__name__)
+app = Flask(__name__, static_path='/')
 app.config.from_object(__name__)
 app.config.from_envvar('WIRE_SETTINGS', silent=True)
 Markdown(app)
@@ -45,23 +45,27 @@ configure_uploads(app, uploaded_avatars)
 configure_uploads(app, uploaded_images)
 
 static_types = [
-    'x'
+    'gif', 'jpg', 'jpeg', 'css', 'gif', 'woff', 'ttf', 'ico'
 ]
 
 @app.before_request
 def before_request():
+    if request.path.split('.')[-1] in static_types:
+        return False
+    
     g.r = redis_connection
+    g.r.get("++++++++"+request.path)
     g.auth = Auth(g.r)
     g.user = User(redis=g.r)
-    if request.path.split('.')[-1] not in static_types: 
-        try:
-            if session['logged_in']:
-                g.user.load(session['logged_in'])
-                g.inbox = Inbox(user=g.user, redis=g.r)
-                g.unread_count = g.inbox.unread_count()
-        
-        except KeyError:
-            pass
+
+    try:
+        if session['logged_in']:
+            g.user.load(session['logged_in'])
+            g.inbox = Inbox(user=g.user, redis=g.r)
+            g.unread_count = g.inbox.unread_count()
+    
+    except KeyError:
+        pass
 
 @app.after_request
 def after_request(response):
