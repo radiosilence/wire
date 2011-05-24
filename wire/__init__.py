@@ -45,7 +45,7 @@ configure_uploads(app, uploaded_avatars)
 configure_uploads(app, uploaded_images)
 
 static_types = [
-    'jpg', 'jpeg', 'png', 'css', 'woff', 'ttf', 'js'
+    'x'
 ]
 
 @app.before_request
@@ -53,7 +53,7 @@ def before_request():
     g.r = redis_connection
     g.auth = Auth(g.r)
     g.user = User(redis=g.r)
-    if request.path.split('.')[-1] not in static_types:
+    if request.path.split('.')[-1] not in static_types: 
         try:
             if session['logged_in']:
                 g.user.load(session['logged_in'])
