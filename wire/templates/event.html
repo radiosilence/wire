@@ -43,7 +43,8 @@
 {% block javascript %}
 <script src="{{ url_for('static', filename='js/event.js') }}" type="text/javascript"></script>
 {% endblock %}
-{% block content %}
+{% block content %}<h1><a href="{{ url_for('view_event', event_id=event.key) }}">{{ event.data['name'] }}</a></h1>
+        {{ flashes() }}
 <article class="event">
   {{ attend_bar(state, event.key) }}
   <a href="{{ url_for('view_event', event_id=event.key) }}"><img src="{{ url_for('static', filename='img/event/%s' % event.data['image']) }}" class="event"/></a>
@@ -52,8 +53,8 @@
   </header>
   <div class="box">
     <div>
-
-    <h1><a href="{{ url_for('view_event', event_id=event.key) }}">{{ event.data['name'] }}</a></h1>
+    <h1>Details</h1>
+    
     {{ event.data['description']|markdown }}
     </div>
     <p class="creator">
@@ -64,7 +65,6 @@
       {% endif %}
     </p>
     <h2>Comments</h2>
-        {{ flashes() }}
     <a name="comments" />
     {% for comment in event.comments %}
       <article class="message
