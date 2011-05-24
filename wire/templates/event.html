@@ -49,7 +49,7 @@
   {{ attend_bar(state, event.key) }}
   <a href="{{ url_for('view_event', event_id=event.key) }}"><img src="{{ url_for('static', filename='img/event/%s' % event.data['image']) }}" class="event"/></a>
   <header>
-    {{ event.data['date'] }} at {{ event.data['time'] }}, {{ event.data['location'] }}, <strong>{{ event.attendees_count }}</strong> attendee(s), <strong>{{ event.maybes_count }}</strong> maybe(s)
+    {{ event.data['date'] }} at {{ event.data['time'] }}, <em>{{ event.data['location'] }}</em>, <strong>{{ event.attendees_count }}</strong> attendee(s), <strong>{{ event.maybes_count }}</strong> maybe(s)
   </header>
   <div class="box">
     <div>
