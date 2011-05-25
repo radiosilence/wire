@@ -11,7 +11,9 @@
     Edit
   {%- endif %} Event</h1>
   {{ flashes() }}
-
+  {% if not new %}
+    <p><a href="{{ url_for('view_event', event_id=event.key) }}">Back to event</a></p>
+  {% endif %}
   <form id="event-form" method="POST" enctype="multipart/form-data" action="
   {%- if new -%}
     {{ url_for('new_event') }}
@@ -66,7 +68,10 @@
     Create Event
   {%- else -%}
     Save
-  {%- endif %}</button></p>
+  {%- endif %}</button>&nbsp;
+  {% if not new %}
+  <a href="{{ url_for('del_event', event_id=event.key) }}" class="button delete_button" style="font-size:24pt !important; font-weight: bold !important">Delete Event</a>
+  {% endif %}</p>
 
   </form>
 </article>

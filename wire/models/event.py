@@ -109,6 +109,22 @@ class Event:
         self._reload_comments()
         self._load_creator()
 
+    def delete(self):
+        r = self.redis
+        r.lrem('_list:events', self.key, 0)
+        self.load_attendees()
+        self.load_maybes()
+        
+        for attendee in self.attendees:
+            r.lrem('user:%s:attending' % attendee.key, self.key, 0)
+        
+        for maybe in self.maybes:
+            r.lrem('user:%s:maybe' % maybe.key, self.key, 0)
+        
+        r.delete('event:%s' % self.key)
+        r.delete('event:%s:attendees' % self.key)
+        r.delete('event:%s:maybes' % self.key)
+
     def _reload_comments(self):
         r = self.redis
         self.comments_count = r.llen('event:%s:comments' % self.key)
@@ -124,7 +140,7 @@ class Event:
 
     def load_attendees(self):
         r = self.redis
-        for key in r.lrange('event:%s:attendees' % self.key):
+        for key in r.lrange('event:%s:attendees' % self.key, 0, -1):
             u = User(redis=self.redis)
             u.load(key)
             self.attendees.append(u)
@@ -132,7 +148,7 @@ class Event:
 
     def load_maybes(self):
         r = self.redis
-        for key in r.lrange('event:%s:maybes' % self.key):
+        for key in r.lrange('event:%s:maybes' % self.key, 0, -1):
             u = User(redis=self.redis)
             u.load(key)
             self.maybes.append(u)

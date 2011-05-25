@@ -303,3 +303,18 @@ div.comments {
     overflow: hidden;
     width: 100%;
 }
+
+a.delete_button {
+    
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0.02, #6f0f0f), color-stop(0.51, #220000), color-stop(0.87, #220000));
+    background: -moz-linear-gradient(center top, #ff0f0f 2%, #220000 51%, #220000 87%);
+      -webkit-box-shadow: 0px 0px 15px rgba(256, 128, 128, .2);
+      -moz-box-shadow: 0px 0px 15px rgba(256, 128, 128, .2);
+}
+
+a.delete_button:hover{
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0.02, #7f0f0f), color-stop(0.51, #320000), color-stop(0.87, #320000));
+    background: -moz-linear-gradient(center top, #ff0f0f 2%, #320000 51%, #320000 87%);
+      -webkit-box-shadow: 0px 0px 15px rgba(256, 128, 128, .3);
+      -moz-box-shadow: 0px 0px 15px rgba(256, 128, 128, .3);
+}

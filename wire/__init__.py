@@ -392,7 +392,10 @@ def save_event(event_id=False, new=False):
                 flash("Event created.", 'success')
             else:
                 flash("Changes saved.", 'success')
-            return redirect(url_for('edit_event', event_id=e.key))
+            if new:
+                return redirect(url_for('view_event', event_id=e.key))
+            else:
+                return redirect(url_for('edit_event', event_id=e.key))
         except EventValidationError:
             for error in e.validation_errors:
                 flash(error, 'error')  
@@ -402,13 +405,35 @@ def save_event(event_id=False, new=False):
         event=e
     )
 
-
 def upload_event_image(image):
     ext = image.filename.split(".")[-1]
     filename = uploaded_images.save(image, name="%s.%s" % (unique_id(), ext))
     path = "%s/%s" % (UPLOADED_IMAGES_DEST, filename)
     resize_image(path, 160)
     return filename
+
+@app.route('/event/<int:event_id>/delete', methods=['GET', 'POST'])
+def del_event(event_id):
+    e = Event(redis=g.r, user=g.user)
+    e.load(event_id)
+
+    try:
+        if g.user.username != e.data['creator']:
+            print e.data
+            abort(401)
+    except AttributeError:
+        abort(401)
+
+    if request.method == "POST":
+        e.delete()
+        flash('Event deleted.', 'success')
+        return redirect(url_for('list_events'))
+    else:
+        return render_template('confirm.html',
+            _message='Are you sure you wish to DELETE this thread?',
+            _ok=url_for('del_event', event_id=event_id),
+            _cancel=url_for('view_event', event_id=event_id)
+        )
 
 @app.route('/event/<int:event_id>/add-comment', methods=['POST'])
 def event_add_comment(event_id):
