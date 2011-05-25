@@ -60,12 +60,14 @@ configure_uploads(app, uploaded_images)
 @app.before_request
 def before_request():
     
+    g.logged_in = False
     g.r = redis_connection
     g.auth = Auth(g.r)
     g.user = User(redis=g.r)
 
     try:
         if session['logged_in']:
+            g.logged_in = True
             g.user.load(session['logged_in'])
             g.inbox = Inbox(user=g.user, redis=g.r)
             g.unread_count = g.inbox.unread_count()
@@ -425,7 +427,7 @@ def event_del_comment(event_id, comment_id):
     e.load(event_id)
     user = e.comment_user(comment_id)
     if user != g.user.key and e.data['creator'] != g.user.username:
-        return 401
+        abort(401)
     
     e.del_comment(comment_id)
     flash("Comment has been deleted.", 'success')
@@ -433,8 +435,8 @@ def event_del_comment(event_id, comment_id):
 
 @app.route('/event/<int:event_id>/attend')
 def event_set_attend(event_id):
-    if not g.user.username:
-        return 401
+    if not g.logged_in:
+        abort(401)
     e = Event(redis=g.r, user=g.user)
     e.load(event_id)
     e.set_attending()
@@ -443,8 +445,8 @@ def event_set_attend(event_id):
 
 @app.route('/event/<int:event_id>/unattend')
 def event_set_unattend(event_id):
-    if not g.user.username:
-        return 401
+    if not g.logged_in:
+        abort(401)
     e = Event(redis=g.r, user=g.user)
     e.load(event_id)
     e.set_unattending()
@@ -453,8 +455,8 @@ def event_set_unattend(event_id):
 
 @app.route('/event/<int:event_id>/maybe')
 def event_set_maybe(event_id):
-    if not g.user.username:
-        return 401
+    if not g.logged_in:
+        abort(401)
     e = Event(redis=g.r, user=g.user)
     e.load(event_id)
     e.set_maybe()
@@ -552,7 +554,7 @@ def login():
         flash('Incorrect username or password.', 'error')
         return redirect(url_for('intro'))
     flash('Successfully logged in.', 'success')
-    return redirect(url_for('inbox'))
+    return redirect(request.form['uri'])
 
 @app.route('/logout', methods=['POST', 'GET'])
 def logout():

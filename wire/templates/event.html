@@ -12,6 +12,7 @@
   <a href="{{ href }}" class="button">{{ text }}</a>
 {% endmacro %}
 {% macro attend_bar(type, event_id) %}
+ {% if g.logged_in %}
   <div class="attendbar">
     <div class="parallelements">
         <div>
@@ -38,6 +39,7 @@
         </div>
     </div>
   </div>
+ {% endif %}
 {% endmacro %}
 {% extends 'main.html' %}
 {% block javascript %}
