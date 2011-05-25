@@ -62,10 +62,10 @@
       <p><label>Where?</label>
         <a href="http://maps.google.com/?q={{ event.data['location'] }}">{{ event.data['location'] }}</a>
       </p>
-      <div class="map">
+      <div class="map" style="padding-bottom:1em">
         <div id="map1" marker_path="{{url_for('static', filename='img/') }}" address="{{ event.data['location'] }}" style="min-height: 300px">mappy</div>
+        </div>
       </div>
-    </div>
     {% if event.show_meeting_place %}
       <p><label>Meeting?</label>
         <span id="meeting-place">{{ event.data['meeting_place'] }}</span>
