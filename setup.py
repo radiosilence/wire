@@ -14,7 +14,7 @@ files = ['static/*', 'templates/*']
 
 setup(
     name=NAME,
-    version = "0.1",
+    version = "0.1.1",
     description = doclines[0],
     long_description = "\n".join(doclines[2:]),
     url='https://github.com/radiosilence/wire',
