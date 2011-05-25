@@ -53,7 +53,7 @@
   </header>
 
   <h1><a href="{{ url_for('view_event', event_id=event.key) }}">{{ event.data['name'] }}</a></h1>
-  <div class="box" style="padding-top: 1em">
+  <div class="box" style="padding-top: .5em">
     <p class="field">
      <label>When</label>
      {{ event.data['date'] }} at {{ event.data['time'] }}
@@ -67,20 +67,20 @@
         </div>
       </div>
     {% if event.show_meeting_place %}
-      <p class="field"><label>Meeting</label>
+      <p class="field"><label>Meet</label>
         <span id="meeting-place">{{ event.data['meeting_place'] }}</span>
 
       </p>
-    {% endif %}
-    <p class="field"><label>What</label><br/>
-      {{ (event.data['description'])|markdown }}
-    </p>
-    <p class="creator">
+    {% endif %}<p class="field">
+     <label>Creator</label>
       {% if g.user.username == event.data['creator'] %}
-        Created by you. <a href="{{ url_for('edit_event', event_id=event.key) }}">Edit this event</a>.
+        Created by you. (<em><a href="{{ url_for('edit_event', event_id=event.key) }}">Edit this event</a>)</em>
       {% else %}
         Created by <a href="{{ url_for('send_message_recipient', recipient=event.data['creator']) }}">{{ event.data['creator'] }}</a>
       {% endif %}
+    </p>
+    <p class="field"><label>What</label><br/>
+      {{ (event.data['description'])|markdown }}
     </p>
     
   </div>
