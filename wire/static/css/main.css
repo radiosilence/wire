@@ -1,22 +1,14 @@
 
-header h1 a {
+.wire header h1 a {
     display: block;
-    width: 435px;
-    height: 180px;
-    background: url('../img/head.png') no-repeat;
-    text-indent: -9999px;
-    font-family: PTSans;
-    font-weight: bold;
-    margin-left: -12px;
-}
-
-header h1 a img {
-    display: none;
-}
-header h1 a {
-    font-size: 58pt;
+    font-size: 38pt;
     font-family: WCROUGHTRAD, sans-serif;
     font-weight: normal;
+    margin: -8px 0px 2px -0px;
+}
+
+.wire header h1 {
+    margin: 0px;
 }
 body {
     background-image: url('../img/bg.png');
@@ -27,7 +19,19 @@ article p {
 article img {
 }
 
-h1, h2, nav li a {
+.wire header.main {
+    border: 1px solid #0e0e0e;
+    overflow: hidden;
+    height: 35px;
+    margin: 0 0 20px 0;
+    background-color: #050505;
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0.02, #0f0f0f), color-stop(0.51, black), color-stop(0.87, black));
+    background: -moz-linear-gradient(center top, #0f0f0f 2%, black 51%, black 87%);
+      -webkit-box-shadow: 0px 0px 15px rgba(128, 128, 128, .2);
+      -moz-box-shadow: 0px 0px 15px rgba(128, 128, 128, .2);
+    
+}
+h1, h2 {
     text-transform: lowercase;
     font-family: WCROUGHTRAD, sans-serif !important;
     font-weight: normal !important;
@@ -35,11 +39,30 @@ h1, h2, nav li a {
     font-weight: normal;*/
 }
 
-h1 {
-    font-size: 28pt !important;
+.wire h1 {
+    font-size: 28pt;
 }
-nav li a {
-    font-size: 18pt !important;
+
+.wire nav {
+    margin: 0px;
+    text-align: right;
+}
+.wire nav li a {
+    font-size: 12pt;
+    font-weight: normal;
+}
+
+.wire nav li a:hover {
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0.02, #1a1a1a), color-stop(0.51, #0e0e0e), color-stop(0.87, #0e0e0e));
+    background: -moz-linear-gradient(center top, #1a1a1a 2%, #0e0e0e 51%, #0e0e0e 87%);
+
+}
+
+.wire nav ul {
+    background: transparent;
+    border: 0px;
+    border-radius: 0px;
+    margin: 0px;
 }
 #userbox li {
     margin-bottom: 0.4em;

@@ -45,23 +45,30 @@
   <link rel="canonical" href="https://wire-bbs.org/{{ canonical }}" />
   <meta name="Description" content="{{ self.title() }}{{ ndash }}wire &ndash; Privacy is a right.')">
 </head>
-<body>
-<div class="container_12">
+<body class="wire">
   
-  <header class="grid_12"><h1><a href="/" title="wire" id="asd">wire &ndash; Privacy is a right.</a></h1></header>
-  <nav class="grid_12">
-   <ul>
-    <li id="news"><a href="{{ url_for('blog_entries') }}">Blog</a></li>
-    <li id="events"><a href="{{ url_for('list_events') }}">Events</a></li>
-      {% if session.logged_in %}
-        <li id="create-event"><a href="{{ url_for('new_event') }}">Create Event</a></li>
-        <li id="send"><a href="{{ url_for('send_message') }}">Wire a Message</a></li>
-      {% else %}
-        <li id="sign_up"><a href="{{ url_for('new_user') }}">Sign Up</a></li>
-      {% endif %}
-    <li id="developers"><a href="{{ url_for('developers') }}">Developers &amp; Sysadmins</a></li>
-   </ul>
-  </nav>
+  <header class="main">
+    <div class="container_12">
+      <div class="grid_4">
+        <h1><a href="/" title="wire" id="asd">wire</a></h1>
+      </div>
+      <nav class="grid_8">
+       <ul>
+        <li id="news"><a href="{{ url_for('blog_entries') }}">Blog</a></li>
+        <li id="events"><a href="{{ url_for('list_events') }}">Events</a></li>
+          {% if session.logged_in %}
+            <li id="create-event"><a href="{{ url_for('new_event') }}">Create Event</a></li>
+            <li id="send"><a href="{{ url_for('send_message') }}">Wire a Message</a></li>
+          {% else %}
+            <li id="sign_up"><a href="{{ url_for('new_user') }}">Sign Up</a></li>
+          {% endif %}
+        <li id="developers"><a href="{{ url_for('developers') }}">Developers &amp; Sysadmins</a></li>
+       </ul>
+      </nav>
+     </div>
+  </header>
+  
+<div class="container_12">
   <section class="grid_8" id="content">  
       {% block content %}{% endblock %}
   </section>
@@ -84,6 +91,7 @@
         <h1>Login</h1>
           {{ flashes() }}
           <form method="POST" action="{{ url_for('login') }}">
+          <input type="hidden" name="uri" value="{{ request.path }}" />
           <p><input type="text" name="username" id="login_username" placeholder="Username" class="login_field"/></p>
           <p><input type="password" name="password" id="login_password" placeholder="Password"  class="login_field"/></p>
           <p><button id="login_submit" action="{{ url_for('login') }}">Log In</button></p>
