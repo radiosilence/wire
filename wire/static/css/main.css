@@ -1,10 +1,10 @@
 
 .wire header h1 a {
     display: block;
-    font-size: 38pt;
+    font-size: 72pt;
     font-family: WCROUGHTRAD, sans-serif;
     font-weight: normal;
-    margin: -8px 0px 2px -0px;
+    margin: -38px 0px 2px -0px;
 }
 
 .wire header h1 {
@@ -97,7 +97,7 @@ table.thread tr.mine:hover, table.inbox tr:hover, table.contacts tr:hover {
     background-color: rgba(20,20,20,.5);
 }
 
-div.opts {
+div.opts, td.opts {
     white-space: nowrap;
     text-align: right;
 }

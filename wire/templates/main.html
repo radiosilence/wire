@@ -19,7 +19,7 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>{% block title %}{% endblock %}{{ ndash }}wire &ndash; Privacy is a right.</title>
+  <title>{% block title %}{% endblock %}{{ ndash }}wire: Privacy is a right.</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css_lib/subverse.css') }}" type="text/css" /> 
   <link rel="stylesheet" href="{{ url_for('static', filename='css_lib/jquery.autocomplete.css') }}" type="text/css" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" type="text/css" />
@@ -58,7 +58,7 @@
         <li id="events"><a href="{{ url_for('list_events') }}">Events</a></li>
           {% if session.logged_in %}
             <li id="create-event"><a href="{{ url_for('new_event') }}">Create Event</a></li>
-            <li id="send"><a href="{{ url_for('send_message') }}">Wire a Message</a></li>
+            <li id="send"><a href="{{ url_for('send_message') }}">Send a Message</a></li>
           {% else %}
             <li id="sign_up"><a href="{{ url_for('new_user') }}">Sign Up</a></li>
           {% endif %}

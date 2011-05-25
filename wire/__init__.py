@@ -554,7 +554,7 @@ def login():
         flash('Incorrect username or password.', 'error')
         return redirect(url_for('intro'))
     flash('Successfully logged in.', 'success')
-    return redirect(request.form['uri'])
+    return redirect(rqu)
 
 @app.route('/logout', methods=['POST', 'GET'])
 def logout():
