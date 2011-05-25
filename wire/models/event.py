@@ -98,6 +98,11 @@ class Event:
             self.data = json.loads(r.get('event:%s' % self.key))
         else:
             raise EventNotFoundError()
+
+        if len(self.data['meeting_place']) > 0:
+            self.show_meeting_place = True
+        else:
+            self.show_meeting_place = False
         
         self._load_attendees_count()
         self._load_maybes_count()

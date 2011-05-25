@@ -34,17 +34,7 @@
 
 
   {% endfor %}
-{% else %}
-  <h1>Encrypted Thread</h1>
-  {{ flashes() }}
-    <form method="POST" action="{{ url_for('view_thread', thread_id=thread.key) }}">
-<input type="hidden" value="">
-    <input type="hidden" name="action" value="decrypt"/>
-    <p>This message needs to be decrypted. To do this, enter the encryption key into the box below.</p>
-    <p><input type="text" name="encryption_key" placeholder="Ex. hunter2" />&nbsp;<input type="submit" value="Decrypt"/></p>
-  </form>
-{% endif %}
-<form action="{{ url_for('view_thread', thread_id=thread.key) }}" method="post">
+  <form action="{{ url_for('view_thread', thread_id=thread.key) }}" method="post">
   <input type="hidden" name="action" value="reply"/>
   {% if encryption_key %}
     <input type="hidden" name="encryption_key" value="{{ encryption_key }}"/>
@@ -52,4 +42,15 @@
   <p><label for="msg-content"><h1>Reply</h1></label><textarea id="msg-content" name="content" style="width:98%; height: 100px" placeholder="Write your reply in here."></textarea></p>
   <p style="text-align: right"><input type="submit" value="Reply to all"/></p>
 </form>
+
+{% else %}
+  <h1>Encrypted Thread</h1>
+  {{ flashes() }}
+    <form method="POST" action="{{ url_for('view_thread', thread_id=thread.key) }}">
+    <input type="hidden" value="">
+    <input type="hidden" name="action" value="decrypt"/>
+    <p>This message needs to be decrypted. To do this, enter the encryption key into the box below.</p>
+    <p><input type="text" name="encryption_key" placeholder="Ex. hunter2" />&nbsp;<input type="submit" value="Decrypt"/></p>
+  </form>
+{% endif %}
 {% endblock %}

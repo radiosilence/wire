@@ -10,6 +10,9 @@ header h1 a {
     margin-left: -12px;
 }
 
+header h1 a img {
+    display: none;
+}
 header h1 a {
     font-size: 58pt;
     font-family: WCROUGHTRAD, sans-serif;

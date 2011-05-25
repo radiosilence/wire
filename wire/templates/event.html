@@ -43,19 +43,38 @@
 {% block javascript %}
 <script src="{{ url_for('static', filename='js/event.js') }}" type="text/javascript"></script>
 {% endblock %}
-{% block content %}<h1><a href="{{ url_for('view_event', event_id=event.key) }}">{{ event.data['name'] }}</a></h1>
-        {{ flashes() }}
+{% block content %}
 <article class="event">
   {{ attend_bar(state, event.key) }}
+  {{ flashes() }}
   <a href="{{ url_for('view_event', event_id=event.key) }}"><img src="{{ url_for('static', filename='img/event/%s' % event.data['image']) }}" class="event"/></a>
   <header>
-    {{ event.data['date'] }} at {{ event.data['time'] }}, <em>{{ event.data['location'] }}</em>, <strong>{{ event.attendees_count }}</strong> attendee(s), <strong>{{ event.maybes_count }}</strong> maybe(s)
+    <strong>{{ event.attendees_count }}</strong> attendee(s), <strong>{{ event.maybes_count }}</strong> maybe(s)
   </header>
-  <div class="box">
-    <div>
-    <h1>Details</h1>
-    {{ event.data['description']|markdown }}
+
+  <h1><a href="{{ url_for('view_event', event_id=event.key) }}">{{ event.data['name'] }}</a></h1>
+  <div class="box" style="padding-top: 1em">
+    <p>
+     <label>When?</label>
+     {{ event.data['date'] }} at {{ event.data['time'] }}
+    </p>
+    <div class="location">
+      <p><label>Where?</label>
+        <a href="http://maps.google.com/?q={{ event.data['location'] }}">{{ event.data['location'] }}</a>
+      </p>
+      <div class="map">
+        <div id="map1" marker_path="{{url_for('static', filename='img/') }}" address="{{ event.data['location'] }}" style="min-height: 300px">mappy</div>
+      </div>
     </div>
+    {% if event.show_meeting_place %}
+      <p><label>Meeting?</label>
+        <span id="meeting-place">{{ event.data['meeting_place'] }}</span>
+
+      </p>
+    {% endif %}
+    <p>
+      {{ ("<label>What?</label> "+event.data['description'])|markdown }}
+    </p>
     <p class="creator">
       {% if g.user.username == event.data['creator'] %}
         Created by you. <a href="{{ url_for('edit_event', event_id=event.key) }}">Edit this event</a>.
