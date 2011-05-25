@@ -32,7 +32,7 @@ $(function() {
     $("#map1").gMap({
         zoom: 14,
         markers: mrkrs,
-        maptype: G_NORMAL_MAP
+        maptype: G_HYBRID_MAP
     });
 
     $('article.event div.location div.map').hide();
