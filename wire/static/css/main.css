@@ -248,6 +248,17 @@ img.event {
     height: 160px;
 }
 
+article.event div.box p.field label {
+    float: left;
+    display: block;
+    width: 100px;
+}
+
+article.event div.box p.field {
+    border-top: 1px solid #1a1a1a;
+    padding-top: 5px; padding-bottom: 5px;
+    margin-bottom: 0px;
+}
 article.event img.event, img.event_edit {
     float: left;
     padding-right: 10px

@@ -54,12 +54,12 @@
 
   <h1><a href="{{ url_for('view_event', event_id=event.key) }}">{{ event.data['name'] }}</a></h1>
   <div class="box" style="padding-top: 1em">
-    <p>
-     <label>When?</label>
+    <p class="field">
+     <label>When</label>
      {{ event.data['date'] }} at {{ event.data['time'] }}
     </p>
     <div class="location">
-      <p><label>Where?</label>
+      <p class="field"><label>Where</label>
         <a href="http://maps.google.com/?q={{ event.data['location'] }}">{{ event.data['location'] }}</a>
       </p>
       <div class="map" style="padding-bottom:1em">
@@ -67,13 +67,13 @@
         </div>
       </div>
     {% if event.show_meeting_place %}
-      <p><label>Meeting?</label>
+      <p class="field"><label>Meeting</label>
         <span id="meeting-place">{{ event.data['meeting_place'] }}</span>
 
       </p>
     {% endif %}
-    <p>
-      {{ ("<label>What?</label> "+event.data['description'])|markdown }}
+    <p class="field"><label>What</label><br/>
+      {{ (event.data['description'])|markdown }}
     </p>
     <p class="creator">
       {% if g.user.username == event.data['creator'] %}
