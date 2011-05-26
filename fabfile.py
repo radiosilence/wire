@@ -33,9 +33,9 @@ def production(socket=False, **kwargs):
     env.socket = socket
     env.summary.append("Configured for production.")
 
-def default_envs(directory=DEFAULT_DIRECTORY, user=DEFAULT_USER):
+def default_envs(directory=DEFAULT_DIRECTORY, user=DEFAULT_USER, name=APP_NAME):
     env.deploy_user = user
-    env.name = APP_NAME
+    env.name = name
     env.directory = directory
     env.virt_path = '/home/%s/.virt_env/%s' % (env.deploy_user,  env.name)
     env.activate = 'source %s/bin/activate' % env.virt_path
