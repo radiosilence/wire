@@ -40,11 +40,6 @@ def default_envs(directory=DEFAULT_DIRECTORY, user=DEFAULT_USER, name=APP_NAME):
     env.virt_path = '/home/%s/.virt_env/%s' % (env.deploy_user,  env.name)
     env.activate = 'source %s/bin/activate' % env.virt_path
     
-def debug(**kwargs):
-    default_envs(**kwargs)
-    env.name = 'wire'
-    virtualenv('python debug.py')
-    
 def user_add():
     with settings(warn_only=True):
         sudo('useradd -m %s' % env.deploy_user)
@@ -86,7 +81,7 @@ def virtualenv(command):
 
 def git_pull():
     'Updates the repository.'
-    url = "git://github.com/radiosilence/%s.git" % env.name
+    url = "git://github.com/radiosilence/%s.git" % APP_NAME
     if not exists(env.directory):
         sudo('mkdir -p %s && chown %s %s' % (env.directory, env.deploy_user, env.directory))
     with settings(warn_only=True):
