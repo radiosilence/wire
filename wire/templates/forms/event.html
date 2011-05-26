@@ -1,5 +1,6 @@
 {% extends "main.html" %}
 {% block javascript %}
+  <script src="{{ url_for('static', filename='js_lib/ui.geo_autocomplete.js') }}" type="text/javascript"></script>
   <script src="{{ url_for('static', filename='js/event_form.js') }}" type="text/javascript"></script>
 {% endblock %}
 {% block content %}
