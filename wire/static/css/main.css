@@ -6,13 +6,10 @@
     font-weight: normal;
     margin: -38px 0px 2px -0px;
     width: 200px;
+    color: #1a1a1a;
     overflow: hidden;
 }
 
-.wire header h1 a:hover {
-    background:#1a1a1a;
-
-}
 
 
 .wire header h1 {
