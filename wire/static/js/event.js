@@ -6,6 +6,23 @@ $(function() {
         $('header .opts a', this).hide();
     })
 
+    $('div.description').css('max-height', '50px');
+    $('<p class="expander" expanded="no"><a href="#">&darr; Expand &darr;</a></p>').insertAfter('div.description');
+
+    $('p.expander').click(function() {
+        if($(this).attr('expanded') == 'yes'){
+            $(this).prev().css('max-height', '50px');
+            $(this).attr('expanded', 'no');
+            $(this).html('<a href="#">&darr; Expand &darr;</a>');
+        } else {
+            $(this).prev().css('max-height', 'none');
+            $(this).attr('expanded', 'yes');
+            $(this).html('<a href="#">&uarr; Un-expand &uarr;</a>');
+
+        }
+//        alert('hi');
+    });
+
     mrkrs =  [
             {address: $('#map1').attr('address'),
                 icon: {

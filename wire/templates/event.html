@@ -76,13 +76,13 @@
     {% endif %}<p class="field">
      <label>Creator</label>
       {% if g.user.username == event.data['creator'] %}
-        Created by you. (<em><a href="{{ url_for('edit_event', event_id=event.key) }}">Edit this event</a>)</em>
+        You (<em><a href="{{ url_for('edit_event', event_id=event.key) }}">Edit this event</a>)</em>
       {% else %}
-        Created by <a href="{{ url_for('send_message_recipient', recipient=event.data['creator']) }}">{{ event.data['creator'] }}</a>
+        <a href="{{ url_for('send_message_recipient', recipient=event.data['creator']) }}">{{ event.data['creator'] }}</a>
       {% endif %}
     </p>
     <p class="field"><label>What</label><br/>
-      {{ (event.data['description'])|markdown }}
+      <div class="description">{{ (event.data['description'])|markdown }}</div>
     </p>
     
   </div>
