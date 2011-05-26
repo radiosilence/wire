@@ -83,7 +83,7 @@ class User:
 
         if len(errors) > 0:
             self.validation_errors = errors
-            raise ValidationError()
+            raise UserValidationError()
 
     def _test_unique_user(self):
         if self.redis.exists("username:"+self.username):
