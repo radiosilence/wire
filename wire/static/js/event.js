@@ -6,13 +6,13 @@ $(function() {
         $('header .opts a', this).hide();
     })
 
-    $('div.description').css('max-height', '50px');
+    $('div.description').css('max-height', '75px');
     $('<p class="expander" expanded="no"><a href="#">&darr; Expand &darr;</a></p>').insertAfter('div.description');
 
     $('p.expander').click(function(e) {
         e.preventDefault();
         if($(this).attr('expanded') == 'yes'){
-            $(this).prev().css('max-height', '50px');
+            $(this).prev().css('max-height', '75px');
             $(this).attr('expanded', 'no');
             $(this).html('<a href="#">&darr; Expand &darr;</a>');
         } else {
