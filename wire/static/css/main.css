@@ -256,6 +256,17 @@ article.event div.box p.creator a {
     font-size: 12pt;
 }
 
+article.event div.description {
+    overflow: hidden;
+}
+p.expander a {
+    background-color: rgba(20,20,20,.5);
+    display: block;
+    width: 100%;
+    text-align: center;
+    text-decoration: none;
+    height: 1.5em;
+}
 article div.attendbar {
     padding: 7px 10px 5px 15px;
     border: 1px solid #1a1a1a;

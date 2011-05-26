@@ -9,7 +9,8 @@ $(function() {
     $('div.description').css('max-height', '50px');
     $('<p class="expander" expanded="no"><a href="#">&darr; Expand &darr;</a></p>').insertAfter('div.description');
 
-    $('p.expander').click(function() {
+    $('p.expander').click(function(e) {
+        e.preventDefault();
         if($(this).attr('expanded') == 'yes'){
             $(this).prev().css('max-height', '50px');
             $(this).attr('expanded', 'no');
@@ -20,7 +21,6 @@ $(function() {
             $(this).html('<a href="#">&uarr; Un-expand &uarr;</a>');
 
         }
-//        alert('hi');
     });
 
     mrkrs =  [
