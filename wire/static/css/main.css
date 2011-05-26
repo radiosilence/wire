@@ -10,7 +10,14 @@
     overflow: hidden;
 }
 
-
+article.intro h1 {
+    display: block;
+    width: 435px;
+    height: 180px;
+    background-image: url('../img/head.png');
+    text-indent: -9999px;
+    margin-left: -15px;
+}
 
 .wire header h1 {
     margin: 0px;
