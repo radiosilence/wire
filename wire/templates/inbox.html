@@ -3,15 +3,15 @@
 <script src="{{ url_for('static', filename='js/inbox.js') }}" type="text/javascript"></script>
 {% endblock %}
 {% block content %}
-<article>
 <div class="parallelements">
  <div>
   <h1>Inbox</h1>
  </div>
- <div>
+ <div style="padding-top:1.8em">
   <p><a class="button newmessagebutton" href="{{ url_for('send_message') }}">New Message</a></p>
  </div>
 </div>
+<article>
 {{ flashes() }}
 
 {% if not empty %}

@@ -1,9 +1,8 @@
 {% extends "main.html" %}
 {% block content %}
-<article>
   <h1>Events</h1>
+<article>
   <p>Listings of up and coming events.</p>
-  <p>Displaying {{ count }} events.</p>
 </article>
 {% for event in events %}
 <article class="event listing">
@@ -28,6 +27,7 @@
     </p>
 
   </div>
+  <p>Displaying {{ count }} events.</p>
 </article>
 {% endfor %}
 {% endblock %}
