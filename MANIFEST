@@ -10,6 +10,7 @@ skeletons/supervisor.skel
 wire/__init__.py
 wire/models/__init__.py
 wire/models/contacts.py
+wire/models/event.py
 wire/models/inbox.py
 wire/models/message.py
 wire/models/thread.py
@@ -22,6 +23,7 @@ wire/static/img_lib
 wire/static/js
 wire/static/js_lib
 wire/static/css/main.css
+wire/static/css_lib/jquery.autocomplete.css
 wire/static/css_lib/subverse.css
 wire/static/css_lib/images/ui-bg_diagonals-medium_20_000000_40x40.png
 wire/static/css_lib/images/ui-bg_flat_0_000000_40x100.png
@@ -78,6 +80,8 @@ wire/static/img_lib/lightbox/lightbox-btn-next.gif
 wire/static/img_lib/lightbox/lightbox-btn-prev.gif
 wire/static/img_lib/lightbox/lightbox-ico-loading.gif
 wire/static/js/contacts.js
+wire/static/js/event.js
+wire/static/js/event_form.js
 wire/static/js/inbox.js
 wire/static/js/message_form.js
 wire/static/js/thread.js
@@ -92,8 +96,12 @@ wire/static/js_lib/jquery.ajaxQueue.js
 wire/static/js_lib/jquery.autocomplete.min.js
 wire/static/js_lib/jquery.bgiframe.min.js
 wire/static/js_lib/jquery.cookie.js
+wire/static/js_lib/jquery.gMap.js
 wire/static/js_lib/jquery.js
+wire/static/js_lib/jquery.pngFix.js
+wire/static/js_lib/shiv.js
 wire/static/js_lib/thickbox-compressed.js
+wire/static/js_lib/ui.geo_autocomplete.js
 wire/static/js_lib/markitup/sets/markdown/set.js
 wire/static/js_lib/versions/jquery-1.4.4.min.js
 wire/static/js_lib/versions/jquery-1.5.1.min.js
@@ -107,6 +115,7 @@ wire/templates/blog.html
 wire/templates/confirm.html
 wire/templates/contacts.html
 wire/templates/developers.html
+wire/templates/event.html
 wire/templates/events.html
 wire/templates/forms
 wire/templates/inbox.html
@@ -122,3 +131,4 @@ wire/utils/auth.py
 wire/utils/crypto.py
 wire/utils/hasher.py
 wire/utils/redis.py
+wire/utils/skipper.py
