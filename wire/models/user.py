@@ -1,7 +1,7 @@
-import redis
 from wire.utils.redis import autoinc
 import json
 from wire.utils.hasher import Hasher
+
 
 class User:
     def __init__(self, data={}, redis=False, key=False):
@@ -17,19 +17,19 @@ class User:
     def load_by_username(self, username):
         self.load(self.redis.get('username:%s' % username))
 
-    def update(self, data, new=False):  
+    def update(self, data, new=False):
         fields = [
             'username',
             'password',
             'password_confirm'
         ]
-    
+
         for field in fields:
             try:
                 self.data[field] = data[field]
             except KeyError:
                 self.data[field] = ""
-        
+
         if new:
             try:
                 self.username = data['username']
@@ -53,7 +53,7 @@ class User:
             self.key = autoinc(self.redis, 'user')
             self.redis.lpush("list:users", self.key)
             self.redis.lpush("list:usernames", self.username)
-                
+
         self.redis.set("username:%s" % self.username, self.key)
         self.redis.set("user:%s" % self.key, json.dumps({
             'username': self.username,
@@ -72,7 +72,8 @@ class User:
             except UserExists:
                 errors.append("User exists.")
 
-        if len(self.data['password']) < 6 and (len(self.data['password']) > 0 or not self.key):
+        if len(self.data['password']) < 6 and \
+            (len(self.data['password']) > 0 or not self.key):
             errors.append("Password must be at least 6 characters.")
 
             try:
@@ -86,7 +87,7 @@ class User:
             raise UserValidationError()
 
     def _test_unique_user(self):
-        if self.redis.exists("username:"+self.username):
+        if self.redis.exists("username:" + self.username):
             raise UserExists()
 
     def load(self, key):
@@ -106,10 +107,12 @@ class User:
         r = self.redis
         r.lpush('user:%s:attending' % self.key, event_id)
         r.lrem('user:%s:maybe' % self.key, event_id, 0)
+
     def set_maybe(self, event_id):
         r = self.redis
         r.lpush('user:%s:maybe' % self.key, event_id)
         r.lrem('user:%s:attending' % self.key, event_id, 0)
+
     def set_unattending(self, event_id):
         r = self.redis
         r.lrem('user:%s:attending' % self.key, event_id, 0)
@@ -127,8 +130,10 @@ class User:
         else:
             return 'unattending'
 
+
 class UserValidationError(Exception):
     pass
+
 
 class UserExists(Exception):
     pass

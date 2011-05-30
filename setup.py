@@ -7,24 +7,24 @@ messages and events between activists and groups.
 
 from distutils.core import setup
 
-NAME='wire-bbs'
+NAME = 'wire-bbs'
 doclines = __doc__.split("\n")
 
 files = ['static/*', 'templates/*']
 
 setup(
     name=NAME,
-    version = "0.1.1",
-    description = doclines[0],
-    long_description = "\n".join(doclines[2:]),
+    version="0.1.1",
+    description=doclines[0],
+    long_description="\n".join(doclines[2:]),
     url='https://github.com/radiosilence/wire',
     author='James E. Cleveland',
     author_email='jamescleveland@gmail.com',
     packages=['wire', 'wire.models', 'wire.utils'],
-    license = "MIT",
-    scripts = ["debug"],
-    package_data = {'wire': files},
-    requires = [
+    license="MIT",
+    scripts=["debug"],
+    package_data={'wire': files},
+    requires=[
       'Flask',
       'redis',
       'json',
@@ -33,7 +33,7 @@ setup(
       'os', 'uuid', 'subprocess', 'shlex',
       'Crypto', 'base64'
     ],
-    classifiers= [
+    classifiers=[
       'Development Status :: 2 - Pre-Alpha',
       'Environment :: Web Environment',
       'Intended Audience :: Developers',

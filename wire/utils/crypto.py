@@ -1,10 +1,10 @@
 from Crypto.Cipher import AES
 from Crypto.Util import Counter
 from Crypto.Random import get_random_bytes
-from Crypto.Hash import SHA256
 from Crypto.Hash import HMAC
 from base64 import b64encode, b64decode
 from hasher import Hasher
+
 
 def encrypt(key, data):
     key, data = key.encode("UTF-8"), data.encode("UTF-8")
@@ -17,6 +17,7 @@ def encrypt(key, data):
     msg = msg + mac.digest()
     msg = salt + msg
     return b64encode(msg)
+
 
 def decrypt(key, data):
     key, data = key.encode("UTF-8"), data.encode("UTF-8")
@@ -35,6 +36,7 @@ def decrypt(key, data):
     aes = AES.new(key, AES.MODE_CTR, iv, counter=ctr)
     return aes.decrypt(msg)
 
+
 def _derive_key(key, salt=get_random_bytes(32)):
     h = Hasher(10)
     return h.hash(key, salt)[-32:], salt
@@ -50,5 +52,3 @@ if __name__ == '__main__':
     print dec
     dec = decrypt("maoo", enc)
     print dec
-
-

@@ -1,10 +1,10 @@
-import redis
 from wire.utils.redis import autoinc
 import json
 from datetime import datetime
 from wire.utils.crypto import encrypt, decrypt, DecryptFailed
 from wire.utils.hasher import Hasher, HashMismatch
 from wire.models.user import User
+
 
 class Message:
     def __init__(self, redis, key=False, user=False):
@@ -32,7 +32,7 @@ class Message:
     def send(self):
         r = self.redis
         self._validate()
-        
+
         self.get_key()
 
         data = {
@@ -52,14 +52,17 @@ class Message:
     def _try_encrypt(self):
         try:
             if len(self.data['encryption_key']) >= 6:
-                self.data['content'] = encrypt(self.data['encryption_key'], self.data['content'])
+                self.data['content'] = encrypt(self.data['encryption_key'],
+                    self.data['content'])
                 self.encrypted = True
                 self.enc_data['encrypted'] = True
-            else: 
+            else:
                 raise KeyError()
-            if len(self.data['destruct_key']) > 0 and self.enc_data['encrypted']:
+            if len(self.data['destruct_key']) > 0 \
+                and self.enc_data['encrypted']:
                 h = Hasher(4)
-                self.enc_data['destruct_key'] = h.hash(self.data['destruct_key'])
+                self.enc_data['destruct_key'] = h.hash(
+                    self.data['destruct_key'])
 
         except KeyError:
             self.enc_data['encrypted'] = False
@@ -90,14 +93,15 @@ class Message:
         if len(self.data['content']) < 1:
             errors.append('Message must be set.')
         try:
-            if len(self.data['encryption_key']) > 0 and len(self.data['encryption_key']) < 8:
+            if len(self.data['encryption_key']) > 0 and \
+                len(self.data['encryption_key']) < 8:
                 errors.append('Crypto Key must be at least eight characters.')
         except KeyError:
             pass
         if len(errors) > 0:
             self.validation_errors = errors
             raise MessageValidationError()
-    
+
     def load(self, key=False):
         if key:
             self.key = key
@@ -112,13 +116,13 @@ class Message:
         self.data['date_date'] = self.data['date'][:10]
         self.data['date_time'] = self.data['date'][11:16]
 
-        try: 
+        try:
             self.data['encrypted']
             self.encrypted = True
             self.decrypted = False
         except KeyError:
             self.encrypted = False
-    
+
     def decrypt(self, encryption_key):
         if self.data['destruct_key']:
             try:
@@ -128,22 +132,26 @@ class Message:
             except (KeyError, HashMismatch):
                 pass
         try:
-            self.data['content'] = decrypt(encryption_key, self.data['content']).decode("UTF-8")
+            self.data['content'] = decrypt(encryption_key, \
+                self.data['content']).decode("UTF-8")
         except TypeError:
             pass
         self.decrypted = True
         self.encrypted = True
-        
+
     def encrypt(self, encryption_key):
         self.data['content'] = encrypt(encryption_key, self.data['content'])
         self.decrypted = False
         self.encrypted = True
 
+
 class MessageValidationError(Exception):
     pass
 
+
 class MessageError(Exception):
     pass
+
 
 class DestructKey(DecryptFailed):
     pass

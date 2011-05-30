@@ -1,7 +1,8 @@
-import redis, json
+import json
 from wire.utils.redis import autoinc
 from wire.models.user import User
 from datetime import datetime
+
 
 class Event:
     def __init__(self, redis=False, user=False):
@@ -23,7 +24,7 @@ class Event:
 
     def list(self, limit=-1, start=0):
         if limit > 0:
-            limit = start+limit
+            limit = start + limit
 
         keys = self.redis.lrange('_list:events', start, limit)
         count = self.redis.llen('_list:events')
@@ -48,7 +49,7 @@ class Event:
                 self.data[field] = data[field]
             except KeyError:
                 self.data[field] = ""
-        
+
     def save(self):
         r = self.redis
         self._validate()
@@ -84,7 +85,7 @@ class Event:
         r = self.redis
         r.lrem('event:%s:comments' % self.key, comment_id, 0)
         r.delete('comment:%s' % comment_id)
-    
+
     def comment_user(self, comment_id):
         r = self.redis
         c = json.loads(r.get('comment:%s' % comment_id))
@@ -103,7 +104,7 @@ class Event:
             self.show_meeting_place = True
         else:
             self.show_meeting_place = False
-        
+
         self._load_attendees_count()
         self._load_maybes_count()
         self._reload_comments()
@@ -114,13 +115,13 @@ class Event:
         r.lrem('_list:events', self.key, 0)
         self.load_attendees()
         self.load_maybes()
-        
+
         for attendee in self.attendees:
             r.lrem('user:%s:attending' % attendee.key, self.key, 0)
-        
+
         for maybe in self.maybes:
             r.lrem('user:%s:maybe' % maybe.key, self.key, 0)
-        
+
         r.delete('event:%s' % self.key)
         r.delete('event:%s:attendees' % self.key)
         r.delete('event:%s:maybes' % self.key)
@@ -153,7 +154,7 @@ class Event:
             u.load(key)
             self.maybes.append(u)
         self._load_maybes_count()
-    
+
     def set_attending(self):
         if self.user.get_event_state(self.key) == 'attending':
             return False
@@ -161,14 +162,15 @@ class Event:
         r.lpush('event:%s:attendees' % self.key, self.user.key)
         r.lrem('event:%s:maybes' % self.key, self.user.key, 0)
         self.user.set_attending(self.key)
-    
-    def set_unattending(self):    
+
+    def set_unattending(self):
         if self.user.get_event_state(self.key) == 'unattending':
             return False
         r = self.redis
         r.lrem('event:%s:attendees' % self.key, self.user.key, 0)
         r.lrem('event:%s:maybes' % self.key, self.user.key, 0)
         self.user.set_unattending(self.key)
+
     def set_maybe(self):
         if self.user.get_event_state(self.key) == 'maybe':
             return False
@@ -189,12 +191,19 @@ class Event:
 
         if len(self.validation_errors) > 0:
             raise EventValidationError()
-    
+
+
 class EventNotFoundError(Exception):
     pass
+
+
 class EventValidationError(Exception):
     pass
+
+
 class EventCommentError(Exception):
     pass
+
+
 class EventMustLoadError(Exception):
     pass

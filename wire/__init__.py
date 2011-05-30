@@ -2,12 +2,16 @@ from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash
 
 from wire.models.user import User, UserValidationError
-from wire.models.message import Message, MessageError, MessageValidationError
+from wire.models.message import Message, \
+    MessageValidationError
 from wire.models.inbox import Inbox
-from wire.models.thread import Thread, DestroyedThreadError, ThreadError, InvalidRecipients
-from wire.models.contacts import Contacts, ContactExistsError, ContactInvalidError
-from wire.models.event import Event, EventValidationError, EventNotFoundError, EventCommentError
-from wire.utils.auth import Auth, AuthError, DeniedError
+from wire.models.thread import Thread, \
+    DestroyedThreadError, ThreadError, InvalidRecipients
+from wire.models.contacts import Contacts, \
+    ContactExistsError, ContactInvalidError
+from wire.models.event import Event, EventValidationError,\
+    EventNotFoundError, EventCommentError
+from wire.utils.auth import Auth, AuthError
 from wire.utils.crypto import DecryptFailed
 from wire.utils.skipper import ignore_ico
 
@@ -17,16 +21,18 @@ from flaskext.uploads import (UploadSet, configure_uploads, IMAGES,
 
 import json
 import redis
-import os, uuid, subprocess, shlex
+import uuid
+import subprocess
+#import shlex
 
 # Default Configuration
-DEBUG                   = True
-SECRET_KEY              = 'TEST KEY'
-UPLOADED_AVATARS_DEST   = 'wire/static/img/avatar'
-UPLOADED_IMAGES_DEST    = 'wire/static/img/event'
-REDIS_HOST              = 'localhost'
-REDIS_PORT              = 6379
-REDIS_DB                = 0
+DEBUG = True
+SECRET_KEY = 'TEST KEY'
+UPLOADED_AVATARS_DEST = 'wire/static/img/avatar'
+UPLOADED_IMAGES_DEST = 'wire/static/img/event'
+REDIS_HOST = 'localhost'
+REDIS_PORT = 6379
+REDIS_DB = 0
 
 if DEBUG:
     app = Flask(__name__)
@@ -57,9 +63,9 @@ redis_connection = redis.Redis(
 configure_uploads(app, uploaded_avatars)
 configure_uploads(app, uploaded_images)
 
+
 @app.before_request
 def before_request():
-    
     g.logged_in = False
     g.r = redis_connection
     g.auth = Auth(g.r)
@@ -71,9 +77,9 @@ def before_request():
             g.user.load(session['logged_in'])
             g.inbox = Inbox(user=g.user, redis=g.r)
             g.unread_count = g.inbox.unread_count()
-    
     except KeyError:
         pass
+
 
 @app.after_request
 def after_request(response):
@@ -81,13 +87,16 @@ def after_request(response):
     session.pop('user', g.auth.user)
     return response
 
+
 @app.route('/')
 def intro():
     return render_template('intro.html')
 
+
 @app.route('/developers')
 def developers():
     return render_template('developers.html')
+
 
 @app.route('/inbox')
 def inbox():
@@ -101,10 +110,10 @@ def inbox():
         threads=i.threads,
         empty=empty)
 
+
 @app.route('/thread/<int:thread_id>', methods=['POST', 'GET'])
 def view_thread(thread_id):
     encryption_key = False
-    decrypted = False
     if str(thread_id) not in g.user.get_threads():
         abort(401)
 
@@ -125,7 +134,6 @@ def view_thread(thread_id):
                 encryption_key = request.form['encryption_key']
                 t.decrypt(encryption_key)
                 flash('Thread successfully decrypted.', 'success')
-                decrypted = True
             except DecryptFailed:
                 flash('Decryption was unsuccessful.', 'error')
                 return redirect(url_for('view_thread', thread_id=thread_id))
@@ -134,7 +142,6 @@ def view_thread(thread_id):
                 return redirect(url_for('inbox'))
             except KeyError:
                 pass
-        
         if t.decrypted:
             t.reset_unread_count()
         return render_template('thread.html',
@@ -144,11 +151,13 @@ def view_thread(thread_id):
             encryption_key=encryption_key,
             subject=t.subject)
     except ThreadError:
-         abort(404)
+        abort(404)
+
 
 @app.route('/send/<string:recipient>')
 def send_message_recipient(recipient):
     return send_message(recipient=recipient)
+
 
 @app.route('/send', methods=['POST', 'GET'])
 def send_message(recipient=False):
@@ -156,7 +165,7 @@ def send_message(recipient=False):
         g.user.username
     except AttributeError:
         abort(401)
-    
+
     t = Thread(redis=g.r, user=g.user)
     m = Message(redis=g.r, key=False, user=g.user)
     if(recipient):
@@ -188,7 +197,9 @@ def send_message(recipient=False):
         thread=t,
         recipients=t.get_form_recipients())
 
-@app.route('/delete-message/<int:message_id>/<int:thread_id>', methods=['POST', 'GET'])
+
+@app.route('/delete-message/<int:message_id>/<int:thread_id>',
+    methods=['POST', 'GET'])
 def delete_message(message_id, thread_id):
     if request.method == 'POST':
         t = Thread(redis=g.r, user=g.user)
@@ -203,9 +214,11 @@ def delete_message(message_id, thread_id):
     else:
         return render_template('confirm.html',
             _message='Are you sure you want to delete this message?',
-            _ok=url_for('delete_message', thread_id=thread_id, message_id=message_id),
+            _ok=url_for('delete_message', thread_id=thread_id,
+                message_id=message_id),
             _cancel=url_for('view_thread', thread_id=thread_id)
         )
+
 
 @app.route('/unsubscribe-thread/<int:thread_id>', methods=['POST', 'GET'])
 def unsubscribe_thread(thread_id):
@@ -225,6 +238,7 @@ def unsubscribe_thread(thread_id):
             _ok=url_for('unsubscribe_thread', thread_id=thread_id),
             _cancel=url_for('inbox')
         )
+
 
 @app.route('/delete-thread/<int:thread_id>', methods=['POST', 'GET'])
 def del_thread(thread_id):
@@ -247,6 +261,7 @@ def del_thread(thread_id):
             _cancel=url_for('inbox')
         )
 
+
 @app.route('/add-recipient/<int:thread_id>', methods=['POST', 'GET'])
 def add_recipient(thread_id):
     try:
@@ -268,12 +283,14 @@ def add_recipient(thread_id):
         return redirect(url_for('view_thread', thread_id=thread_id))
     else:
         return render_template('confirm.html',
-            _message='Are you sure you wish to add recipient %s to this thread?' % username,
+            _message='Are you sure you wish to add recipient %s to\
+ this thread?' % username,
             _ok=url_for('add_recipient', thread_id=thread_id),
             _cancel=url_for('view_thread', thread_id=thread_id),
             _hiddens=[('username', username)]
         )
-        
+
+
 @app.route('/address-book')
 def contacts(async=False):
     try:
@@ -287,9 +304,12 @@ def contacts(async=False):
         return render_template('contacts.html',
             contacts=c.contacts
         )
+
+
 @app.route('/async/address-book')
 def async_contacts():
     return contacts(async=True)
+
 
 @app.route('/add-contact/<string:contact>')
 def add_contact(contact):
@@ -309,10 +329,12 @@ def add_contact(contact):
         flash('User "%s" is already in your address book.' % contact, 'error')
     return redirect(url_for('contacts'))
 
+
 @app.route('/add-contact', methods=['POST'])
 def add_contact_post():
     contact = request.form['username']
     return add_contact(contact)
+
 
 @app.route('/async/contact/search/<string:part>')
 def async_contact_search(part):
@@ -322,6 +344,7 @@ def async_contact_search(part):
         abort(401)
     c = Contacts(redis=g.r, user=g.user)
     return json.dumps(c.search(part))
+
 
 @app.route('/delete-contact/<string:contact>')
 def del_contact(contact):
@@ -334,6 +357,7 @@ def del_contact(contact):
     flash('Deleted contact "%s".' % contact, 'success')
     return redirect(url_for('contacts'))
 
+
 @app.route('/events')
 def list_events():
     e = Event(redis=g.r, user=g.user)
@@ -342,6 +366,7 @@ def list_events():
         events=events,
         count=count
     )
+
 
 @app.route('/event/<int:event_id>')
 def view_event(event_id):
@@ -352,13 +377,16 @@ def view_event(event_id):
         state=g.user.get_event_state(event_id)
     )
 
+
 @app.route('/create-event', methods=['POST', 'GET'])
 def new_event():
     return save_event(new=True)
 
+
 @app.route('/edit-event/<int:event_id>', methods=['POST', 'GET'])
 def edit_event(event_id):
     return save_event(new=False, event_id=event_id)
+
 
 def save_event(event_id=False, new=False):
     try:
@@ -367,7 +395,7 @@ def save_event(event_id=False, new=False):
         abort(401)
 
     e = Event(redis=g.r, user=g.user)
-    
+
     if not new:
         try:
             e.load(event_id)
@@ -376,7 +404,7 @@ def save_event(event_id=False, new=False):
         print e.data
         if e.data['creator'] != g.user.username:
             abort(401)
-    
+
     if request.method == 'POST':
         e.update(request.form)
         try:
@@ -398,12 +426,13 @@ def save_event(event_id=False, new=False):
                 return redirect(url_for('edit_event', event_id=e.key))
         except EventValidationError:
             for error in e.validation_errors:
-                flash(error, 'error')  
+                flash(error, 'error')
 
     return render_template('forms/event.html',
         new=new,
         event=e
     )
+
 
 def upload_event_image(image):
     ext = image.filename.split(".")[-1]
@@ -411,6 +440,7 @@ def upload_event_image(image):
     path = "%s/%s" % (UPLOADED_IMAGES_DEST, filename)
     resize_image(path, 160)
     return filename
+
 
 @app.route('/event/<int:event_id>/delete', methods=['GET', 'POST'])
 def del_event(event_id):
@@ -435,6 +465,7 @@ def del_event(event_id):
             _cancel=url_for('view_event', event_id=event_id)
         )
 
+
 @app.route('/event/<int:event_id>/add-comment', methods=['POST'])
 def event_add_comment(event_id):
     e = Event(redis=g.r, user=g.user)
@@ -444,7 +475,8 @@ def event_add_comment(event_id):
         flash("Comment has been added.", 'success')
     except EventCommentError as detail:
         flash(detail, 'error')
-    return redirect(url_for('view_event', event_id=event_id)+'#comments')
+    return redirect(url_for('view_event', event_id=event_id) + '#comments')
+
 
 @app.route('/event/<int:event_id>/delete-comment/<int:comment_id>')
 def event_del_comment(event_id, comment_id):
@@ -453,10 +485,11 @@ def event_del_comment(event_id, comment_id):
     user = e.comment_user(comment_id)
     if user != g.user.key and e.data['creator'] != g.user.username:
         abort(401)
-    
+
     e.del_comment(comment_id)
     flash("Comment has been deleted.", 'success')
-    return redirect(url_for('view_event', event_id=event_id)+'#comments')
+    return redirect(url_for('view_event', event_id=event_id) + '#comments')
+
 
 @app.route('/event/<int:event_id>/attend')
 def event_set_attend(event_id):
@@ -468,6 +501,7 @@ def event_set_attend(event_id):
     flash("You have been marked as attending.", 'success')
     return redirect(url_for('view_event', event_id=event_id))
 
+
 @app.route('/event/<int:event_id>/unattend')
 def event_set_unattend(event_id):
     if not g.logged_in:
@@ -477,6 +511,7 @@ def event_set_unattend(event_id):
     e.set_unattending()
     flash("You have been marked as not attending.", 'success')
     return redirect(url_for('view_event', event_id=event_id))
+
 
 @app.route('/event/<int:event_id>/maybe')
 def event_set_maybe(event_id):
@@ -488,17 +523,21 @@ def event_set_maybe(event_id):
     flash("You have been marked as maybe attending.", 'success')
     return redirect(url_for('view_event', event_id=event_id))
 
+
 @app.route('/blog')
 def blog_entries():
     return render_template('blog.html')
+
 
 @app.route('/blog/<int:entry_id>')
 def view_blog_entry(entry_id):
     return "viewing entry",  entry_id
 
+
 @app.route('/sign-up', methods=['POST', 'GET'])
 def new_user():
     return edit_user(new=True)
+
 
 @app.route('/edit-profile', methods=['POST', 'GET'])
 def edit_user(new=False):
@@ -507,14 +546,14 @@ def edit_user(new=False):
             g.user.username
         except AttributeError:
             abort(401)
-    
+
     if new:
         u = User(redis=g.r)
     else:
         u = g.user
     if request.method == 'POST':
         u.update(request.form, new=new)
-        
+
         try:
             avatar = request.files.get('avatar')
             if avatar:
@@ -534,11 +573,12 @@ def edit_user(new=False):
         except UserValidationError:
             for error in u.validation_errors:
                 flash(error, 'error')
-    
+
     return render_template('forms/user.html',
         new=new,
         user=u
     )
+
 
 def upload_avatar(avatar):
     ext = avatar.filename.split(".")[-1]
@@ -546,6 +586,7 @@ def upload_avatar(avatar):
     path = "%s/%s" % (UPLOADED_AVATARS_DEST, filename)
     resize_image(path, 80)
     return filename
+
 
 def resize_image(path, x, y=False):
     if not y:
@@ -566,8 +607,10 @@ def resize_image(path, x, y=False):
     print "rezied", path
     return subprocess.check_output(args)
 
+
 def unique_id():
     return hex(uuid.uuid4().time)[2:-1]
+
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -581,6 +624,7 @@ def login():
     flash('Successfully logged in.', 'success')
     return redirect(request.form['uri'])
 
+
 @app.route('/logout', methods=['POST', 'GET'])
 def logout():
     try:
@@ -588,11 +632,13 @@ def logout():
         flash('Logged out.', 'success')
     except KeyError:
         pass
-    return redirect(url_for('intro'))   
+    return redirect(url_for('intro'))
+
 
 @app.errorhandler(401)
 def unauthorized(error):
     return _status(error), 401
+
 
 def _status(error):
     status = [x.strip() for x in str(error).split(":")]
@@ -600,10 +646,12 @@ def _status(error):
         _status=status[0],
         _message=status[1]
         )
+
+
 @app.errorhandler(404)
 def not_found(error):
     return _status(error), 404
 
+
 if __name__ == '__main__':
     app.run()
-

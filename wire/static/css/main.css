@@ -40,6 +40,15 @@ article img {
     background-color: rgba(20,20,20,.5);
     
 }
+
+input {
+    font-family: PTSans, sans-serif !important;
+}
+
+input[type=submit] {
+    font-family: PTSans, sans-serif !important;
+}
+
 h1, h2 {
     text-transform: lowercase;
     font-family: WCROUGHTRAD, sans-serif !important;
@@ -59,6 +68,7 @@ h1, h2 {
     font-weight: normal;
     font-family: PTSans, sans-serif !important;
     display: block;
+    padding-top: 11px;
     height: 35px;
 }
 

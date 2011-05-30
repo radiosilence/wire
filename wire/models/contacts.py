@@ -1,6 +1,3 @@
-import redis
-from wire.models.user import User
-
 class Contacts:
     def __init__(self, redis=False, user=False):
         self.user = user
@@ -10,8 +7,8 @@ class Contacts:
         self._update()
 
     def _update(self):
-        self.contacts = [c.decode("UTF-8") for c in self.redis.lrange(self.key, 0, -1)]
-
+        self.contacts = [c.decode("UTF-8") \
+            for c in self.redis.lrange(self.key, 0, -1)]
 
     def add(self, username):
         r = self.redis
@@ -36,8 +33,10 @@ class Contacts:
                 results.append(contact)
         return results
 
+
 class ContactInvalidError(Exception):
     pass
+
 
 class ContactExistsError(Exception):
     pass

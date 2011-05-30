@@ -1,7 +1,8 @@
 from wire.models.message import Message, MessageError, DestructKey
-import redis, json
+import json
 from wire.utils.redis import autoinc
 import copy
+
 
 class Thread:
     def __init__(self, subject=False, redis=False, user=False):
@@ -21,12 +22,13 @@ class Thread:
         if not key:
             key = self.key
         try:
-            count = int(self.redis.get('user:%s:thread:%s:unreads' % (self.user.key, key)))
+            count = int(self.redis.get('user:%s:thread:%s:unreads' % \
+                (self.user.key, key)))
         except TypeError:
             count = 0
         self.unread_count = count
         return count
-    
+
     def get_form_recipients(self):
         result = []
         for recipient in self.recipient_usernames:
@@ -35,13 +37,16 @@ class Thread:
         return result
 
     def reset_unread_count(self):
-        self.redis.set('user:%s:thread:%s:unreads' % (self.user.key, self.key), 0)
-            
+        self.redis.set('user:%s:thread:%s:unreads' % \
+            (self.user.key, self.key), 0)
+
     def _update_recipients(self):
         r = self.redis
         self.recipients = []
         self.recipients = r.lrange('thread:%s:recipients' % self.key, 0, -1)
-        self.recipient_usernames = [json.loads(r.get('user:%s' % rec))['username'] for rec in self.recipients]
+        self.recipient_usernames = [json.loads( \
+            r.get('user:%s' % rec) \
+        )['username'] for rec in self.recipients]
 
     def set_recipients(self, recipients):
         self.recipients = recipients
@@ -57,17 +62,17 @@ class Thread:
                 user_key = self.redis.get('username:%s' % recipient)
                 if user_key not in self.recipients:
                     self.recipients.append(user_key)
-                
+
             elif len(recipient) > 0:
                 self.invalid_recipients.append(recipient)
-        
+
         if self.user.key not in self.recipients:
             self.recipients.append(self.user.key)
         self.recipient_usernames.extend(usernames)
-        
+
         if len(self.invalid_recipients) > 0:
             raise InvalidRecipients()
-        
+
     def _validate(self):
         errors = []
         if len(self.data['subject']) < 1:
@@ -75,7 +80,6 @@ class Thread:
         if len(errors) > 0:
             self.validation_errors = errors
             raise ValidationError()
-
 
     def _sync_recipients(self):
         r = self.redis
@@ -85,8 +89,9 @@ class Thread:
             if recipient not in self.recipients:
                 r.rpush('thread:%s:recipients' % self.key, recipient)
                 r.lpush('user:%s:threads' % recipient, self.key)
-                r.incr('user:%s:thread:%s:unreads' % (recipient, self.key), len(self.messages))
-        
+                r.incr('user:%s:thread:%s:unreads' % \
+                    (recipient, self.key), len(self.messages))
+
         del new_recipients
 
     def save(self):
@@ -104,15 +109,16 @@ class Thread:
         self._sync_recipients()
         for message in self.queued_messages:
             self._commit_message(message)
-    
+
     def add_message(self, m):
         m.get_key()
         if len(self.messages) == 0:
             self.encrypted = m.encrypted
             self.save()
         elif self.encrypted != m.encrypted:
-            raise ThreadError("Messages in same thread must have same encryption.")
-    
+            raise ThreadError(
+                "Messages in same thread must have same encryption.")
+
         if self.key:
             m.thread = self.key
             self.messages.append(m)
@@ -123,11 +129,12 @@ class Thread:
     def _commit_message(self, message):
         self.redis.rpush('thread:%s:messages' % self.key, message.get_key())
         self._incr_unreads()
-        
+
     def _incr_unreads(self):
         for recipient in self.recipients:
             if recipient != self.user.key:
-                self.redis.incr('user:%s:thread:%s:unreads' % (recipient, self.key))
+                self.redis.incr('user:%s:thread:%s:unreads' \
+                    % (recipient, self.key))
 
     def delete_message(self, message):
         r = self.redis
@@ -171,7 +178,8 @@ class Thread:
         if self.recipients:
             for recipient_key in self.recipients:
                 r.lrem('user:%s:threads' % recipient_key, self.key, 0)
-                r.delete('user:%s:thread:%s:unreads' % (recipient_key, self.key))
+                r.delete('user:%s:thread:%s:unreads' % \
+                    (recipient_key, self.key))
 
         [m.delete() for m in self.messages]
 
@@ -196,13 +204,18 @@ class Thread:
                 self.delete_message(message)
                 raise DestroyedThreadError()
 
+
 class DestroyedThreadError(Exception):
     pass
+
+
 class ThreadError(Exception):
     pass
 
+
 class ValidationError(Exception):
     pass
+
 
 class InvalidRecipients(Exception):
     pass
