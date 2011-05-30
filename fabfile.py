@@ -8,7 +8,7 @@ env.key_filename = "/home/%s/.ssh/id_rsa" % getpass.getuser()
 
 APP_NAME='wire'
 DEFAULT_USER= getpass.getuser()
-DEFAULT_DIRECTORY='/srv/%s' % APP_NAME
+DEFAULT_DIRECTORY='/srv/%s'
 
 env.summary = ['SUMMARY FOR [%s] DEPLOYMENT' % APP_NAME]
 
@@ -33,10 +33,13 @@ def production(socket=False, **kwargs):
     env.socket = socket
     env.summary.append("Configured for production.")
 
-def default_envs(directory=DEFAULT_DIRECTORY, user=DEFAULT_USER, name=APP_NAME):
+def default_envs(directory=False, user=DEFAULT_USER, name=APP_NAME):
     env.deploy_user = user
     env.name = name
-    env.directory = directory
+    if not directory:
+        env.directory = DEFAULT_DIRECTORY % env.name
+    else:
+        env.directory = directory
     env.virt_path = '/home/%s/.virt_env/%s' % (env.deploy_user,  env.name)
     env.activate = 'source %s/bin/activate' % env.virt_path
     
@@ -56,7 +59,7 @@ def conf_supervisor(gunicorn_config='/etc/gunicorn.conf.py'):
         skel_data = {
             'name': env.name,
             'user': env.deploy_user,
-            'app': env.name+':app',
+            'app': APP_NAME+':app',
             'gunicorn_config': gunicorn_config,
             'socket': env.socket,
             'directory': env.directory
@@ -98,7 +101,8 @@ def make_virt():
     sudo('mkdir -p %s; mkdir -p /home/%s/.tmp' %
         (env.virt_path, env.deploy_user))
     sudo('export TMPDIR=/home/%s/.tmp && virtualenv %s --no-site-packages'
-        % (env.deploy_user, env.virt_path), user=env.deploy_user)
+        % (env.deploy_user, env.virt_path))
+    sudo('chown %s %s -R' % (env.deploy_user, env.virt_path))
     env.summary.append('Created virtualenv in "%s".' % env.virt_path)
 
 def pip_install_req():
