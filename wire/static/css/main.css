@@ -57,6 +57,7 @@ h1, h2 {
 .wire nav li a {
     font-size: 12pt;
     font-weight: normal;
+    font-family: PTSans, sans-serif !important;
     display: block;
     height: 35px;
 }
