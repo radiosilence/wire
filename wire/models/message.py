@@ -23,7 +23,6 @@ class Message:
         self.enc_data = {}
         if key:
             self.load()
-
     def get_key(self):
         if not self.key:
             self.key = autoinc(self.redis, 'message')
@@ -101,7 +100,6 @@ class Message:
         if len(errors) > 0:
             self.validation_errors = errors
             raise MessageValidationError()
-
     def load(self, key=False):
         if key:
             self.key = key

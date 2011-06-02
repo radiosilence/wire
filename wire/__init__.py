@@ -87,6 +87,9 @@ def after_request(response):
     session.pop('user', g.auth.user)
     return response
 
+@app.route('/twittertest', methods=['GET', 'POST']):
+def timeline():
+    return render_template('timeline.html')
 
 @app.route('/')
 def intro():
