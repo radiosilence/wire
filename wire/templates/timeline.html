@@ -1,0 +1,26 @@
+{% extends "main.html" %}
+{% block content %}
+<h1>Timeline</h1>
+{{ flashes() }}
+<form method="POST" action="{{ url_for('post_update') }}">
+  <p style="text-align: right"><textarea class="fullwidth" name="text" placeholder="Post something interesting..."></textarea><br/>
+  <input type="submit" value="Post"/></p>
+</form>
+{% for update in timeline %}
+  <article class="message{%- if g.user.username == update.user.username %} mine
+    {%- endif %}">
+    <img src="{{ url_for('static', filename='img/avatar/%s' % update.user.avatar) }}" class="avatar"/>
+    <header>
+      <div class="opts">
+        {% if g.user.username == update.user.username %}
+          <a href="{{ url_for('timeline') }}">x</a>
+        {% endif %}
+      </div>
+      <a href="#">{{ update.user.username }}</a> {{ update.data['date'] }} at {{ update.data['time'] }}
+
+    </header>
+    <div class="message">
+    {{ update.text|markdown }}</div>
+  </article>
+{% endfor %}
+{% endblock %}

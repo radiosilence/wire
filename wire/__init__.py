@@ -1,7 +1,8 @@
 from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash
 
-from wire.models.user import User, UserValidationError
+from wire.models.user import User, UserValidationError, \
+    Update, UpdateError
 from wire.models.message import Message, \
     MessageValidationError
 from wire.models.inbox import Inbox
@@ -11,6 +12,7 @@ from wire.models.contacts import Contacts, \
     ContactExistsError, ContactInvalidError
 from wire.models.event import Event, EventValidationError,\
     EventNotFoundError, EventCommentError
+
 from wire.utils.auth import Auth, AuthError
 from wire.utils.crypto import DecryptFailed
 from wire.utils.skipper import ignore_ico
@@ -35,6 +37,7 @@ REDIS_PORT = 6379
 REDIS_DB = 0
 
 if DEBUG:
+    print "Debug mode."
     app = Flask(__name__)
     static_types = [
         'ico'
@@ -87,9 +90,33 @@ def after_request(response):
     session.pop('user', g.auth.user)
     return response
 
-@app.route('/twittertest', methods=['GET', 'POST']):
+
+@app.route('/timeline', methods=['GET', 'POST'])
 def timeline():
-    return render_template('timeline.html')
+    timeline = g.user.timeline
+    return render_template('timeline.html',
+        timeline=timeline)
+
+
+@app.route('/post-update', methods=['POST'])
+def post_update():
+    try:
+        respond = request.form['respond']
+    except KeyError:
+        respond = None
+    u = Update(text=request.form['text'], user=g.user, redis=g.r,
+        respond=respond)
+    try:
+        print u.text
+        print "Hashes:", u.hashes
+        print "mentions:", u.mentions
+        u.save()
+        flash("Update posted.", 'success')
+        print "Here"
+    except UpdateError:
+        pass
+    return redirect(url_for('timeline'))
+
 
 @app.route('/')
 def intro():
@@ -300,12 +327,11 @@ def contacts(async=False):
         g.user.username
     except AttributeError:
         abort(401)
-    c = Contacts(redis=g.r, user=g.user)
     if async:
-        return json.dumps(c.contacts)
+        return json.dumps(g.user.contacts)
     else:
         return render_template('contacts.html',
-            contacts=c.contacts
+            contacts=g.user.contacts
         )
 
 

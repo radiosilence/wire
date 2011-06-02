@@ -1,6 +1,9 @@
 from wire.utils.redis import autoinc
 import json
 from wire.utils.hasher import Hasher
+from wire.models.contacts import Contacts
+from datetime import datetime
+import re
 
 
 class User:
@@ -130,6 +133,29 @@ class User:
         else:
             return 'unattending'
 
+    def get_contacts(self):
+        c = Contacts(redis=self.redis, user=self)
+        return c.contacts
+
+    contacts = property(get_contacts)
+
+    def get_followers(self):
+        r = self.redis
+        followers = []
+        for follower in r.lrange('user:%s:followers' % self.key, 0, -1):
+            u = User(redis=self.redis)
+            u.load(follower)
+            followers.append(u)
+        return followers
+
+    followers = property(get_followers)
+
+    def get_timeline(self):
+        t = Timeline(redis=self.redis, user=self)
+        return t.updates
+
+    timeline = property(get_timeline)
+
 
 class UserValidationError(Exception):
     pass
@@ -137,3 +163,117 @@ class UserValidationError(Exception):
 
 class UserExists(Exception):
     pass
+
+
+class Update:
+    def __init__(self, text=None, redis=None,
+        user=None, key=None, respond=None):
+
+        self.key = key
+        self.redis = redis
+        self.user = user
+        self.mentions = []
+        self.hashes = []
+        self.data = {}
+        self.datetime = str(datetime.now())
+        self.respond = respond
+        self.done_keys = []
+        self.text = text
+        if self.text:
+            self.parse(text)
+        if self.key:
+            self.load(key)
+
+    def save(self):
+        r = self.redis
+        if not self.key:
+            self.key = autoinc(r, 'update')
+
+        r.set('update:%s' % self.key, self.json)
+        self._update_followers()
+        self._update_mentions()
+        self._update_timeline()
+
+    def load(self, key):
+        r = self.redis
+        data = json.loads(r.get('update:%s' % self.key))
+
+        self.hashes = data['hashes']
+        self.text = data['text']
+        u = User(redis=self.redis)
+        u.load_by_username(data['username'])
+        self.user = u
+        self.mentions = data['mentions']
+        self.respond = data['respond']
+        self.datetime = data['datetime']
+        self.data['date'] = self.datetime[:10]
+        self.data['time'] = self.datetime[11:16]
+
+    def delete(self):
+        pass
+
+    def parse(self, text):
+        for match in re.finditer('(#[^\s]+)', text):
+            self.hashes.append(match.group(0)[1:])
+        for match in re.finditer('(@[^\s]+)', text):
+            self.mentions.append(match.group(0)[1:])
+
+    def _update_followers(self):
+        r = self.redis
+        for follower in self.user.followers:
+            if follower.key == self.user.key:
+                continue
+            if follower.key in self.done_keys:
+                continue
+            self.done_keys.append(follower.key)
+            r.lpush('user:%s:timeline' % follower.key, self.key)
+
+    def _update_mentions(self):
+        r = self.redis
+        for mentionee in self.mentions:
+            key = r.get('username:%s' % mentionee)
+            if not key:
+                continue
+            if key == self.user.key:
+                continue
+            if key in self.done_keys:
+                continue
+            self.done_keys.append(key)
+            r.lpush('user:%s:timeline' % key, self.key)
+            r.lpush('user:%s:mentions' % key, self.key)
+
+    def _update_timeline(self):
+        self.redis.lpush('user:%s:timeline' % self.user.key, self.key)
+
+    def get_data_json(self):
+        return json.dumps({
+            'username': self.user.username,
+            'text': self.text,
+            'mentions': self.mentions,
+            'hashes': self.hashes,
+            'respond': self.respond,
+            'datetime': self.datetime
+        })
+
+    json = property(get_data_json)
+
+
+class UpdateError(Exception):
+    pass
+
+
+class Timeline:
+    def __init__(self, redis=None, user=None, type='Timeline'):
+        self.redis = redis
+        self.user = user
+        self.type = type
+
+    def get_updates(self):
+        r = self.redis
+        updates = []
+        for update in r.lrange('user:%s:timeline' % self.user.key, 0, -1):
+            u = Update(redis=self.redis, key=update, user=self.user)
+            updates.append(u)
+        return updates
+
+    updates = property(get_updates)

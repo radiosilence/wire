@@ -177,7 +177,7 @@ div.parallelements {
 }
 
 article.message {
-    border-top: 2px solid rgba(20,20,20,.5);
+    border-bottom: 1px solid #1a1a1a;
 }
 
 article.message img.avatar {

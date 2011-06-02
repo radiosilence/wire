@@ -7,7 +7,7 @@ class Contacts:
         self._update()
 
     def _update(self):
-        self.contacts = [c.decode("UTF-8") \
+        self.contacts = [c.decode("UTF-8") 
             for c in self.redis.lrange(self.key, 0, -1)]
 
     def add(self, username):
@@ -16,12 +16,21 @@ class Contacts:
             raise ContactExistsError()
         if not r.exists('username:%s' % username):
             raise ContactInvalidError()
+        r.lpush('user:%s:followers' %
+            self.contact_key(username), self.user.key)
+
         r.lpush(self.key, username)
         self.redis.sort(self.key, alpha=True, store=self.key)
         self._update()
 
+    def contact_key(self, username):
+        return self.redis.get('username:%s' % username)
+
     def delete(self, contact):
-        self.redis.lrem(self.key, contact, 0)
+        r = self.redis
+        r.lrem(self.key, contact, 0)
+        r.lrem('user:%s:followers' %
+            self.contact_key(contact), self.user.key, 0)
         self._update()
 
     def search(self, part):
