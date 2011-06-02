@@ -4,11 +4,12 @@ import datetime
 
 
 class Update:
-    def __init__(self, text, redis=None, user=None, key=None):
+    def __init__(self, text, redis=None, user=None, key=None, respond=None):
         self.redis = redis
         self.user = user
         self.mentions = []
         self.hashes = []
+        self.respond = respond
         self.text = text
         self.parse(text)
         self.datetime = datetime.now()
