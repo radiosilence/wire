@@ -85,6 +85,9 @@
           {%- endif %}>Inbox ({{ g.unread_count }})</a></li>
          <li><a href="{{ url_for('contacts') }}">Address Book</a></li>
          <li><a href="{{ url_for('edit_user') }}">Edit Profile</a></li>
+         <li><a href="{{ url_for('timeline') }}">Timeline</a></li>
+         <li><a href="{{ url_for('mentions') }}">Mentions</a></li>
+         <li><a href="{{ url_for('user_updates', username=g.user.username) }}">Updates</a></li>
         </ul></p>
         <p><button id="logout_submit">Log Out</button></p>
         </form>

@@ -1,11 +1,16 @@
 {% extends "main.html" %}
+{% block javascript %}
+ <script src="{{ url_for('static', filename='js/timeline.js') }}" type="text/javascript"></script>
+{% endblock %}
 {% block content %}
-<h1>Timeline</h1>
+<h1>{{ title }}</h1>
 {{ flashes() }}
+{% if not disable_input %}
 <form method="POST" action="{{ url_for('post_update') }}">
   <p style="text-align: right"><textarea class="fullwidth" name="text" placeholder="Post something interesting..."></textarea><br/>
   <input type="submit" value="Post"/></p>
 </form>
+{% endif %}
 {% for update in timeline %}
   <article class="message{%- if g.user.username == update.user.username %} mine
     {%- endif %}">
@@ -13,7 +18,7 @@
     <header>
       <div class="opts">
         {% if g.user.username == update.user.username %}
-          <a href="{{ url_for('timeline') }}">x</a>
+          <a href="{{ url_for('delete_update', update_id=update.key) }}">x</a>
         {% endif %}
       </div>
       <a href="#">{{ update.user.username }}</a> {{ update.data['date'] }} at {{ update.data['time'] }}

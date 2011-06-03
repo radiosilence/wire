@@ -2,7 +2,7 @@ from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash
 
 from wire.models.user import User, UserValidationError, \
-    Update, UpdateError
+    Update, UpdateError, UserNotFoundError
 from wire.models.message import Message, \
     MessageValidationError
 from wire.models.inbox import Inbox
@@ -91,12 +91,32 @@ def after_request(response):
     return response
 
 
-@app.route('/timeline', methods=['GET', 'POST'])
+@app.route('/timeline')
 def timeline():
     timeline = g.user.timeline
     return render_template('timeline.html',
-        timeline=timeline)
+        timeline=timeline,
+        title='Timeline')
 
+@app.route('/mentions')
+def mentions():
+    timeline = g.user.mentions
+    return render_template('timeline.html',
+        timeline=timeline,
+        title='Mentions')
+
+@app.route('/user/<string:username>')
+def user_updates(username):
+    u = User(redis=g.r)
+    try:
+        u.load_by_username(username)
+    except UserNotFoundError:
+        abort(404)
+
+    return render_template('timeline.html',
+        timeline=u.updates,
+        title='%s\'s updates' % username,
+        disable_input=True)
 
 @app.route('/post-update', methods=['POST'])
 def post_update():
@@ -107,14 +127,21 @@ def post_update():
     u = Update(text=request.form['text'], user=g.user, redis=g.r,
         respond=respond)
     try:
-        print u.text
-        print "Hashes:", u.hashes
-        print "mentions:", u.mentions
         u.save()
         flash("Update posted.", 'success')
-        print "Here"
     except UpdateError:
         pass
+    return redirect(url_for('timeline'))
+
+
+@app.route('/delete-update/<int:update_id>')
+def delete_update(update_id):
+    u = Update(redis=g.r, user=g.user)
+    u.load(update_id)
+    if u.user.key != g.user.key:
+        abort(401)
+    u.delete()
+    flash("Update deleted.", 'success')
     return redirect(url_for('timeline'))
 
 

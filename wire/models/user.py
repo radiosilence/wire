@@ -95,7 +95,7 @@ class User:
 
     def load(self, key):
         if not self.redis.exists('user:%s' % key):
-            return False
+            raise UserNotFoundError
         self.key = key
         data = json.loads(self.redis.get('user:%s' % key))
         self.data = data
@@ -156,8 +156,24 @@ class User:
 
     timeline = property(get_timeline)
 
+    def get_mentions(self):
+        t = Timeline(redis=self.redis, user=self, type='mentions')
+        return t.updates
+
+    mentions = property(get_mentions)
+
+    def get_updates(self):
+        t = Timeline(redis=self.redis, user=self, type='updates')
+        return t.updates
+
+    updates = property(get_updates)
+
 
 class UserValidationError(Exception):
+    pass
+
+
+class UserNotFoundError(Exception):
     pass
 
 
@@ -196,6 +212,11 @@ class Update:
 
     def load(self, key):
         r = self.redis
+
+        if not r.exists('update:%s' % key):
+            raise UpdateError()
+
+        self.key = key
         data = json.loads(r.get('update:%s' % self.key))
 
         self.hashes = data['hashes']
@@ -210,7 +231,32 @@ class Update:
         self.data['time'] = self.datetime[11:16]
 
     def delete(self):
-        pass
+        r = self.redis
+        if not self.key:
+            return None
+
+        self._del_followers()
+        self._del_mentions()
+        self._del_timeline()
+
+        r.delete('update:%s' % self.key)
+
+    def _del_followers(self):
+        r = self.redis
+        for follower in self.user.followers:
+            r.lrem('user:%s:timeline' % follower.key, self.key, 0)
+
+    def _del_mentions(self):
+        r = self.redis
+        for mentionee in self.mentions:
+            key = r.get('username:%s' % mentionee)
+            r.lrem('user:%s:timeline' % key, self.key, 0)
+            r.lrem('user:%s:mentions' % key, self.key, 0)
+    
+    def _del_timeline(self):
+        r = self.redis
+        r.lrem('user:%s:timeline' % self.user.key, self.key, 0)
+        r.lrem('user:%s:updates' % self.user.key, self.key, 0)
 
     def parse(self, text):
         for match in re.finditer('(#[^\s]+)', text):
@@ -234,16 +280,20 @@ class Update:
             key = r.get('username:%s' % mentionee)
             if not key:
                 continue
-            if key == self.user.key:
-                continue
             if key in self.done_keys:
                 continue
             self.done_keys.append(key)
-            r.lpush('user:%s:timeline' % key, self.key)
             r.lpush('user:%s:mentions' % key, self.key)
 
+            if key == self.user.key:
+                continue
+
+            r.lpush('user:%s:timeline' % key, self.key)
+
     def _update_timeline(self):
-        self.redis.lpush('user:%s:timeline' % self.user.key, self.key)
+        r = self.redis
+        r.lpush('user:%s:timeline' % self.user.key, self.key)
+        r.lpush('user:%s:updates' % self.user.key, self.key)
 
     def get_data_json(self):
         return json.dumps({
@@ -263,7 +313,7 @@ class UpdateError(Exception):
 
 
 class Timeline:
-    def __init__(self, redis=None, user=None, type='Timeline'):
+    def __init__(self, redis=None, user=None, type='timeline'):
         self.redis = redis
         self.user = user
         self.type = type
@@ -271,7 +321,7 @@ class Timeline:
     def get_updates(self):
         r = self.redis
         updates = []
-        for update in r.lrange('user:%s:timeline' % self.user.key, 0, -1):
+        for update in r.lrange('user:%s:%s' % (self.user.key, self.type), 0, -1):
             u = Update(redis=self.redis, key=update, user=self.user)
             updates.append(u)
         return updates
