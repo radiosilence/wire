@@ -1,5 +1,4 @@
 *.pyc
-wire/static/*_lib
 *.sublime-project
 wire/static/img/avatar/*.*
 !wire/static/img/avatar/default.png
