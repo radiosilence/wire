@@ -15,6 +15,7 @@ env.summary = ['SUMMARY FOR [%s] DEPLOYMENT' % APP_NAME]
 def deploy(**kwargs):
     production(**kwargs)
     deploy_pip()
+    link_config()
     conf_supervisor()
     start()
     show_config()
@@ -78,6 +79,13 @@ def conf_supervisor(gunicorn_config='/etc/gunicorn.conf.py'):
             path, skel_data, use_sudo=True)
 
     env.summary.append('Written supervisor config to "%s".' % path)
+
+
+def link_config():
+    with settings(warn_only=True):
+        with cd(env.directory + '/wire'):
+            sudo('ln -s local_settings.py-production local_settings.py')
+    env.summary.append('Linked production config.')
 
 
 def start():
