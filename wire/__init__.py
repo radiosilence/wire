@@ -15,7 +15,7 @@ from wire.models.event import Event, EventValidationError,\
 
 from wire.utils.auth import Auth, AuthError
 from wire.utils.crypto import DecryptFailed
-from wire.utils.skipper import ignore_ico
+#from wire.utils.skipper import ignore_ico
 
 from flaskext.markdown import Markdown
 from flaskext.uploads import (UploadSet, configure_uploads, IMAGES,
@@ -25,48 +25,45 @@ import json
 import redis
 import uuid
 import subprocess
-#import shlex
 
-# Default Configuration
-DEBUG = True
-SECRET_KEY = 'TEST KEY'
-UPLOADED_AVATARS_DEST = 'wire/static/img/avatar'
-UPLOADED_IMAGES_DEST = 'wire/static/img/event'
-REDIS_HOST = 'localhost'
-REDIS_PORT = 6379
-REDIS_DB = 0
-# Get a key from http://code.google.com/apis/maps/signup.html
-GMAPS_KEY = 'Fill me in!'
-
-if DEBUG:
-    print "Debug mode."
-    app = Flask(__name__)
-    static_types = [
-        'ico'
-    ]
-else:
-    app = Flask(__name__, static_path='/')
-    static_types = [
-        'gif', 'jpg', 'jpeg', 'css', 'gif', 'woff', 'ttf', 'ico', 'js'
-    ]
-
-
-app.config.from_object(__name__)
-app.config.from_envvar('WIRE_SETTINGS', silent=True)
-app.wsgi_app = ignore_ico(app.wsgi_app, static_types)
-Markdown(app)
+from local_settings import *
 
 uploaded_avatars = UploadSet('avatars', IMAGES)
 uploaded_images = UploadSet('images', IMAGES)
+
+
+def config(debug=None):
+    if debug:
+        print "Debug mode."
+#        static_types = [
+#            'ico'
+#        ]
+        app = Flask(__name__)
+
+    else:
+#        static_types = [
+#            'gif', 'jpg', 'jpeg', 'css', 'gif', 'woff', 'ttf', 'ico', 'js'
+#        ]
+        app = Flask(__name__, static_path='/')
+
+    app.config.from_object(__name__)
+    app.config.from_envvar('WIRE_SETTINGS')
+    configure_uploads(app, uploaded_avatars)
+    configure_uploads(app, uploaded_images)
+    Markdown(app)
+
+    return app
+
+app = config(debug=DEBUG)
+
+#app.wsgi_app = ignore_ico(app.wsgi_app, static_types)
+
 
 redis_connection = redis.Redis(
     host=app.config['REDIS_HOST'],
     port=app.config['REDIS_PORT'],
     db=app.config['REDIS_DB']
 )
-
-configure_uploads(app, uploaded_avatars)
-configure_uploads(app, uploaded_images)
 
 
 @app.before_request
@@ -75,7 +72,7 @@ def before_request():
     g.r = redis_connection
     g.auth = Auth(g.r)
     g.user = User(redis=g.r)
-    g.GMAPS_KEY = GMAPS_KEY
+    g.GMAPS_KEY = app.config['GMAPS_KEY']
 
     try:
         if session['logged_in']:
@@ -496,7 +493,7 @@ def save_event(event_id=False, new=False):
 def upload_event_image(image):
     ext = image.filename.split(".")[-1]
     filename = uploaded_images.save(image, name="%s.%s" % (unique_id(), ext))
-    path = "%s/%s" % (UPLOADED_IMAGES_DEST, filename)
+    path = "%s/%s" % (app.config['UPLOADED_IMAGES_DEST'], filename)
     resize_image(path, 160)
     return filename
 
@@ -642,7 +639,7 @@ def edit_user(new=False):
 def upload_avatar(avatar):
     ext = avatar.filename.split(".")[-1]
     filename = uploaded_avatars.save(avatar, name="%s.%s" % (unique_id(), ext))
-    path = "%s/%s" % (UPLOADED_AVATARS_DEST, filename)
+    path = "%s/%s" % (app.config['UPLOADED_AVATARS_DEST'], filename)
     resize_image(path, 80)
     return filename
 
@@ -710,7 +707,3 @@ def _status(error):
 @app.errorhandler(404)
 def not_found(error):
     return _status(error), 404
-
-
-if __name__ == '__main__':
-    app.run()

@@ -23,6 +23,7 @@ class Message:
         self.enc_data = {}
         if key:
             self.load()
+
     def get_key(self):
         if not self.key:
             self.key = autoinc(self.redis, 'message')

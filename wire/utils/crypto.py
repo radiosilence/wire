@@ -44,11 +44,3 @@ def _derive_key(key, salt=get_random_bytes(32)):
 
 class DecryptFailed(Exception):
     pass
-
-if __name__ == '__main__':
-    enc = encrypt("moo", "LOREM")
-    print enc
-    dec = decrypt("moo", enc)
-    print dec
-    dec = decrypt("maoo", enc)
-    print dec
