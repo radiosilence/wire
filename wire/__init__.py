@@ -35,6 +35,8 @@ UPLOADED_IMAGES_DEST = 'wire/static/img/event'
 REDIS_HOST = 'localhost'
 REDIS_PORT = 6379
 REDIS_DB = 0
+# Get a key from http://code.google.com/apis/maps/signup.html
+GMAPS_KEY = 'Fill me in!'
 
 if DEBUG:
     print "Debug mode."
@@ -73,6 +75,7 @@ def before_request():
     g.r = redis_connection
     g.auth = Auth(g.r)
     g.user = User(redis=g.r)
+    g.GMAPS_KEY = GMAPS_KEY
 
     try:
         if session['logged_in']:
