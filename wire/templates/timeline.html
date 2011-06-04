@@ -21,7 +21,7 @@
           <a href="{{ url_for('delete_update', update_id=update.key) }}">x</a>
         {% endif %}
       </div>
-      <a href="#">{{ update.user.username }}</a> {{ update.data['date'] }} at {{ update.data['time'] }}
+      <a href="{{ url_for('user_updates', username=update.user.username) }}">{{ update.user.username }}</a> {{ update.data['date'] }} at {{ update.data['time'] }}
 
     </header>
     <div class="message">

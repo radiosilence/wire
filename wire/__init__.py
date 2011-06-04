@@ -93,6 +93,10 @@ def after_request(response):
 
 @app.route('/timeline')
 def timeline():
+    try:
+        g.user.username
+    except AttributeError:
+        abort(401)
     timeline = g.user.timeline
     return render_template('timeline.html',
         timeline=timeline,
@@ -100,6 +104,10 @@ def timeline():
 
 @app.route('/mentions')
 def mentions():
+    try:
+        g.user.username
+    except AttributeError:
+        abort(401)
     timeline = g.user.mentions
     return render_template('timeline.html',
         timeline=timeline,
