@@ -73,7 +73,9 @@ def before_request():
     g.auth = Auth(g.r)
     g.user = User(redis=g.r)
     g.GMAPS_KEY = app.config['GMAPS_KEY']
-
+    g.r.get('======================')
+    g.r.get('%s' % request.path)
+    g.r.get('======================')
     try:
         if session['logged_in']:
             g.logged_in = True
@@ -728,14 +730,19 @@ def unauthorized(error):
     return _status(error), 401
 
 
+@app.errorhandler(404)
+def not_found(error):
+    return _status(error), 404
+
+
+@app.errorhandler(500)
+def fuckup(error):
+    return _status(error), 500
+
+
 def _status(error):
     status = [x.strip() for x in str(error).split(":")]
     return render_template('status.html',
         _status=status[0],
         _message=status[1]
         )
-
-
-@app.errorhandler(404)
-def not_found(error):
-    return _status(error), 404

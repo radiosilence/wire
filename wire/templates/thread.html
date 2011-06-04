@@ -11,7 +11,7 @@
   <p><form class="add_recp" method="POST" action="{{ url_for('add_recipient', thread_id=thread.key) }}">
   <input type="hidden" name="confirm" value="0"/><span class="recp_list">
   {% for username in thread.recipient_usernames %}
-    <a href="{{ url_for('add_contact', contact=username) }}">{{ username }}</a>,
+    <a href="{{ url_for('user_updates', username=username) }}">{{ username }}</a>,
   {% endfor %}
   &nbsp;<input type="text" name="username" id="addrecip"/><input type="submit" value="Add"/></span></form></p>
 
@@ -25,7 +25,7 @@
         <a href="{{ url_for('delete_message', thread_id=thread.key, message_id=message.key) }}">x</a>
       {% endif %}
     </div>
-    <a href="{{ url_for('add_contact', contact=message.sender.username) }}">{{ message.sender.username }}</a> {{ message.data['date_date'] }} at {{ message.data['date_time'] }}
+    <a href="{{ url_for('user_updates', username=message.sender.username) }}">{{ message.sender.username }}</a> {{ message.data['date_date'] }} at {{ message.data['date_time'] }}
 
   </header>
 

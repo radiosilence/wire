@@ -21,7 +21,7 @@
   {% for contact in contacts %}
   <tr>
    <td style="width: 100%">
-   <a href="{{ url_for('send_message_recipient', recipient=contact) }}">{{ contact }}</a>
+   <a href="{{ url_for('user_updates', username=contact) }}">{{ contact }}</a>
    </td>
    <td class="opts">
     <a href="{{ url_for('del_contact', contact=contact) }}">x</a>
