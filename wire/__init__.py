@@ -47,7 +47,7 @@ def config(debug=None):
         app = Flask(__name__, static_path='/')
 
     app.config.from_object(__name__)
-    app.config.from_envvar('WIRE_SETTINGS')
+    app.config.from_envvar('WIRE_SETTINGS', silent=True)
     configure_uploads(app, uploaded_avatars)
     configure_uploads(app, uploaded_images)
     Markdown(app)
