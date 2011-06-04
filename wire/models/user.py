@@ -69,6 +69,10 @@ class User:
         if len(self.username) < 1:
             errors.append("Username must be one character or longer.")
 
+        for c in [('\s', 'space'), ('\#', 'hash'), ('@', '@'), ('\/', 'slash')]:
+            if re.search(c[0], self.username):
+                errors.append("Username must not have a %s in it." % c[1])
+
         if not self.key:
             try:
                 self._test_unique_user()
