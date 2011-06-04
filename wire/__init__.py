@@ -82,6 +82,8 @@ def before_request():
             g.unread_count = g.inbox.unread_count()
     except KeyError:
         pass
+    except UserNotFoundError:
+        logout()
 
 
 @app.after_request
