@@ -74,7 +74,7 @@ def conf_supervisor(gunicorn_config='/etc/gunicorn.conf.py'):
             'socket': env.socket,
             'directory': env.directory
         }
-        path = '/etc/supervisor.d/%s.conf' % env.name
+        path = '/etc/supervisor.d/%s.ini' % env.name
         upload_template('skeletons/supervisor.skel',
             path, skel_data, use_sudo=True)
 
