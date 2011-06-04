@@ -121,9 +121,16 @@ def user_updates(username):
     except UserNotFoundError:
         abort(404)
 
+    if u.username in g.user.contacts:
+        state = 'contact'
+    else:
+        state = 'nocontact'
+
     return render_template('timeline.html',
         timeline=u.updates,
-        title='%s\'s updates' % username,
+        user=u,
+        state=state,
+        title='%s' % username,
         disable_input=True)
 
 @app.route('/post-update', methods=['POST'])
@@ -374,9 +381,19 @@ def contacts(async=False):
 def async_contacts():
     return contacts(async=True)
 
+@app.route('/user/<string:contact>/add')
+def add_contact_t(contact):
+    return add_contact(contact,
+        redirect_url=url_for('user_updates', username=contact))
+
+@app.route('/user/<string:contact>/del')
+def del_contact_t(contact):
+    return del_contact(contact,
+        redirect_url=url_for('user_updates', username=contact))
+
 
 @app.route('/add-contact/<string:contact>')
-def add_contact(contact):
+def add_contact(contact, redirect_url=None):
     try:
         g.user.username
     except AttributeError:
@@ -391,7 +408,10 @@ def add_contact(contact):
         flash('User "%s" does not exist.' % contact, 'error')
     except ContactExistsError:
         flash('User "%s" is already in your address book.' % contact, 'error')
-    return redirect(url_for('contacts'))
+
+    if not redirect_url:
+        redirect_url = url_for('contacts')
+    return redirect(redirect_url)
 
 
 @app.route('/add-contact', methods=['POST'])
@@ -411,7 +431,7 @@ def async_contact_search(part):
 
 
 @app.route('/delete-contact/<string:contact>')
-def del_contact(contact):
+def del_contact(contact, redirect_url=None):
     try:
         g.user.username
     except AttributeError:
@@ -419,7 +439,9 @@ def del_contact(contact):
     c = Contacts(redis=g.r, user=g.user)
     c.delete(contact)
     flash('Deleted contact "%s".' % contact, 'success')
-    return redirect(url_for('contacts'))
+    if not redirect_url:
+        redirect_url = url_for('contacts')
+    return redirect(redirect_url)
 
 
 @app.route('/events')

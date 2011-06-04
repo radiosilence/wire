@@ -1,16 +1,67 @@
+{% macro button(type, contact) %}
+  {% if type == 'add' %}
+    {% set href = url_for('add_contact_t',contact=contact) %}
+    {% set text = 'Follow' %}
+  {% elif type == 'remove' %}
+    {% set href = url_for('del_contact_t', contact=contact) %}
+    {% set text = 'Unfollow' %}
+  {% endif %}
+  <a href="{{ href }}" class="button">{{ text }}</a>
+{% endmacro %}
+{% macro contact_bar(type, contact) %}
+ {% if g.logged_in %}
+  <div class="contactbar">
+    <div class="parallelements">
+        <div>
+          <p>
+          {% if type == 'contact' %}
+            You <strong>are</strong> following this user.
+          {% elif type == 'nocontact' %}
+            You are <strong>not</strong> following this user.
+          {% endif %}
+          </p>
+        </div>
+        <div>
+          <p>
+          {% if type == 'contact' %}
+            {{ button('remove', contact) }}
+          {% elif type == 'nocontact' %}
+            {{ button('add', contact) }}
+          {% endif %}
+          </p>
+        </div>
+    </div>
+  </div>
+ {% endif %}
+{% endmacro %}
 {% extends "main.html" %}
 {% block javascript %}
  <script src="{{ url_for('static', filename='js/timeline.js') }}" type="text/javascript"></script>
 {% endblock %}
 {% block content %}
+{% if user and g.user.key != user.key %}
+<img src="{{ url_for('static', filename='img/avatar/%s' % user.avatar) }}" class="avatar userpageavatar" style="float:left"/>
+<h1 style="margin-top: 0px">{{ title }}</h1>
+<p>This user is {% if g.user.username not in user.contacts %} not{% endif %} following you.</p>
+<article>
+  {{ contact_bar(state, user.username) }}
+
+{% else %}
+<article>
 <h1>{{ title }}</h1>
+
+{% endif %}
 {{ flashes() }}
+
+</article>
+
 {% if not disable_input %}
 <form method="POST" action="{{ url_for('post_update') }}">
   <p style="text-align: right"><textarea class="fullwidth" name="text" placeholder="Post something interesting..."></textarea><br/>
   <input type="submit" value="Post"/></p>
 </form>
 {% endif %}
+
 {% for update in timeline %}
   <article class="message{%- if g.user.username == update.user.username %} mine
     {%- endif %}">

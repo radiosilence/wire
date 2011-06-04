@@ -60,9 +60,12 @@ h1, h2 {
 }
 
 .wire nav {
-    margin: 0px;
+    margin-bottom: 0px;
+    margin-top: 0px;
+    margin-right: 0px;
     text-align: right;
 }
+
 .wire nav li a {
     font-size: 12pt;
     font-weight: normal;
@@ -84,6 +87,8 @@ h1, h2 {
     border: 0px;
     border-radius: 0px;
     margin: 0px;
+
+    float: right;
 }
 #userbox li {
     margin-bottom: 0.4em;
@@ -190,6 +195,10 @@ img.avatar {
     height: 80px;
 }
 
+img.userpageavatar {
+    margin-right: 10px;
+}
+
 .newmessagebutton {
     margin-top: -10px !important;
 }
@@ -278,7 +287,7 @@ p.expander a {
     text-decoration: none;
     height: 1.5em;
 }
-article div.attendbar {
+article div.attendbar, article div.contactbar {
     padding: 7px 10px 5px 15px;
     border: 1px solid #1a1a1a;
     margin-bottom: 10px;
@@ -286,16 +295,16 @@ article div.attendbar {
     border-radius: 5px;
 }
 
-article div.attendbar div.parallelements div:last-child p {
+article div.attendbar div.parallelements div:last-child p, article div.contactbar div.parallelements div:last-child p  {
     text-align: right;
 }
 
-article div.attendbar div.parallelements div {
+article div.attendbar div.parallelements div, article div.contactbar div.parallelements div {
     margin: 0px;
     padding: 0px;
     width: 50%;
 }
-article div.attendbar div p {
+article div.attendbar div p, article div.contactbar div p {
     margin: 0px;
 }
 img.event {
