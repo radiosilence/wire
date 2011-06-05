@@ -40,9 +40,9 @@
 {% endblock %}
 {% block content %}
 
-<img src="{{ url_for('static', filename='img/avatar/%s' % user.avatar) }}" class="avatar userpageavatar" style="float:left"/>
 <h1 style="margin-top: 0px">{{ title }}</h1>
 {% if user and g.user.key != user.key %}
+<img src="{{ url_for('static', filename='img/avatar/%s' % user.avatar) }}" class="avatar userpageavatar" style="float:left"/>
 <p>This user is {% if g.user.username not in user.contacts %} not{% endif %} following you. <a class="button" href="{{ url_for('send_message_recipient', recipient=user.username) }}">Send Message</a></p>
 <article>
   {{ contact_bar(state, user.username) }}
