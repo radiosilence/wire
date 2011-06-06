@@ -22,7 +22,7 @@
       {% if g.user.username == event.data['creator'] %}
         Created by you. <a href="{{ url_for('edit_event', event_id=event.key) }}">Edit this event</a>.
       {% else %}
-        Created by <a href="{{ url_for('send_message_recipient', recipient=event.data['creator']) }}">{{ event.data['creator'] }}</a>
+        Created by <a href="{{ url_for('user_updates', username=event.data['creator']) }}">{{ event.data['creator'] }}</a>
       {% endif %}
     </p>
 
