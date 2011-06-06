@@ -44,9 +44,14 @@ class Thread:
         r = self.redis
         self.recipients = []
         self.recipients = r.lrange('thread:%s:recipients' % self.key, 0, -1)
-        self.recipient_usernames = [json.loads( \
-            r.get('user:%s' % rec) \
-        )['username'] for rec in self.recipients]
+        self.recipient_usernames = []
+        for rec in self.recipients:
+            try:
+                self.recipient_usernames.append(json.loads( \
+                    r.get('user:%s' % rec) \
+                    )['username'])
+            except TypeError:
+                r.lrem('thread:%s:recipients' % self.key, rec, 0)
 
     def set_recipients(self, recipients):
         self.recipients = recipients
