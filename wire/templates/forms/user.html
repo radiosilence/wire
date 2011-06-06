@@ -36,10 +36,17 @@
       <div>
         <p>
           <label for="password_confirm">Password (Confirm)</label><br/>
-          <input type="password" name="password_confirm" id="password_confirm" placeholder="{% if new %}Ex: hunter2{% else %}No   change{% endif %}"/></p>
+          <input type="password" name="password_confirm" id="password_confirm" placeholder="{% if new %}Ex: hunter2{% else %}No change{% endif %}"/>
+
+          </p>
       </div>
+    {% if not new %}
+      <div>
+        <p>If you do not enter a new password, it will not be changed.</p>
+      </div>
+    {% endif %}
     </div>
-  <p class="submit"><button class="submit" id="submit_user_form">{% if new %}Create{% else %}Save{% endif %}</button></p>
+  <p class="submit"><button class="submit" id="submit_user_form" style="font-size: 22pt !important; font-weight: bold !important;">{% if new %}Create{% else %}Save{% endif %}</button></p>
 </form>
 </article>
 {% endblock %}
