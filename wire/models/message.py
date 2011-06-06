@@ -51,7 +51,7 @@ class Message:
 
     def _try_encrypt(self):
         try:
-            if len(self.data['encryption_key']) >= 6:
+            if len(self.data['encryption_key']) >= 8:
                 self.data['content'] = encrypt(self.data['encryption_key'],
                     self.data['content'])
                 self.encrypted = True
