@@ -755,6 +755,7 @@ def not_found(error):
 
 @app.errorhandler(500)
 def fuckup(error):
+    print error
     return _status("500: Internal Server Error"), 500
 
 
