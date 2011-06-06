@@ -103,8 +103,17 @@ def timeline():
         abort(401)
     timeline = g.user.timeline
     return render_template('timeline.html',
-        timeline=timeline,
+        timeline=timeline.updates,
         title='Timeline')
+
+
+@app.route('/rt')
+def rebuild_timeline():
+    timeline = g.user.timeline
+    return render_template('timeline.html',
+        timeline=timeline.rebuild(),
+        title='Rebuilt')
+
 
 @app.route('/mentions')
 def mentions():
@@ -114,8 +123,9 @@ def mentions():
         abort(401)
     timeline = g.user.mentions
     return render_template('timeline.html',
-        timeline=timeline,
+        timeline=timeline.updates,
         title='Mentions')
+
 
 @app.route('/user/<string:username>')
 def user_updates(username):
@@ -130,12 +140,14 @@ def user_updates(username):
     else:
         state = 'nocontact'
 
+    print u.posted.updates
     return render_template('timeline.html',
-        timeline=u.updates,
+        timeline=u.posted.updates,
         user=u,
         state=state,
         title='%s' % username,
         disable_input=True)
+
 
 @app.route('/post-update', methods=['POST'])
 def post_update():
@@ -385,10 +397,12 @@ def contacts(async=False):
 def async_contacts():
     return contacts(async=True)
 
+
 @app.route('/user/<string:contact>/add')
 def add_contact_t(contact):
     return add_contact(contact,
         redirect_url=url_for('user_updates', username=contact))
+
 
 @app.route('/user/<string:contact>/del')
 def del_contact_t(contact):
@@ -413,6 +427,8 @@ def add_contact(contact, redirect_url=None):
     except ContactExistsError:
         flash('User "%s" is already in your address book.' % contact, 'error')
 
+    t = g.user.timeline
+    t.rebuild()
     if not redirect_url:
         redirect_url = url_for('contacts')
     return redirect(redirect_url)
@@ -442,6 +458,8 @@ def del_contact(contact, redirect_url=None):
         abort(401)
     c = Contacts(redis=g.r, user=g.user)
     c.delete(contact)
+    t = g.user.timeline
+    t.rebuild()
     flash('Deleted contact "%s".' % contact, 'success')
     if not redirect_url:
         redirect_url = url_for('contacts')

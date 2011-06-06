@@ -69,7 +69,9 @@ class User:
         if len(self.username) < 1:
             errors.append("Username must be one character or longer.")
 
-        for c in [('\s', 'space'), ('\#', 'hash'), ('@', '@'), ('\/', 'slash')]:
+        for c in [
+            ('\s', 'space'), ('\#', 'hash'), ('@', '@'), ('\/', 'slash')
+        ]:
             if re.search(c[0], self.username):
                 errors.append("Username must not have a %s in it." % c[1])
 
@@ -156,21 +158,21 @@ class User:
 
     def get_timeline(self):
         t = Timeline(redis=self.redis, user=self)
-        return t.updates
+        return t
 
     timeline = property(get_timeline)
 
     def get_mentions(self):
         t = Timeline(redis=self.redis, user=self, type='mentions')
-        return t.updates
+        return t
 
     mentions = property(get_mentions)
 
-    def get_updates(self):
+    def get_posted(self):
         t = Timeline(redis=self.redis, user=self, type='updates')
-        return t.updates
+        return t
 
-    updates = property(get_updates)
+    posted = property(get_posted)
 
 
 class UserValidationError(Exception):
@@ -256,7 +258,7 @@ class Update:
             key = r.get('username:%s' % mentionee)
             r.lrem('user:%s:timeline' % key, self.key, 0)
             r.lrem('user:%s:mentions' % key, self.key, 0)
-    
+
     def _del_timeline(self):
         r = self.redis
         r.lrem('user:%s:timeline' % self.user.key, self.key, 0)
@@ -321,11 +323,42 @@ class Timeline:
         self.redis = redis
         self.user = user
         self.type = type
+        self.update_cache = []
+        self.update_keys = []
+
+    def add(self, update):
+        if update.key not in self.update_keys:
+            self.update_cache.append(update)
+            self.update_keys.append(update.key)
+
+    def rebuild(self):
+        self.update_cache = []
+        self.update_keys = []
+        for contact in self.user.contacts:
+            u = User(redis=self.redis)
+            u.load_by_username(contact)
+            for update in u.posted.updates:
+                self.add(update)
+
+        for update in self.user.mentions.updates:
+            self.add(update)
+        for update in self.user.posted.updates:
+            self.add(update)
+        self.update_cache = sorted(self.update_cache,
+            key=lambda x: int(x.key), reverse=True)
+        self.save_rebuilt()
+
+    def save_rebuilt(self):
+        r = self.redis
+        r.delete('user:%s:timeline' % self.user.key)
+        for update in self.update_cache:
+            r.rpush('user:%s:timeline' % self.user.key, update.key)
 
     def get_updates(self):
         r = self.redis
         updates = []
-        for update in r.lrange('user:%s:%s' % (self.user.key, self.type), 0, -1):
+        for update in r.lrange('user:%s:%s' %
+                (self.user.key, self.type), 0, -1):
             u = Update(redis=self.redis, key=update, user=self.user)
             updates.append(u)
         return updates
