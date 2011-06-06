@@ -2032,7 +2032,9 @@ code {
 #content article pre, article pre, div.fieldset pre, td pre {
   padding: 0.5em;
   margin: 1em;
-  border: 1px solid #0e0e0e; }
+  border: 1px solid #0e0e0e;
+  overflow: hidden;
+  white-space: pre-wrap; }
   #content article pre code, article pre code, div.fieldset pre code, td pre code {
     border: 0px; }
 
