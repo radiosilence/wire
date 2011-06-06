@@ -21,6 +21,9 @@ from flaskext.markdown import Markdown
 from flaskext.uploads import (UploadSet, configure_uploads, IMAGES,
                               UploadNotAllowed)
 
+import logging
+from logging import Formatter, FileHandler
+
 import json
 import redis
 import uuid
@@ -66,6 +69,18 @@ redis_connection = redis.Redis(
 )
 
 
+ADMINS = ['jamescleveland@gmail.com']
+if not app.debug:
+    file_handler = FileHandler('error.log', encoding="UTF-8")
+    file_handler.setLevel(logging.WARNING)
+    file_handler.setFormatter(Formatter(
+        '%(asctime)s %(levelname)s: %(message)s '
+        '[in %(pathname)s:%(funcName)s:%(lineno)d]'
+    ))
+    app.logger.addHandler(file_handler)
+    print "Added log handler."
+
+
 @app.before_request
 def before_request():
     g.logged_in = False
@@ -73,9 +88,6 @@ def before_request():
     g.auth = Auth(g.r)
     g.user = User(redis=g.r)
     g.GMAPS_KEY = app.config['GMAPS_KEY']
-    g.r.get('======================')
-    g.r.get('%s' % request.path)
-    g.r.get('======================')
     try:
         if session['logged_in']:
             g.logged_in = True
@@ -105,14 +117,6 @@ def timeline():
     return render_template('timeline.html',
         timeline=timeline.updates,
         title='Timeline')
-
-
-@app.route('/rt')
-def rebuild_timeline():
-    timeline = g.user.timeline
-    return render_template('timeline.html',
-        timeline=timeline.rebuild(),
-        title='Rebuilt')
 
 
 @app.route('/mentions')
@@ -755,7 +759,6 @@ def not_found(error):
 
 @app.errorhandler(500)
 def fuckup(error):
-    print error
     return _status("500: Internal Server Error"), 500
 
 

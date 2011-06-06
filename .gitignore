@@ -1,3 +1,4 @@
+*.log
 *.pyc
 *.sublime-project
 wire/static/img/avatar/*.*
