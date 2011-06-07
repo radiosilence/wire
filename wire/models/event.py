@@ -1,6 +1,6 @@
 import json
 from wire.utils.redis import autoinc
-from wire.models.user import User
+from wire.models.user import User, UserNotFoundError
 from datetime import datetime
 
 
@@ -130,14 +130,17 @@ class Event:
         r = self.redis
         self.comments_count = r.llen('event:%s:comments' % self.key)
         for key in r.lrange('event:%s:comments' % self.key, 0, -1):
-            comment = json.loads(r.get('comment:%s' % key))
-            u = User(redis=self.redis)
-            u.load(comment['user'])
-            comment['user'] = u
-            comment['date_date'] = comment['date'][:10]
-            comment['date_time'] = comment['date'][11:16]
-            comment['key'] = key
-            self.comments.append(comment)
+            try:
+                comment = json.loads(r.get('comment:%s' % key))
+                u = User(redis=self.redis)
+                u.load(comment['user'])
+                comment['user'] = u
+                comment['date_date'] = comment['date'][:10]
+                comment['date_time'] = comment['date'][11:16]
+                comment['key'] = key
+                self.comments.append(comment)
+            except UserNotFoundError:
+                r.lrem('event:%s:comments' % self.key, key, 0)
 
     def load_attendees(self):
         r = self.redis

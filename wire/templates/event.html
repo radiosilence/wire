@@ -108,11 +108,14 @@
     {% if event.comments_count == 0 %}
     <p>No comments added yet.</p>
     {% endif %}
+
+    {% if session.logged_in %}
     <form action="{{ url_for('event_add_comment', event_id=event.key) }}" method="POST">
       <h2>Add Comment</h2>
       <p><textarea name="text" style="width:97%"></textarea></p>
       <p><input type="submit" value="Add"/></p>
     </form>
+    {% endif %}
   </div>
 </article>
 {% endblock %}

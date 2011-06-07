@@ -580,6 +580,11 @@ def del_event(event_id):
 
 @app.route('/event/<int:event_id>/add-comment', methods=['POST'])
 def event_add_comment(event_id):
+    try:
+        g.user.username
+    except AttributeError:
+        abort(401)
+
     e = Event(redis=g.r, user=g.user)
     e.load(event_id)
     try:
