@@ -62,7 +62,7 @@
   <input type="submit" value="Post"/></p>
 </form>
 {% endif %}
-
+<div class="timeline">
 {% for update in timeline %}
   <article class="message{%- if g.user.username == update.user.username %} mine
     {%- endif %}">
@@ -72,6 +72,7 @@
         {% if g.user.username == update.user.username %}
           <a href="{{ url_for('delete_update', update_id=update.key) }}">x</a>
         {% endif %}
+        <a href="#">Reply</a>
       </div>
       <a href="{{ url_for('user_updates', username=update.user.username) }}">{{ update.user.username }}</a> {{ update.data['date'] }} at {{ update.data['time'] }}
 
@@ -80,4 +81,5 @@
     {{ update.text|markdown }}</div>
   </article>
 {% endfor %}
+</div>
 {% endblock %}

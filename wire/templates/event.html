@@ -91,18 +91,18 @@
     <a name="comments" />
     {% for comment in event.comments %}
       <article class="message
-      {%- if g.user.username == comment['user'].username or g.user.username == event.data['creator'] %} creator
+      {%- if g.user.username == comment.user.username or g.user.username == event.data['creator'] %} creator
       {%- endif -%}">
-        <img src="{{ url_for('static', filename='img/avatar/%s' % comment['user'].avatar) }}" class="avatar"/>
+        <img src="{{ url_for('static', filename='img/avatar/%s' % comment.user.avatar) }}" class="avatar"/>
         <header>
           <div class="opts">
-            {% if g.user.username == comment['user'].username or g.user.username == event.data['creator'] %}
-            <a href="{{ url_for('event_del_comment', event_id=event.key, comment_id=comment['key']) }}">x</a>
+            {% if g.user.username == comment.user.username or g.user.username == event.data['creator'] %}
+            <a href="{{ url_for('event_del_comment', event_id=event.key, comment_id=comment.key) }}">x</a>
             {% endif %}
           </div>
-          <a href="{{ url_for('user_updates', username=comment['user'].username) }}">{{ comment['user'].username }}</a> {{ comment['date_date'] }} at {{ comment['date_time'] }}
+          <a href="{{ url_for('user_updates', username=comment.user.username) }}">{{ comment.user.username }}</a> {{ comment.data['date'] }} at {{ comment.data['time'] }}
         </header>
-        <p>{{ comment['text']|markdown }}</p>
+        <p>{{ comment.text|markdown }}</p>
       </article>
     {% endfor %}
     {% if event.comments_count == 0 %}

@@ -189,7 +189,7 @@ class UserExists(Exception):
 
 class Update:
     def __init__(self, text=None, redis=None,
-        user=None, key=None, respond=None):
+        user=None, key=None, respond=None, event=None):
 
         self.key = key
         self.redis = redis
@@ -201,6 +201,7 @@ class Update:
         self.respond = respond
         self.done_keys = []
         self.text = text
+        self.event = event
         if self.text:
             self.parse(text)
         if self.key:
@@ -212,9 +213,16 @@ class Update:
             self.key = autoinc(r, 'update')
 
         r.set('update:%s' % self.key, self.json)
-        self._update_followers()
+        if self.event:
+            self._update_event()
+        else:
+            self._update_followers()
+            self._update_timeline()
+
+        if self.respond:
+            self._update_conversation()
+
         self._update_mentions()
-        self._update_timeline()
 
     def load(self, key):
         r = self.redis
@@ -230,6 +238,10 @@ class Update:
         u = User(redis=self.redis)
         u.load_by_username(data['username'])
         self.user = u
+        try:
+            self.event = data['event']
+        except KeyError:
+            self.event = None
         self.mentions = data['mentions']
         self.respond = data['respond']
         self.datetime = data['datetime']
@@ -241,11 +253,17 @@ class Update:
         if not self.key:
             return None
 
-        self._del_followers()
+        if self.event:
+            self._del_event()
+        else:
+            self._del_followers()
+            self._del_timeline()
         self._del_mentions()
-        self._del_timeline()
 
         r.delete('update:%s' % self.key)
+
+    def _del_event(self):
+        self.redis.lrem('event:%s:comments' % self.event, self.key, 0)
 
     def _del_followers(self):
         r = self.redis
@@ -269,6 +287,12 @@ class Update:
             self.hashes.append(match.group(0)[1:])
         for match in re.finditer('(@[^\s]+)', text):
             self.mentions.append(match.group(0)[1:])
+
+    def _update_event(self):
+        self.redis.lpush('event:%s:comments' % self.event, self.key)
+
+    def _update_conversation(self):
+        pass
 
     def _update_followers(self):
         r = self.redis
@@ -308,7 +332,8 @@ class Update:
             'mentions': self.mentions,
             'hashes': self.hashes,
             'respond': self.respond,
-            'datetime': self.datetime
+            'datetime': self.datetime,
+            'event': self.event
         })
 
     json = property(get_data_json)

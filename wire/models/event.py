@@ -1,6 +1,6 @@
 import json
 from wire.utils.redis import autoinc
-from wire.models.user import User, UserNotFoundError
+from wire.models.user import User, UserNotFoundError, Update, UpdateError
 from datetime import datetime
 
 
@@ -67,29 +67,30 @@ class Event:
     def _load_creator(self):
         self.creator.load_by_username(self.data['creator'])
 
-    def add_comment(self, message):
+    def add_comment(self, message, respond=None):
         if not self.key:
             raise EventMustLoadError()
         r = self.redis
+
         if len(message) < 1:
             raise EventCommentError("Message must be at least one character.")
-        comment_id = autoinc(r, 'comment')
-        r.set('comment:%s' % comment_id, json.dumps({
-            'user': self.user.key,
-            'text': message,
-            'date': self.date
-        }))
-        r.lpush('event:%s:comments' % self.key, comment_id)
+
+        u = Update(text=message, user=self.user, redis=r,
+            respond=respond, event=self.key)
+
+        u.save()
 
     def del_comment(self, comment_id):
         r = self.redis
-        r.lrem('event:%s:comments' % self.key, comment_id, 0)
-        r.delete('comment:%s' % comment_id)
+
+        u = Update(user=self.user, redis=r)
+        u.load(comment_id)
+        u.delete()
 
     def comment_user(self, comment_id):
-        r = self.redis
-        c = json.loads(r.get('comment:%s' % comment_id))
-        return c['user']
+        c = Update(redis=self.redis, user=self.user)
+        c.load(comment_id)
+        return c.user
 
     def load(self, event_id):
         r = self.redis
@@ -131,16 +132,11 @@ class Event:
         self.comments_count = r.llen('event:%s:comments' % self.key)
         for key in r.lrange('event:%s:comments' % self.key, 0, -1):
             try:
-                comment = json.loads(r.get('comment:%s' % key))
-                u = User(redis=self.redis)
-                u.load(comment['user'])
-                comment['user'] = u
-                comment['date_date'] = comment['date'][:10]
-                comment['date_time'] = comment['date'][11:16]
-                comment['key'] = key
-                self.comments.append(comment)
-            except UserNotFoundError:
-                r.lrem('event:%s:comments' % self.key, key, 0)
+                c = Update(redis=r, user=self.user)
+                c.load(key)
+                self.comments.append(c)
+            except UpdateError:
+                r.delete('event:%s:comments' % self.key, key, 0)
 
     def load_attendees(self):
         r = self.redis
