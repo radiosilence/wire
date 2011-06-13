@@ -68,8 +68,6 @@ redis_connection = redis.Redis(
     db=app.config['REDIS_DB']
 )
 
-
-ADMINS = ['jamescleveland@gmail.com']
 if not app.debug:
     file_handler = FileHandler('error.log', encoding="UTF-8")
     file_handler.setLevel(logging.WARNING)
@@ -641,13 +639,13 @@ def event_set_maybe(event_id):
     return redirect(url_for('view_event', event_id=event_id))
 
 
-@app.route('/blog')
-def blog_entries():
-    return render_template('blog.html')
+@app.route('/news')
+def news_articles():
+    return render_template('news.html')
 
 
-@app.route('/blog/<int:entry_id>')
-def view_blog_entry(entry_id):
+@app.route('/news/<int:entry_id>')
+def view_news_article(entry_id):
     return "viewing entry",  entry_id
 
 
