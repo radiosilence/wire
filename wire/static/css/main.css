@@ -204,12 +204,7 @@ img.userpageavatar {
     margin-top: -10px !important;
 }
 
-header .opts a {
-    float: right;
-    font-size: 10pt;
-    font-family: monospace;
-}
-article.mine:hover {
+article.mine:hover, .timeline article:hover {
     background-color: rgba(20,20,20,.2);
 }
 
@@ -323,6 +318,7 @@ article.event div.box p.field {
     border-top: 1px solid #1a1a1a;
     padding-top: 5px; padding-bottom: 5px;
     margin-bottom: 0px;
+    margin-top: 0px;
 }
 article.event img.event, img.event_edit {
     float: left;
@@ -362,3 +358,9 @@ a.delete_button:hover{
       -moz-box-shadow: 0px 0px 15px rgba(256, 128, 128, .3);
 }
 
+
+article.message header .opts a {
+    float: right;
+    font-size: 10pt;
+    font-weight: normal !important;
+}
