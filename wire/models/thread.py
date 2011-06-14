@@ -1,4 +1,4 @@
-from wire.models.message import Message, MessageError, DestructKey
+from wire.models.message import Message, MessageError
 import json
 from wire.utils.redis import autoinc
 import copy
@@ -14,9 +14,8 @@ class Thread:
         self.recipient_usernames = []
         self.user = user
         self.key = False
-        self.encrypted = False
-        self.decrypted = True
         self.unread_count = 0
+        self.encryption = None
 
     def get_unread_count(self, key=False):
         if not key:
@@ -105,8 +104,7 @@ class Thread:
             self.key = autoinc(self.redis, 'thread')
 
         data = {
-            'subject': self.subject,
-            'encrypted': self.encrypted
+            'subject': self.subject
         }
 
         r.set('thread:%s:data' % self.key, json.dumps(data))
@@ -118,11 +116,7 @@ class Thread:
     def add_message(self, m):
         m.get_key()
         if len(self.messages) == 0:
-            self.encrypted = m.encrypted
             self.save()
-        elif self.encrypted != m.encrypted:
-            raise ThreadError(
-                "Messages in same thread must have same encryption.")
 
         if self.key:
             m.thread = self.key
@@ -158,9 +152,10 @@ class Thread:
             raise ThreadError("Thread %s data doesn't exist." % self.key)
         data = json.loads(data)
         self.subject = data['subject']
-        self.encrypted = data['encrypted']
-        if self.encrypted:
-            self.decrypted = False
+        try:
+            self.encryption = data['encryption']
+        except KeyError:
+            self.encryption = 'plain'
         for message_key in message_keys:
             m = Message(redis=self.redis, user=self.user)
             try:
@@ -199,15 +194,6 @@ class Thread:
         self._update_recipients()
         if len(self.recipients) < 1:
             self.delete()
-
-    def decrypt(self, encryption_key):
-        for message in self.messages:
-            try:
-                message.decrypt(encryption_key)
-                self.decrypted = True
-            except DestructKey:
-                self.delete_message(message)
-                raise DestroyedThreadError()
 
 
 class DestroyedThreadError(Exception):

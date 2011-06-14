@@ -277,7 +277,7 @@
   display: none; }
 
 .ui-helper-hidden-accessible {
-  position: absolute !important;
+  position: absolute;
   clip: rect(1px 1px 1px 1px);
   clip: rect(1px, 1px, 1px, 1px); }
 
@@ -320,7 +320,7 @@
 /* Interaction Cues
  *---------------------------------- */
 .ui-state-disabled {
-  cursor: default !important; }
+  cursor: default; }
 
 /* Icons
  *---------------------------------- */
@@ -1169,7 +1169,7 @@
   .ui-accordion .ui-accordion-li-fix {
     display: inline; }
   .ui-accordion .ui-accordion-header-active {
-    border-bottom: 0 !important; }
+    border-bottom: 0; }
   .ui-accordion .ui-accordion-header a {
     display: block;
     font-size: 1em;
@@ -1256,7 +1256,7 @@
   position: relative;
   padding: 0;
   margin-right: 0.1em;
-  text-decoration: none !important;
+  text-decoration: none;
   cursor: pointer;
   text-align: center;
   zoom: 1;
@@ -1459,7 +1459,7 @@ button.ui-button::-moz-focus-inner {
       position: relative;
       top: 1px;
       margin: 0 0.2em 1px 0;
-      border-bottom: 0 !important;
+      border-bottom: 0;
       padding: 0;
       white-space: nowrap; }
       .ui-tabs .ui-tabs-nav li a {
@@ -1483,7 +1483,7 @@ button.ui-button::-moz-focus-inner {
     padding: 1em 1em;
     background: none; }
   .ui-tabs .ui-tabs-hide {
-    display: none !important; }
+    display: none; }
 
 /* position: relative prevents IE scroll bug (element with position: relative inside container with overflow: auto appear as "fixed") */
 /* first selector in group seems obsolete, but required to overcome bug in Opera applying cursor: text overall if defined elsewhere... */
@@ -1861,8 +1861,8 @@ input, textarea {
   font-size: 12pt; }
   input:focus, textarea:focus {
     background-color: #050505;
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0.87, #0a0a0a), color-stop(0.51, #0a0a0a), color-stop(0.02, black)) !important;
-    background: -moz-linear-gradient(center top, #0a0a0a 87%, #0a0a0a 51%, black 2%) !important;
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0.87, #0a0a0a), color-stop(0.51, #0a0a0a), color-stop(0.02, black));
+    background: -moz-linear-gradient(center top, #0a0a0a 87%, #0a0a0a 51%, black 2%);
     -webkit-box-shadow: 0px 0px 5px rgba(128, 128, 128, 0.01);
     -moz-box-shadow: 0px 0px 5px rgba(128, 128, 128, 0.01); }
 
@@ -1896,8 +1896,8 @@ button, input[type=submit], .qq-upload-button, nav ul, a.button {
   -moz-box-shadow: 0px 0px 15px rgba(128, 128, 128, 0.1);
   color: white;
   font-family: PTSans, sans-serif;
-  font-size: 12pt !important;
-  font-weight: normal !important;
+  font-size: 12pt;
+  font-weight: normal;
   text-transform: none; }
 
 input[type=text] {
@@ -1905,7 +1905,7 @@ input[type=text] {
   padding-bottom: 5px; }
 
 button, input[type=submit], .qq-upload-button, .ui-button-text, a.button {
-  padding: 4px 10px !important; }
+  padding: 4px 10px; }
 
 button:hover, input[type=submit]:hover, .qq-upload-button:hover, a.button:hover {
   background: -webkit-gradient(linear, left top, left bottom, color-stop(0.02, #0f0f0f), color-stop(0.51, #0f0f0f), color-stop(0.87, #0c0c0c));
@@ -2063,11 +2063,11 @@ em {
   font-style: italic; }
 
 input.timepick {
-  width: 80px !important; }
+  width: 80px; }
 input.datepick {
-  width: 160px !important; }
+  width: 160px; }
 input.price {
-  width: 5em !important; }
+  width: 5em; }
 
 div.tabs, div.accordion {
   overflow: hidden;
@@ -2080,7 +2080,7 @@ div.tabs div, div.accordion div {
   overflow: hidden; }
 div.tabs article, div.accordion article {
   margin: 0px;
-  border-right: 0px !important;
+  border-right: 0px;
   padding: 0px; }
 div.tabs article:last-child {
   border-bottom: 0px solid; }
@@ -2124,9 +2124,9 @@ sub {
   top: .5ex; }
 
 pre.blank {
-  margin: 0px !important;
-  padding: 0px !important;
-  border: 0px !important;
+  margin: 0px;
+  padding: 0px;
+  border: 0px;
   color: white;
   font-size: 12pt; }
 

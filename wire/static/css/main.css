@@ -371,3 +371,14 @@ article.message header .opts a {
     font-size: 10pt;
     font-weight: normal !important;
 }
+
+.encrypted_message {
+    background-color: #1a1a1a !important;
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0.02, #4f4f4f), color-stop(0.51, #323232), color-stop(0.87, #323232));
+    background: url('../img/encrypted_message.png') center;
+    height: 40px;
+    padding: 0px;
+    color:transparent;
+    overflow:hidden;
+    resize: none;
+}

@@ -7,14 +7,13 @@ from wire.models.message import Message, \
     MessageValidationError
 from wire.models.inbox import Inbox
 from wire.models.thread import Thread, \
-    DestroyedThreadError, ThreadError, InvalidRecipients
+    ThreadError, InvalidRecipients
 from wire.models.contacts import Contacts, \
     ContactExistsError, ContactInvalidError
 from wire.models.event import Event, EventValidationError,\
     EventNotFoundError, EventCommentError
 
 from wire.utils.auth import Auth, AuthError
-from wire.utils.crypto import DecryptFailed
 #from wire.utils.skipper import ignore_ico
 
 from flaskext.markdown import Markdown
@@ -227,7 +226,6 @@ def inbox():
 
 @app.route('/thread/<int:thread_id>', methods=['POST', 'GET'])
 def view_thread(thread_id):
-    encryption_key = False
     if str(thread_id) not in g.user.get_threads():
         abort(401)
 
@@ -244,25 +242,9 @@ def view_thread(thread_id):
                 t.load(thread_id)
                 flash("Reply has been sent.", 'success')
                 return redirect(url_for('view_thread', thread_id=t.key))
-            try:
-                encryption_key = request.form['encryption_key']
-                t.decrypt(encryption_key)
-                flash('Thread successfully decrypted.', 'success')
-            except DecryptFailed:
-                flash('Decryption was unsuccessful.', 'error')
-                return redirect(url_for('view_thread', thread_id=thread_id))
-            except DestroyedThreadError:
-                flash('System error. Message lost.', 'error')
-                return redirect(url_for('inbox'))
-            except KeyError:
-                pass
-        if t.decrypted:
-            t.reset_unread_count()
         return render_template('thread.html',
             messages=t.messages,
             thread=t,
-            decrypted=t.decrypted,
-            encryption_key=encryption_key,
             subject=t.subject)
     except ThreadError:
         abort(404)
