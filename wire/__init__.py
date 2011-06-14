@@ -124,6 +124,7 @@ def mentions():
     except AttributeError:
         abort(401)
     timeline = g.user.mentions
+    g.user.reset_mentions()
     return render_template('timeline.html',
         timeline=timeline.updates,
         title='Mentions')

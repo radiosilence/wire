@@ -44,6 +44,19 @@ class User:
         self.threads = threads
         return threads
 
+    def reset_mentions(self):
+        self.redis.set('user:%s:mentions:unread' % self.key, 0)
+
+    def get_unread_mentions(self):
+        k = 'user:%s:mentions:unread' % self.key
+        r = self.redis
+        if not r.exists(k):
+            r.set(k, 0)
+            return 0
+        return int(self.redis.get(k))
+
+    unread_mentions = property(get_unread_mentions)
+
     def save(self):
         self._validate()
         h = Hasher()
@@ -343,7 +356,7 @@ class Update:
                 continue
             self.done_keys.append(key)
             r.lpush('user:%s:mentions' % key, self.key)
-
+            r.incr('user:%s:mentions:unread' % key)
             if key == self.user.key:
                 continue
 
