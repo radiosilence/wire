@@ -204,7 +204,7 @@ img.userpageavatar {
     margin-top: -10px !important;
 }
 
-article.mine:hover, .timeline article:hover {
+article.mine:hover, .timeline article:hover, article.message:hover {
     background-color: rgba(20,20,20,.2);
 }
 
