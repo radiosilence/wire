@@ -11,8 +11,13 @@
     {% endif %}
   {% endwith %}
 {% endmacro -%}
-{%-macro update_box(update=None) %}
-<form method="POST" action="{{ url_for('post_update') }}">
+{%-macro update_box(update=None, event_id=None) %}
+<form method="POST" action="
+  {%- if event_id -%}
+    {{ url_for('event_add_comment', event_id=event_id) }}
+  {%- else -%}
+    {{ url_for('post_update') }}
+  {%- endif -%}">
   <p style="text-align: right"><textarea class="fullwidth" name="text" placeholder="Post something interesting...">{%-if update-%}
     @{{ update.user.username }}{{ ' ' }} 
     {%-for mention in update.mentions-%}

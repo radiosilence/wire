@@ -616,6 +616,15 @@ def event_add_comment(event_id):
     return redirect(url_for('view_event', event_id=event_id) + '#comments')
 
 
+@app.route('/event/<int:event_id>/reply/<int:update_id>')
+def event_add_reply(update_id, event_id):
+    u = Update(redis=g.r, user=g.user)
+    u.load(update_id)
+    return render_template('respond.html',
+        update=u,
+        event=event_id)
+
+
 @app.route('/event/<int:event_id>/delete-comment/<int:comment_id>')
 def event_del_comment(event_id, comment_id):
     e = Event(redis=g.r, user=g.user)

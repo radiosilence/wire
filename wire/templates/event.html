@@ -78,7 +78,7 @@
       {% if g.user.username == event.data['creator'] %}
         You (<em><a href="{{ url_for('edit_event', event_id=event.key) }}">Edit this event</a>)</em>
       {% else %}
-        <a href="{{ url_for('send_message_recipient', recipient=event.data['creator']) }}">{{ event.data['creator'] }}</a>
+        <a href="{{ url_for('user_updates', username=event.data['creator']) }}">{{ event.data['creator'] }}</a>
       {% endif %}
     </p>
     <p class="field"><label>What</label><br/>
@@ -99,6 +99,7 @@
             {% if g.user.username == comment.user.username or g.user.username == event.data['creator'] %}
             <a href="{{ url_for('delete_update', update_id=comment.key) }}">x</a>
             {% endif %}
+            <a href="{{ url_for('event_add_reply', update_id=comment.key, event_id=event.key) }}">Reply</a>
           </div>
           <a href="{{ url_for('user_updates', username=comment.user.username) }}" class="user">{{ comment.user.username }}</a> {{ comment.data['date'] }} at {{ comment.data['time'] }}
         </header>
