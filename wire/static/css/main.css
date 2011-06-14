@@ -210,11 +210,16 @@ article.mine:hover, .timeline article:hover {
 
 article.message header {
     font-size: 10pt;
-    max-height: 1.2em;
+    padding-top: 0px;
+    max-height: 18px;
     overflow: hidden;
 }
 
 article.message header a {
+    text-decoration: underline;
+}
+
+article.message header a.user {
     font-size: 12pt;
     font-weight: bold;
 }
@@ -224,7 +229,9 @@ article.message div.message {
     overflow: hidden;
 }
 
-
+article.message p {
+    margin-top: 0px;
+}
 article.event header {
     font-size: 10pt;
     max-height: 2.2em;

@@ -47,7 +47,7 @@
 <article>
   {{ contact_bar(state, user.username) }}
 
-{% else %}
+{% elif not disable_userbox %}
 <p>This is you. Do not attempt to follow yourself.</p>
 <article>
 
@@ -57,10 +57,7 @@
 </article>
 
 {% if not disable_input %}
-<form method="POST" action="{{ url_for('post_update') }}">
-  <p style="text-align: right"><textarea class="fullwidth" name="text" placeholder="Post something interesting..."></textarea><br/>
-  <input type="submit" value="Post"/></p>
-</form>
+{{ update_box() }}
 {% endif %}
 <div class="timeline">
 {% for update in timeline %}
@@ -72,9 +69,16 @@
         {% if g.user.username == update.user.username %}
           <a href="{{ url_for('delete_update', update_id=update.key) }}">x</a>
         {% endif %}
-        <a href="#">Reply</a>
+        <a href="{{ url_for('respond_update', update_id=update.key) }}">Reply</a>
       </div>
-      <a href="{{ url_for('user_updates', username=update.user.username) }}">{{ update.user.username }}</a> {{ update.data['date'] }} at {{ update.data['time'] }}
+      <a href="{{ url_for('user_updates', username=update.user.username) }}" class="user">{{ update.user.username }}</a> {{ update.data['date'] }} at {{ update.data['time'] }}
+
+    {%-if update.respond -%}
+     {{ ' ' }}<em>In reply to <a href="{{ url_for('conversation', conversation_id=update.conversation) }}">#{{ update.respond }}</a></em>
+    {%-endif-%}
+    {%-if update.event-%}
+     {{ ' ' }}<em>On event "<a href="{{ url_for('view_event', event_id=update.event) }}">{{ update.data['event_name'] }}</a></em>"
+    {%-endif-%}
 
     </header>
     <div class="message">

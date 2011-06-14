@@ -151,20 +151,43 @@ def user_updates(username):
         disable_input=True)
 
 
+@app.route('/conversation/<int:conversation_id>')
+def conversation(conversation_id):
+    updates = []
+    for key in g.r.lrange('conversation:%s' % conversation_id, 0, -1):
+        u = Update(redis=g.r, user=g.user)
+        u.load(key)
+        updates.append(u)
+    return render_template('timeline.html',
+        timeline=updates,
+        title='Conversation #%s' % conversation_id,
+        disable_input=True,
+        disable_userbox=True)
+
+
 @app.route('/post-update', methods=['POST'])
 def post_update():
     try:
-        respond = request.form['respond']
-    except KeyError:
-        respond = None
+        g.user.username
+    except AttributeError:
+        abort(401)
+
     u = Update(text=request.form['text'], user=g.user, redis=g.r,
-        respond=respond)
+        respond=request.form['respond'])
     try:
         u.save()
         flash("Update posted.", 'success')
     except UpdateError:
         pass
     return redirect(url_for('timeline'))
+
+
+@app.route('/respond/<int:update_id>')
+def respond_update(update_id):
+    u = Update(redis=g.r, user=g.user)
+    u.load(update_id)
+    return render_template('respond.html',
+        update=u)
 
 
 @app.route('/delete-update/<int:update_id>')

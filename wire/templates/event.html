@@ -97,10 +97,10 @@
         <header>
           <div class="opts">
             {% if g.user.username == comment.user.username or g.user.username == event.data['creator'] %}
-            <a href="{{ url_for('event_del_comment', event_id=event.key, comment_id=comment.key) }}">x</a>
+            <a href="{{ url_for('delete_update', update_id=comment.key) }}">x</a>
             {% endif %}
           </div>
-          <a href="{{ url_for('user_updates', username=comment.user.username) }}">{{ comment.user.username }}</a> {{ comment.data['date'] }} at {{ comment.data['time'] }}
+          <a href="{{ url_for('user_updates', username=comment.user.username) }}" class="user">{{ comment.user.username }}</a> {{ comment.data['date'] }} at {{ comment.data['time'] }}
         </header>
         <p>{{ comment.text|markdown }}</p>
       </article>

@@ -25,7 +25,7 @@
         <a href="{{ url_for('delete_message', thread_id=thread.key, message_id=message.key) }}">x</a>
       {% endif %}
     </div>
-    <a href="{{ url_for('user_updates', username=message.sender.username) }}">{{ message.sender.username }}</a> {{ message.data['date_date'] }} at {{ message.data['date_time'] }}
+    <a href="{{ url_for('user_updates', username=message.sender.username) }}" class="user">{{ message.sender.username }}</a> {{ message.data['date_date'] }} at {{ message.data['date_time'] }}
 
   </header>
 

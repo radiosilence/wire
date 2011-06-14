@@ -1,0 +1,24 @@
+{% extends 'main.html' %}
+{% block content %}
+<p>Responding to update #{{ update.key }}</p>
+  <article class="message{%- if g.user.username == update.user.username %} mine
+    {%- endif %}">
+    <img src="{{ url_for('static', filename='img/avatar/%s' % update.user.avatar) }}" class="avatar"/>
+    <header>
+      <div class="opts">
+        {% if g.user.username == update.user.username %}
+          <a href="{{ url_for('delete_update', update_id=update.key) }}">x</a>
+        {% endif %}
+        <a href="{{ url_for('respond_update', update_id=update.key) }}">Reply</a>
+      </div>
+      <a href="{{ url_for('user_updates', username=update.user.username) }}" class="user">{{ update.user.username }}</a> {{ update.data['date'] }} at {{ update.data['time'] }}
+
+    {%-if update.event %}
+    On event "<a href="{{ url_for('view_event', event_id=update.event) }}">{{ update.data['event_name'] }}</a>"
+    {% endif-%}
+    </header>
+    <div class="message">
+    {{ update.text|markdown }}</div>
+  </article>
+{{ update_box(update=update) }}
+{% endblock %}

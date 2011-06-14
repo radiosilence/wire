@@ -11,6 +11,23 @@
     {% endif %}
   {% endwith %}
 {% endmacro -%}
+{%-macro update_box(update=None) %}
+<form method="POST" action="{{ url_for('post_update') }}">
+  <p style="text-align: right"><textarea class="fullwidth" name="text" placeholder="Post something interesting...">{%-if update-%}
+    @{{ update.user.username }}{{ ' ' }} 
+    {%-for mention in update.mentions-%}
+     {%-if g.user.username != mention-%}
+      @{{ mention }}{{ ' ' }}
+     {%-endif-%}
+    {%- endfor -%}
+  {%-endif-%}</textarea><br/>
+  <input type="hidden" value="
+  {%- if update -%}
+    {{ update.key }}
+  {%- endif -%}" name="respond"/>
+  <input type="submit" value="Post"/></p>
+</form>
+{% endmacro -%}
 {%- if self.title() != "" -%}
   {% set ndash = ' \u2013 ' -%}
 {%- else -%}

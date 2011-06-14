@@ -189,7 +189,7 @@ class UserExists(Exception):
 
 class Update:
     def __init__(self, text=None, redis=None,
-        user=None, key=None, respond=None, event=None):
+        user=None, key=None, respond="", event=None, conversation=None):
 
         self.key = key
         self.redis = redis
@@ -198,7 +198,15 @@ class Update:
         self.hashes = []
         self.data = {}
         self.datetime = str(datetime.now())
-        self.respond = respond
+        self.conversation = conversation
+        if respond:
+            if len(respond) > 0:
+                self.respond = int(respond)
+            else:
+                self.respond = None
+        else:
+            self.respond = None
+
         self.done_keys = []
         self.text = text
         self.event = event
@@ -212,16 +220,16 @@ class Update:
         if not self.key:
             self.key = autoinc(r, 'update')
 
+        self._get_conversation()
+
         r.set('update:%s' % self.key, self.json)
+
         if self.event:
             self._update_event()
         else:
             self._update_followers()
             self._update_timeline()
-
-        if self.respond:
-            self._update_conversation()
-
+        self._update_conversation()
         self._update_mentions()
 
     def load(self, key):
@@ -240,10 +248,17 @@ class Update:
         self.user = u
         try:
             self.event = data['event']
+            if self.event:
+                self.data['event_name'] = json.loads(
+                    r.get('event:%s' % self.event))['name']
         except KeyError:
             self.event = None
         self.mentions = data['mentions']
         self.respond = data['respond']
+        try:
+            self.conversation = data['conversation']
+        except KeyError:
+            self.conversation = None
         self.datetime = data['datetime']
         self.data['date'] = self.datetime[:10]
         self.data['time'] = self.datetime[11:16]
@@ -259,6 +274,7 @@ class Update:
             self._del_followers()
             self._del_timeline()
         self._del_mentions()
+        self._del_conversation()
 
         r.delete('update:%s' % self.key)
 
@@ -282,6 +298,10 @@ class Update:
         r.lrem('user:%s:timeline' % self.user.key, self.key, 0)
         r.lrem('user:%s:updates' % self.user.key, self.key, 0)
 
+    def _del_conversation(self):
+        r = self.redis
+        r.lrem('conversation:%s' % self.conversation, self.key, 0)
+
     def parse(self, text):
         for match in re.finditer('(#[^\s]+)', text):
             self.hashes.append(match.group(0)[1:])
@@ -292,7 +312,16 @@ class Update:
         self.redis.lpush('event:%s:comments' % self.event, self.key)
 
     def _update_conversation(self):
-        pass
+        self.redis.lpush('conversation:%s' % self.conversation, self.key)
+
+    def _get_conversation(self):
+        if self.respond:
+            u = Update(redis=self.redis, user=self.user)
+            u.load(self.respond)
+            if u.conversation:
+                self.conversation = u.conversation
+        if not self.conversation:
+            self.conversation = autoinc(self.redis, 'conversation')
 
     def _update_followers(self):
         r = self.redis
@@ -333,6 +362,7 @@ class Update:
             'hashes': self.hashes,
             'respond': self.respond,
             'datetime': self.datetime,
+            'conversation': self.conversation,
             'event': self.event
         })
 
