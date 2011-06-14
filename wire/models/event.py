@@ -21,6 +21,7 @@ class Event:
         self.maybes = []
         self.maybes_count = 0
         self.creator = User(redis=redis)
+        self.conversation_id = None
 
     def list(self, limit=-1, start=0):
         if limit > 0:
@@ -62,6 +63,7 @@ class Event:
         if len(self.data['location']) < 1:
             self.data['location'] = 'Undisclosed Location'
         self._load_creator()
+        self.data['conversation'] = self.conversation
         r.set('event:%s' % self.key, json.dumps(self.data))
 
     def _load_creator(self):
@@ -76,8 +78,7 @@ class Event:
             raise EventCommentError("Message must be at least one character.")
 
         u = Update(text=message, user=self.user, redis=r,
-            respond=respond, event=self.key)
-
+            respond=respond, event=self.key, conversation=self.conversation)
         u.save()
 
     def del_comment(self, comment_id):
@@ -100,6 +101,11 @@ class Event:
             self.data = json.loads(r.get('event:%s' % self.key))
         else:
             raise EventNotFoundError()
+
+        try:
+            self.conversation_id = self.data['conversation']
+        except KeyError:
+            self.conversation_id = self.conversation
 
         if len(self.data['meeting_place']) > 0:
             self.show_meeting_place = True
@@ -129,14 +135,15 @@ class Event:
 
     def _reload_comments(self):
         r = self.redis
-        self.comments_count = r.llen('event:%s:comments' % self.key)
-        for key in r.lrange('event:%s:comments' % self.key, 0, -1):
+        k = 'conversation:%s' % self.conversation
+        self.comments_count = r.llen(k)
+        for key in r.lrange(k, 0, -1):
             try:
                 c = Update(redis=r, user=self.user)
                 c.load(key)
                 self.comments.append(c)
             except UpdateError:
-                r.delete('event:%s:comments' % self.key, key, 0)
+                r.delete(k, key, 0)
 
     def load_attendees(self):
         r = self.redis
@@ -190,6 +197,14 @@ class Event:
 
         if len(self.validation_errors) > 0:
             raise EventValidationError()
+
+    def get_conversation(self):
+        if not self.conversation_id:
+            self.conversation_id = autoinc(self.redis, 'conversation')
+            self.save()
+        return self.conversation_id
+
+    conversation = property(get_conversation)
 
 
 class EventNotFoundError(Exception):
