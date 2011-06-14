@@ -1987,6 +1987,7 @@ code {
   margin-bottom: 0.5em; }
 #content article blockquote, article blockquote, div.fieldset blockquote, td blockquote {
   border-left: 3px solid #0e0e0e;
+  margin-left: 0px;
   padding-left: 1em;
   color: #888; }
 #content article code, article code, div.fieldset code, td code {

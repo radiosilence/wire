@@ -103,7 +103,9 @@
           </div>
           <a href="{{ url_for('user_updates', username=comment.user.username) }}" class="user">{{ comment.user.username }}</a> {{ comment.data['date'] }} at {{ comment.data['time'] }}
         </header>
+        <div class="message">
         <p>{{ comment.text|markdown }}</p>
+        </div>
       </article>
     {% endfor %}
     {% if event.comments_count == 0 %}
