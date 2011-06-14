@@ -1,7 +1,7 @@
 import json
 from wire.utils.redis import autoinc
 from wire.models.user import User, UserNotFoundError, Update, UpdateError
-from datetime import datetime
+from datetime import datetime, time, date
 
 
 class Event:
@@ -194,6 +194,17 @@ class Event:
     def _validate(self):
         if len(self.data['name']) < 1:
             self.validation_errors.append("Event name must be set.")
+        try:
+            t = self.data['time'].split(':')
+            time(int(t[0]), int(t[1]))
+        except ValueError:
+            self.validation_errors.append("Time must be valid 24 hour time.")
+
+        try:
+            d = self.data['date'].split('-')
+            date(int(d[0]), int(d[1]), int(d[2]))
+        except ValueError:
+            self.validation_errors.append("Date must be a real date.")
 
         if len(self.validation_errors) > 0:
             raise EventValidationError()

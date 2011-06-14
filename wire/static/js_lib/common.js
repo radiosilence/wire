@@ -119,6 +119,7 @@ $(function(){
    });
    
   //$('.markdown').markItUp(myMarkdownSettings);
+  $(".timepick").timepicker();
 
   $(".datepick").datepicker({
       dateFormat: 'yy-mm-dd'
