@@ -8,21 +8,16 @@ $(function() {
 });
 
 $(function() {
-    enc_form = '<h1>Security Options</h1> \
-    <p><label for="crypto-key">Crypto Key</label><br/> \
-        <input type="text" name="encryption_key" id="crypto-key" /> <a href="#" id="encrypt" class="button">Encrypt</a><br/> \
-        If you choose to encrypt your message, a key must be decided in person and memorised by the sender and recievers. It must be 8 or more characters long. AVOID dictionary words. \
-    </p>';    
-    $('article#crypto').html(enc_form);
+    $('article#crypto').show();
     $('article#crypto a#encrypt').live('click', function(e) {
         e.preventDefault();
-        password = $('#crypto-key').val();
+        passphrase = $('#crypto-key').val();
         plaintext = $('#msg-content').val();
-        if(password.length < 6) {
-            alert('password must be at least x chars');
+        if(passphrase.length < 12) {
+            $('#encrypt-failed').show();
             return false;
         }
-        $('#msg-content').val(sjcl.encrypt(password, plaintext, window.p));
+        $('#msg-content').val(sjcl.encrypt(passphrase, plaintext, window.p));
         $('#msg-encryption').val('aes256');
 
         $('#msg-content').hide();
@@ -39,7 +34,7 @@ $(function() {
     });
     if(window.num_enc) {
         $('#reply-form').hide();
-        //$('#messages').hide();
+        $('#messages').hide();
         $('#decrypt').show();
         $('#decrypt-button').click(function(e) {
             e.preventDefault()
@@ -47,16 +42,23 @@ $(function() {
                 $('article.message div.aes256').each(function() {
                     $(this).text(sjcl.decrypt($('#passphrase').val(), $(this).text()));
                     $(this).removeClass('encrypted_message');
-                    $('#decrypt').hide();
                 });
+                $('#decrypt').hide();
                 $('#decrypt-failed').hide();
                 $('#decrypt-success').show();
                 $('#messages').show();
                 $('#reply-form').show();
+                window.passphrase = $('#passphrase').val();
             } catch(CORRUPT) {
                 $('#decrypt-failed').show();
+                $('#decrypt').show();
             }
             
-        })
+        });
+
+        $('#reply-form').submit(function(e) {
+            $('#msg-content').hide()
+            $('#msg-content').val(sjcl.encrypt(window.passphrase, $('#msg-content').val(), window.p));
+        });
     }
 });

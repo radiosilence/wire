@@ -45,11 +45,9 @@
   <div id="reply">
     <form action="{{ url_for('view_thread', thread_id=thread.key) }}" method="post" id="reply-form">
     <input type="hidden" name="action" value="reply"/>
-    {% if encryption_key %}
-      <input type="hidden" name="encryption_key" value="{{ encryption_key }}"/>
-    {% endif %}
-    <p><label for="msg-content"><h1>Reply</h1></label><textarea id="msg-content" name="content" style="width:98%; height: 100px" placeholder="Write your reply in here."></textarea></p>
-    <p style="text-align: right"><input type="submit" value="Reply to all"/></p>
+    <input type="hidden" name="encryption" value="{{ thread.encryption }}"/>
+    <p><label for="msg-content"><h1>Reply</h1></label><textarea id="msg-content" name="content" class="fullwidth" style="height: 100px" placeholder="Write your reply in here."></textarea></p>
+    <p style="text-align: right"><input type="submit" class="reply-button" value="Reply to all"/></p>
   </form>
   </div>
 
