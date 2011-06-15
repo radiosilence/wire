@@ -35,8 +35,7 @@
     </td>
     <td style="width:100%">
     <a href="{{ url_for('view_thread', thread_id=thread.key) }}">
-    {{ thread.subject }}
-    {{ thread.encryption }}</a>
+    {{ thread.subject }}</a>[{{ thread.encryption }}]
     </td>
 
     <td class="opts" style="width: 20px">

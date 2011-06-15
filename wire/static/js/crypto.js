@@ -1,7 +1,7 @@
 // Encryption
 $(function() {
     window.p = {
-        iter: 100000,
+        iter: 10000,
         mode: "ocb2",
         ks: 256
     };
@@ -25,33 +25,37 @@ $(function() {
         $('#msg-content').val(sjcl.encrypt(password, plaintext, window.p));
         $('#msg-encryption').val('aes256');
 
+        $('#msg-content').hide();
         $('article#crypto').hide();
         $('#msg').append('<div class="encrypted_message"></div>');
-        console.log($('#msg-content').val());
     });
 });
 
 // Decryption
 $(function() {
-
-    decrypt_form = '<p>It seems that messages in this thread are encrypted with AES-256. Decrypt them by entering the passphrase below:</p> \
-        <p><input type="text" id="passphrase"/> <a class="button" id="decrypt-button" href="#">Decrypt</a></p>';
-    window.num_enc = 0;
+    window.encrypted = false;
     $('article.message div.aes256').each(function() {
-        $(this).attr('enc_content', $(this).text());
-        $(this).text('');
-        $(this).addClass('encrypted_message');
-        window.num_enc += 1;
+        window.num_enc = true;
     });
-    if(window.num_enc > 0) {
-        $('#decrypt').html(decrypt_form);
+    if(window.num_enc) {
+        $('#reply-form').hide();
+        //$('#messages').hide();
+        $('#decrypt').show();
         $('#decrypt-button').click(function(e) {
-            e.preventDefault();
-            $('article.message div.aes256').each(function() {
-                $(this).text(sjcl.decrypt($('#passphrase').val(), $(this).attr('enc_content'), window.p));
-                $(this).removeClass('encrypted_message');
-                $('#decrypt').hide();
-            });
+            e.preventDefault()
+            try {
+                $('article.message div.aes256').each(function() {
+                    $(this).text(sjcl.decrypt($('#passphrase').val(), $(this).text()));
+                    $(this).removeClass('encrypted_message');
+                    $('#decrypt').hide();
+                });
+                $('#decrypt-failed').hide();
+                $('#decrypt-success').show();
+                $('#messages').show();
+                $('#reply-form').show();
+            } catch(CORRUPT) {
+                $('#decrypt-failed').show();
+            }
             
         })
     }

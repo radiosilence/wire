@@ -14,7 +14,13 @@
     <a href="{{ url_for('user_updates', username=username) }}">{{ username }}</a>,
   {% endfor %}
   &nbsp;<input type="text" name="username" id="addrecip"/><input type="submit" value="Add"/></span></form></p>
-  <div id="decrypt"></div>
+  <div id="decrypt" style="display:none">
+    <p>It seems that messages in this thread are encrypted with AES-256. Decrypt them by entering the passphrase below:<br/>
+    <div class="ui-state-error ui-corner-all response_error" id="decrypt-failed" style="display:none"><span class="ui-icon ui-icon-alert"></span>Decryption Failed<br/></div>
+      <input type="text" id="passphrase"/> <a class="button" id="decrypt-button" href="#">Decrypt</a></p>
+  </div>
+  <div class="ui-state-highlight ui-corner-all response_highlight" id="decrypt-success" style="display:none"><span class="ui-icon ui-icon-info"></span>Decryption Succeeded<br/></div>
+  <div id="messages">
   {% for message in messages %}
   <article class="message{%- if g.user.username == message.sender.username %} mine
     {%- endif %}">
@@ -35,14 +41,17 @@
 
 
   {% endfor %}
-  <form action="{{ url_for('view_thread', thread_id=thread.key) }}" method="post">
-  <input type="hidden" name="action" value="reply"/>
-  {% if encryption_key %}
-    <input type="hidden" name="encryption_key" value="{{ encryption_key }}"/>
-  {% endif %}
-  <p><label for="msg-content"><h1>Reply</h1></label><textarea id="msg-content" name="content" style="width:98%; height: 100px" placeholder="Write your reply in here."></textarea></p>
-  <p style="text-align: right"><input type="submit" value="Reply to all"/></p>
-</form>
+  </div>
+  <div id="reply">
+    <form action="{{ url_for('view_thread', thread_id=thread.key) }}" method="post" id="reply-form">
+    <input type="hidden" name="action" value="reply"/>
+    {% if encryption_key %}
+      <input type="hidden" name="encryption_key" value="{{ encryption_key }}"/>
+    {% endif %}
+    <p><label for="msg-content"><h1>Reply</h1></label><textarea id="msg-content" name="content" style="width:98%; height: 100px" placeholder="Write your reply in here."></textarea></p>
+    <p style="text-align: right"><input type="submit" value="Reply to all"/></p>
+  </form>
+  </div>
 
 
 {% endblock %}
