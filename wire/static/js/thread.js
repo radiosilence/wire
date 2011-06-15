@@ -13,4 +13,9 @@ $(function() {
             autoFill: true
         });        
     });
+
+    converter = new Showdown.converter();
+    $('article.message div.plain').each(function() {
+        $(this).html(converter.makeHtml($(this).text()));
+    }); 
 });

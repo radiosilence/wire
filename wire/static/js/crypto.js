@@ -39,9 +39,13 @@ $(function() {
         $('#decrypt-button').click(function(e) {
             e.preventDefault()
             try {
+                converter = new Showdown.converter();
                 $('article.message div.aes256').each(function() {
-                    $(this).text(sjcl.decrypt($('#passphrase').val(), $(this).text()));
+                    text = sjcl.decrypt($('#passphrase').val(), $(this).text());
+                    $(this).html(converter.makeHtml(text));
                     $(this).removeClass('encrypted_message');
+                    $(this).removeClass('aes256');
+                    $(this).addClass('plain');
                 });
                 $('#decrypt').hide();
                 $('#decrypt-failed').hide();
