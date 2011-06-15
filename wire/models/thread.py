@@ -104,7 +104,8 @@ class Thread:
             self.key = autoinc(self.redis, 'thread')
 
         data = {
-            'subject': self.subject
+            'subject': self.subject,
+            'encryption': self.encryption
         }
 
         r.set('thread:%s:data' % self.key, json.dumps(data))

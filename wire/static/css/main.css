@@ -377,8 +377,11 @@ article.message header .opts a {
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0.02, #4f4f4f), color-stop(0.51, #323232), color-stop(0.87, #323232));
     background: url('../img/encrypted_message.png') center;
     height: 40px;
-    padding: 0px;
+    padding: 0px !important;
     color:transparent;
     overflow:hidden;
     resize: none;
+    border: 1px solid #1a1a1a;
+    border-radius: 5px;
+    margin-top: 10px;
 }

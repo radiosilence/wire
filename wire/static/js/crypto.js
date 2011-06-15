@@ -1,10 +1,13 @@
+// Encryption
 $(function() {
-    p = {
+    window.p = {
         iter: 100000,
         mode: "ocb2",
         ks: 256
     };
-    rp = {}
+});
+
+$(function() {
     enc_form = '<h1>Security Options</h1> \
     <p><label for="crypto-key">Crypto Key</label><br/> \
         <input type="text" name="encryption_key" id="crypto-key" /> <a href="#" id="encrypt" class="button">Encrypt</a><br/> \
@@ -19,13 +22,37 @@ $(function() {
             alert('password must be at least x chars');
             return false;
         }
-        $('#msg-content').val(sjcl.encrypt(password, plaintext, p));
+        $('#msg-content').val(sjcl.encrypt(password, plaintext, window.p));
         $('#msg-encryption').val('aes256');
-        $('#msg-content').attr('disabled', 'disabled');
-        $('#msg-content').addClass('encrypted_message');
-        $('article#crypto').fadeOut('slow', 'swing', function(){
-        });
-        //$('#msg').append('<div class="ui-state-highlight ui-corner-all response_highlight"><span class="ui-icon ui-icon-info"></span>Message has been encrypted.</div>');
+
+        $('article#crypto').hide();
+        $('#msg').append('<div class="encrypted_message"></div>');
         console.log($('#msg-content').val());
     });
+});
+
+// Decryption
+$(function() {
+
+    decrypt_form = '<p>It seems that messages in this thread are encrypted with AES-256. Decrypt them by entering the passphrase below:</p> \
+        <p><input type="text" id="passphrase"/> <a class="button" id="decrypt-button" href="#">Decrypt</a></p>';
+    window.num_enc = 0;
+    $('article.message div.aes256').each(function() {
+        $(this).attr('enc_content', $(this).text());
+        $(this).text('');
+        $(this).addClass('encrypted_message');
+        window.num_enc += 1;
+    });
+    if(window.num_enc > 0) {
+        $('#decrypt').html(decrypt_form);
+        $('#decrypt-button').click(function(e) {
+            e.preventDefault();
+            $('article.message div.aes256').each(function() {
+                $(this).text(sjcl.decrypt($('#passphrase').val(), $(this).attr('enc_content'), window.p));
+                $(this).removeClass('encrypted_message');
+                $('#decrypt').hide();
+            });
+            
+        })
+    }
 });

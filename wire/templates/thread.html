@@ -2,6 +2,7 @@
 {% block javascript %}
 <script src="{{ url_for('static', filename='js_lib/jquery.autocomplete.min.js') }}" type="text/javascript"></script>
 <script src="{{ url_for('static', filename='js/thread.js') }}" type="text/javascript"></script>
+<script src="{{ url_for('static', filename='js/crypto.js') }}" type="text/javascript"></script>
 {% endblock %}
 {% block content %}
 
@@ -13,7 +14,7 @@
     <a href="{{ url_for('user_updates', username=username) }}">{{ username }}</a>,
   {% endfor %}
   &nbsp;<input type="text" name="username" id="addrecip"/><input type="submit" value="Add"/></span></form></p>
-
+  <div id="decrypt"></div>
   {% for message in messages %}
   <article class="message{%- if g.user.username == message.sender.username %} mine
     {%- endif %}">
@@ -28,8 +29,8 @@
 
   </header>
 
-  <div class="message">
-{{ message.data['content']|markdown }}</div>
+  <div class="message {{ thread.encryption }}">
+    {{ message.data['content'] }}</div>
   </article>
 
 

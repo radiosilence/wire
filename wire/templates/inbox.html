@@ -29,13 +29,14 @@
     {%- endif -%}</td>
     <td style="white-space: nowrap;"><a href="{{ url_for('user_updates', username=thread.sender) }}">{{ thread.sender }}</a></td>
     <td style="width:10px; padding-right: 0px">
-    {% if thread.encryption %}
+    {% if thread.encryption != 'plain' %}
      <img src="{{ url_for('static', filename='img/lock.png') }}" />
     {% endif %}
     </td>
     <td style="width:100%">
     <a href="{{ url_for('view_thread', thread_id=thread.key) }}">
-    {{ thread.subject }}</a>
+    {{ thread.subject }}
+    {{ thread.encryption }}</a>
     </td>
 
     <td class="opts" style="width: 20px">

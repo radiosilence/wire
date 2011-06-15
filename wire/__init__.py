@@ -272,9 +272,11 @@ def send_message(recipient=False):
 
     if request.method == 'POST':
         try:
+            print request.form
             t.subject = request.form['subject']
             m.update(request.form)
             t.parse_recipients(request.form['recipients'])
+            t.encryption = request.form['encryption']
             t.save()
             t.add_message(m)
             m.send()
