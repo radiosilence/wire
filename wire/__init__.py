@@ -318,6 +318,20 @@ def delete_message(message_id, thread_id):
         )
 
 
+@app.route('/thread/<int:thread_id>/mark-read')
+def mark_thread_read(thread_id):
+    try:
+        if str(thread_id) not in g.user.get_threads():
+            abort(401)
+    except AttributeError:
+        abort(401)
+
+    t = Thread(redis=g.r, user=g.user)
+    t.load(thread_id)
+    t.reset_unread_count()
+    abort(200)
+
+
 @app.route('/unsubscribe-thread/<int:thread_id>', methods=['POST', 'GET'])
 def unsubscribe_thread(thread_id):
     try:
