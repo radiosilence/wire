@@ -48,5 +48,8 @@
 {% else %}
     <p>No threads for you :'-(</p>
 {% endif %}
+
 </article>
+<article>
+<p><a href="{{ url_for('mark_all_read') }}">Mark all as read</a></p></article>
 {% endblock %}

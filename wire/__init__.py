@@ -224,6 +224,20 @@ def inbox():
         empty=empty)
 
 
+@app.route('/inbox/mark-all-read')
+def mark_all_read():
+    try:
+        g.user.username
+    except AttributeError:
+        abort(401)
+    i = g.inbox
+    i.load_messages()
+    for thread in i.threads:
+        thread.reset_unread_count()
+    flash('All messages marked read.', 'success')
+    return redirect(url_for('inbox'))
+
+
 @app.route('/thread/<int:thread_id>', methods=['POST', 'GET'])
 def view_thread(thread_id):
     if str(thread_id) not in g.user.get_threads():

@@ -28,10 +28,14 @@ $(function() {
 
 // Decryption
 $(function() {
+    function mark_read() {
+        $.get(document.URL+'/mark-read');
+    }
     window.encrypted = false;
     $('article.message div.aes256').each(function() {
         window.num_enc = true;
     });
+    console.log();
     if(window.num_enc) {
         $('#reply-form').hide();
         $('#messages').hide();
@@ -52,6 +56,7 @@ $(function() {
                 $('#decrypt-success').show();
                 $('#messages').show();
                 $('#reply-form').show();
+                mark_read();
                 window.passphrase = $('#passphrase').val();
             } catch(CORRUPT) {
                 $('#decrypt-failed').show();
@@ -64,5 +69,7 @@ $(function() {
             $('#msg-content').hide()
             $('#msg-content').val(sjcl.encrypt(window.passphrase, $('#msg-content').val(), window.p));
         });
+    } else {
+        mark_read();
     }
 });
