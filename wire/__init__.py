@@ -14,7 +14,6 @@ from wire.models.event import Event, EventValidationError,\
     EventNotFoundError, EventCommentError
 
 from wire.utils.auth import Auth, AuthError
-#from wire.utils.skipper import ignore_ico
 
 from flaskext.markdown import Markdown
 from flaskext.uploads import (UploadSet, configure_uploads, IMAGES,
@@ -37,15 +36,9 @@ uploaded_images = UploadSet('images', IMAGES)
 def config(debug=None):
     if debug:
         print "Debug mode."
-#        static_types = [
-#            'ico'
-#        ]
         app = Flask(__name__)
 
     else:
-#        static_types = [
-#            'gif', 'jpg', 'jpeg', 'css', 'gif', 'woff', 'ttf', 'ico', 'js'
-#        ]
         app = Flask(__name__, static_path='/')
 
     app.config.from_object(__name__)
@@ -57,9 +50,6 @@ def config(debug=None):
     return app
 
 app = config(debug=DEBUG)
-
-#app.wsgi_app = ignore_ico(app.wsgi_app, static_types)
-
 
 redis_connection = redis.Redis(
     host=app.config['REDIS_HOST'],
