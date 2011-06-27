@@ -1,7 +1,7 @@
 // Encryption
 $(function() {
     window.p = {
-        iter: 10000,
+        iter: 1000,
         mode: "ocb2",
         ks: 256
     };
