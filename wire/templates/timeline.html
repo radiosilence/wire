@@ -38,6 +38,8 @@
 {% block javascript %}
  <script src="{{ url_for('static', filename='js/timeline.js') }}" type="text/javascript"></script>
 {% endblock %}
+
+{% block title %}{{ title }}{% endblock %}
 {% block content %}
 
 <h1 style="margin-top: 0px">{{ title }}</h1>

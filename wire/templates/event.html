@@ -45,6 +45,7 @@
 {% block javascript %}
 <script src="{{ url_for('static', filename='js/event.js') }}" type="text/javascript"></script>
 {% endblock %}
+{% block title %}{{ event.data['name'] }}{% endblock %}
 {% block content %}
 <article class="event">
   {{ attend_bar(state, event.key) }}
