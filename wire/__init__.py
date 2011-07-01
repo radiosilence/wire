@@ -132,7 +132,6 @@ def user_updates(username):
     else:
         state = 'nocontact'
 
-    print u.posted.updates
     return render_template('timeline.html',
         timeline=u.posted.updates,
         user=u,
@@ -276,7 +275,6 @@ def send_message(recipient=False):
 
     if request.method == 'POST':
         try:
-            print request.form
             t.subject = request.form['subject']
             m.update(request.form)
             t.parse_recipients(request.form['recipients'])
@@ -537,7 +535,6 @@ def save_event(event_id=False, new=False):
             e.load(event_id)
         except EventNotFoundError:
             abort(404)
-        print e.data
         if e.data['creator'] != g.user.username:
             abort(401)
 
@@ -585,7 +582,6 @@ def del_event(event_id):
 
     try:
         if g.user.username != e.data['creator']:
-            print e.data
             abort(401)
     except AttributeError:
         abort(401)
@@ -754,7 +750,6 @@ def resize_image(path, x, y=False):
         '100',
         path
     ]
-    print "rezied", path
     return subprocess.check_output(args)
 
 
