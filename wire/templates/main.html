@@ -34,14 +34,16 @@
 </form>
 {% endmacro -%}
 {%- if self.title() != "" -%}
-  {% set ndash = ' \u2013 ' -%}
+  {%- set ndash = ' \u2014 ' -%}
+  {%- set tagline = '' -%}
 {%- else -%}
-  {% set ndash = '' %}
+  {%- set ndash = '' -%}
+  {%- set tagline = ': Privacy is a right.' -%}
 {%- endif -%}<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>{% block title %}{% endblock %}{{ ndash }}wire: Privacy is a right.</title><link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" />
+  <title>{% block title %}{% endblock %}{{ ndash }}wire{{ tagline }}</title><link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" />
   <link rel="canonical" href="{{ request.url }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css_lib/reset.css') }}" type="text/css" /> 
   <link rel="stylesheet" href="{{ url_for('static', filename='css_lib/subverse.css') }}" type="text/css" /> 
@@ -70,7 +72,7 @@
     }); 
   </script> 
   <link rel="canonical" href="https://wire-bbs.org/{{ canonical }}" />
-  <meta name="Description" content="{{ self.title() }}{{ ndash }}wire &ndash; Privacy is a right.')">
+  <meta name="Description" content="{{ self.title() }}{{ ndash }}wire{{ tagline }}')">
 </head>
 <body class="wire">
   
