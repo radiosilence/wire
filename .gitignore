@@ -9,3 +9,4 @@ wire/local_settings.py
 build/
 dist/
 config.py
+*.un~
