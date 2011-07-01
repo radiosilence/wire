@@ -51,9 +51,12 @@
   {{ flashes() }}
   <a href="{{ url_for('view_event', event_id=event.key) }}"><img src="{{ url_for('static', filename='img/event/%s' % event.data['image']) }}" class="event"/></a>
   <header>
-    <strong>{{ event.attendees_count }}</strong> attendee(s), <strong>{{ event.maybes_count }}</strong> maybe(s)
+  <strong>{{ event.attendees_count }}</strong> attendee(s), <strong>{{ event.maybes_count }}</strong> maybe(s)
   </header>
 
+  <div style="float:right">
+    <g:plusone></g:plusone>
+  </div>
   <h1><a href="{{ url_for('view_event', event_id=event.key) }}">{{ event.data['name'] }}</a></h1>
   <div class="box" style="padding-top: .5em">
     <p class="field">
