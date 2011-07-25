@@ -14,6 +14,7 @@ env.summary = ['SUMMARY FOR [%s] DEPLOYMENT' % APP_NAME]
 
 def deploy(**kwargs):
     production(**kwargs)
+    stop()
     deploy_pip()
     link_config()
     conf_supervisor()
@@ -98,6 +99,10 @@ def start():
     env.summary.append('Started process with supervisor.')
 
 
+def stop():
+    with settings(hide('warnings'), warn_only=True):
+        sudo('supervisorctl stop %s' % env.name)
+
 def virtualenv(command):
     with cd(env.directory):
         sudo(env.activate + ' && ' + command, user=env.deploy_user)
@@ -130,7 +135,7 @@ def make_virt():
 
 
 def pip_install_req():
-    virtualenv('pip install -r %s/REQUIREMENTS' % env.directory)
+    virtualenv('pip install -U -r %s/REQUIREMENTS' % env.directory)
     env.summary.append('Pip installed requirements from "%s/REQUIREMENTS".' %
         env.directory)
 
