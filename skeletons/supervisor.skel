@@ -1,5 +1,5 @@
 [program:%(name)s]
-command=/usr/local/bin/gunicorn %(app)s -c /etc/gunicorn.conf.py -b unix:%(socket)s
+command=%(virt_path)s/bin/gunicorn %(app)s -c /etc/gunicorn.conf.py -b unix:%(socket)s
 directory=%(directory)s
 environment=WIRE_SETTINGS=%(directory)s/config.py
 user=%(user)s

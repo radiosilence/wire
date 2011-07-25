@@ -72,7 +72,8 @@ def conf_supervisor(gunicorn_config='/etc/gunicorn.conf.py'):
             'app': APP_NAME + ':app',
             'gunicorn_config': gunicorn_config,
             'socket': env.socket,
-            'directory': env.directory
+            'directory': env.directory,
+            'virt_path': env.virt_path
         }
         path = '/etc/supervisor.d/%s.ini' % env.name
         upload_template('skeletons/supervisor.skel',
