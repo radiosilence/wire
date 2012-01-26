@@ -12,11 +12,11 @@ activists and groups.
 
 from setuptools import setup, find_packages
 
-NAME = 'wire'
+NAME = 'wire-bbs'
 
 setup(
     name=NAME,
-    version="0.1.2",
+    version="0.0.2",
     description='Activist socialising and organisation tool.',
     long_description=open('README.rst').read(),
     url='https://github.com/radiosilence/wire',
@@ -24,7 +24,6 @@ setup(
     author_email='jamescleveland@gmail.com',
     packages=['wire'],
     license="LICENSE.txt",
-    scripts=["run_app"],
     package_data={
         '': ['*.txt', '*.rst']
     },

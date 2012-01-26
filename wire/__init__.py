@@ -15,10 +15,10 @@ uploaded_images = UploadSet('images', IMAGES)
 def create_app(debug=False):
     if debug:
         print "Debug mode."
-        app = Flask(__name__)
+        app = Flask('wire')
 
     else:
-        app = Flask(__name__, static_path='/')
+        app = Flask('wire', static_path='/')
 
     app.config.from_object(__name__)
     app.config.from_envvar('WIRE_SETTINGS', silent=True)
