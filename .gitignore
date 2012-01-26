@@ -10,3 +10,5 @@ build/
 dist/
 config.py
 *.un~
+
+wire/local_settings.py

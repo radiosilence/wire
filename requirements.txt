@@ -1,0 +1,7 @@
+Flask
+redis
+pycrypto
+Flask-Markdown
+Flask-Uploads
+Whirlpool
+Markdown
