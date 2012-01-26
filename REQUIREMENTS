@@ -5,5 +5,3 @@ Flask-Markdown
 Flask-Uploads
 Whirlpool
 Markdown
-gunicorn
-meinheld
