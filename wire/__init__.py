@@ -28,7 +28,7 @@ def create_app(debug=False):
     Markdown(app)
 
     if not debug:
-        file_handler = FileHandler(app,config['LOG_LOCATION'],
+        file_handler = FileHandler(app.config['LOG_LOCATION'],
             encoding="UTF-8")
         file_handler.setLevel(logging.WARNING)
         file_handler.setFormatter(Formatter(
