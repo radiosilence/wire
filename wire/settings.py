@@ -1,6 +1,6 @@
 # Default Configuration
 DEBUG = False
-#SECRET_KEY = 'TEST KEY'
+SECRET_KEY = ''
 UPLOADED_AVATARS_DEST = 'wire/static/img/avatar'
 UPLOADED_IMAGES_DEST = 'wire/static/img/event'
 REDIS_HOST = 'localhost'

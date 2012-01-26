@@ -1,4 +1,4 @@
-include debug README.rst requirements.txt
+include README.rst requirements.txt
 recursive-include wire/static/js_lib *.js
 recursive-include wire/static/img_lib *
 recursive-include wire/static/js *
