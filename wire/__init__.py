@@ -21,6 +21,7 @@ def create_app(debug=False):
         app = Flask('wire', static_path='/')
 
     app.config.from_object('wire.settings')
+    app.config.from_envvar('WIRE_SETTINGS', silent=True)
     app.config['DEBUG'] = debug
     configure_uploads(app, uploaded_avatars)
     configure_uploads(app, uploaded_images)
