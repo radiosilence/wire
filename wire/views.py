@@ -6,6 +6,9 @@ import subprocess
 from flask import request, session, g, redirect, url_for, abort, \
      render_template, flash
 
+from flaskext.uploads import (UploadSet, configure_uploads, IMAGES,
+                              UploadNotAllowed)
+
 from wire import app
 
 from wire.models import User, UserValidationError, \
