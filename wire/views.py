@@ -25,6 +25,8 @@ from wire.models import Event, EventValidationError,\
 
 from wire.utils import Auth, AuthError
 
+from wire import uploaded_images, uploaded_avatars
+
 @app.before_request
 def before_request():
     g.logged_in = False

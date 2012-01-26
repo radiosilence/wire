@@ -4,8 +4,7 @@ from logging import Formatter, FileHandler
 from flask import Flask
 
 from flaskext.markdown import Markdown
-from flaskext.uploads import (UploadSet, configure_uploads, IMAGES,
-                              UploadNotAllowed)
+from flaskext.uploads import configure_uploads, UploadSet, IMAGES
 
 from wire.settings import *
 
