@@ -12,3 +12,4 @@ config.py
 *.un~
 
 wire/local_settings.py
+*.egg-info/

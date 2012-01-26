@@ -1,38 +1,34 @@
-"""wire: Properly private messaging.
+"""
+====
+wire
+====
 
-A solution to government-comprimised messaging services, by
-providing a simple buy powerful user interface to communicate
-messages and events between activists and groups.
+*Properly private messaging*
+
+A solution to government-comprimised messaging services, by providing a simple
+but powerful user interface to communicate messages and events between
+activists and groups.
 """
 
-from distutils.core import setup
+from setuptools import setup, find_packages
 
-NAME = 'wire-bbs'
-doclines = __doc__.split("\n")
-
-files = ['static/*', 'templates/*']
+NAME = 'wire'
 
 setup(
     name=NAME,
-    version="0.1.1",
-    description=doclines[0],
-    long_description="\n".join(doclines[2:]),
+    version="0.1.2",
+    description='Activist socialising and organisation tool.',
+    long_description=open('README.rst').read(),
     url='https://github.com/radiosilence/wire',
-    author='James E. Cleveland',
+    author='James Cleveland',
     author_email='jamescleveland@gmail.com',
-    packages=['wire', 'wire.models', 'wire.utils'],
-    license="MIT",
-    scripts=["debug"],
-    package_data={'wire': files},
-    requires=[
-      'Flask',
-      'redis',
-      'json',
-      'flaskext.markdown',
-      'flaskext.uploads',
-      'os', 'uuid', 'subprocess', 'shlex',
-      'Crypto', 'base64'
-    ],
+    packages=['wire'],
+    license="LICENSE.txt",
+    scripts=["run_app"],
+    package_data={
+        '': ['*.txt', '*.rst']
+    },
+    install_requires=open('requirements.txt').read().split("\n"),
     classifiers=[
       'Development Status :: 2 - Pre-Alpha',
       'Environment :: Web Environment',
