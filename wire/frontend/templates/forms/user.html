@@ -9,9 +9,9 @@
 <article>
 <form id="user-form" method="POST" enctype="multipart/form-data" action="
   {%- if new -%}
-    {{ url_for('new_user') }}
+    {{ url_for('frontend.new_user') }}
   {%- else -%}
-    {{ url_for('edit_user') }}
+    {{ url_for('frontend.edit_user') }}
   {%- endif -%}
   ">
 <input type="hidden" value="">

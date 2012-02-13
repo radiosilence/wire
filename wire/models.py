@@ -318,8 +318,6 @@ class Inbox:
         return count
 
 
-
-
 class Message:
     def __init__(self, redis, key=False, user=False):
         self.id = ""

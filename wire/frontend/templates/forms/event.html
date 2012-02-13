@@ -14,13 +14,13 @@
   {%- endif %} Event</h1>
   {{ flashes() }}
   {% if not new %}
-    <p><a href="{{ url_for('view_event', event_id=event.key) }}">Back to event</a></p>
+    <p><a href="{{ url_for('frontend.view_event', event_id=event.key) }}">Back to event</a></p>
   {% endif %}
   <form id="event-form" method="POST" enctype="multipart/form-data" action="
   {%- if new -%}
-    {{ url_for('new_event') }}
+    {{ url_for('frontend.new_event') }}
   {%- else -%}
-    {{ url_for('edit_event', event_id=event.key) }}
+    {{ url_for('frontend.edit_event', event_id=event.key) }}
   {%- endif -%}
   ">
     <div class="parallelements">
@@ -72,7 +72,7 @@
     Save
   {%- endif %}</button>&nbsp;
   {% if not new %}
-  <a href="{{ url_for('del_event', event_id=event.key) }}" class="button delete_button" style="font-size:24pt !important; font-weight: bold !important">Delete Event</a>
+  <a href="{{ url_for('frontend.del_event', event_id=event.key) }}" class="button delete_button" style="font-size:24pt !important; font-weight: bold !important">Delete Event</a>
   {% endif %}</p>
 
   </form>

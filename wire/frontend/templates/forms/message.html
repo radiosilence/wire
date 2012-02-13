@@ -9,7 +9,7 @@
 <h1>Send a Message</h1>
 <article>
 {{ flashes() }}
-<form id="msg-form" method="POST" action="{{ url_for('send_message') }}">
+<form id="msg-form" method="POST" action="{{ url_for('frontend.send_message') }}">
 <input type="hidden" name="encryption" value="plain" id="msg-encryption"/>
     <p><label for="recipients">Recipient(s)</label><br/>
         <textarea id="recipients" class="fullwidth" style="height: 3em" name="recipients">{{ ', '.join(recipients) }}</textarea><br/>Send to multiple recipients by separating their usernames with a comma (User1, User2, etc)

@@ -7,12 +7,12 @@
 {% endblock %}
 {% block content %}
 
-  <h1><a href="{{ url_for('view_thread', thread_id=thread.key) }}">{{ subject }}</a></h1>
+  <h1><a href="{{ url_for('frontend.view_thread', thread_id=thread.key) }}">{{ subject }}</a></h1>
   {{ flashes() }}
-  <p><form class="add_recp" method="POST" action="{{ url_for('add_recipient', thread_id=thread.key) }}">
+  <p><form class="add_recp" method="POST" action="{{ url_for('frontend.add_recipient', thread_id=thread.key) }}">
   <input type="hidden" name="confirm" value="0"/><span class="recp_list">
   {% for username in thread.recipient_usernames %}
-    <a href="{{ url_for('user_updates', username=username) }}">{{ username }}</a>,
+    <a href="{{ url_for('frontend.user_updates', username=username) }}">{{ username }}</a>,
   {% endfor %}
   &nbsp;<input type="text" name="username" id="addrecip"/><input type="submit" value="Add"/></span></form></p>
   <div id="decrypt" style="display:none">
@@ -29,10 +29,10 @@
   <header>
     <div class="opts">
       {% if g.user.username == message.sender.username %}
-        <a href="{{ url_for('delete_message', thread_id=thread.key, message_id=message.key) }}">x</a>
+        <a href="{{ url_for('frontend.delete_message', thread_id=thread.key, message_id=message.key) }}">x</a>
       {% endif %}
     </div>
-    <a href="{{ url_for('user_updates', username=message.sender.username) }}" class="user">{{ message.sender.username }}</a> {{ message.data['date_date'] }} at {{ message.data['date_time'] }}
+    <a href="{{ url_for('frontend.user_updates', username=message.sender.username) }}" class="user">{{ message.sender.username }}</a> {{ message.data['date_date'] }} at {{ message.data['date_time'] }}
 
   </header>
 
@@ -44,7 +44,7 @@
   {% endfor %}
   </div>
   <div id="reply">
-    <form action="{{ url_for('view_thread', thread_id=thread.key) }}" method="post" id="reply-form">
+    <form action="{{ url_for('frontend.view_thread', thread_id=thread.key) }}" method="post" id="reply-form">
     <input type="hidden" name="action" value="reply"/>
     <input type="hidden" name="encryption" value="{{ thread.encryption }}"/>
     <p><label for="msg-content"><h1>Reply</h1></label><textarea id="msg-content" name="content" class="fullwidth" style="height: 100px" placeholder="Write your reply in here."></textarea></p>

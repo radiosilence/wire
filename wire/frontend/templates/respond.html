@@ -7,14 +7,14 @@
     <header>
       <div class="opts">
         {% if g.user.username == update.user.username %}
-          <a href="{{ url_for('delete_update', update_id=update.key) }}">x</a>
+          <a href="{{ url_for('frontend.delete_update', update_id=update.key) }}">x</a>
         {% endif %}
-        <a href="{{ url_for('respond_update', update_id=update.key) }}">Reply</a>
+        <a href="{{ url_for('frontend.respond_update', update_id=update.key) }}">Reply</a>
       </div>
-      <a href="{{ url_for('user_updates', username=update.user.username) }}" class="user">{{ update.user.username }}</a> {{ update.data['date'] }} at {{ update.data['time'] }}
+      <a href="{{ url_for('frontend.user_updates', username=update.user.username) }}" class="user">{{ update.user.username }}</a> {{ update.data['date'] }} at {{ update.data['time'] }}
 
     {%-if update.event %}
-    On event "<a href="{{ url_for('view_event', event_id=update.event) }}">{{ update.data['event_name'] }}</a>"
+    On event "<a href="{{ url_for('frontend.view_event', event_id=update.event) }}">{{ update.data['event_name'] }}</a>"
     {% endif-%}
     </header>
     <div class="message">

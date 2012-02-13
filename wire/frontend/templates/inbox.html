@@ -9,7 +9,7 @@
   <h1>Inbox</h1>
  </div>
  <div style="padding-top:1.8em">
-  <p><a class="button newmessagebutton" href="{{ url_for('send_message') }}">New Message</a></p>
+  <p><a class="button newmessagebutton" href="{{ url_for('frontend.send_message') }}">New Message</a></p>
  </div>
 </div>
 <article>
@@ -28,20 +28,20 @@
     {%- endif -%}>
     <td style="width:10px; padding-right: 0px">{%- if thread.unread_count > 0 %}>
     {%- endif -%}</td>
-    <td style="white-space: nowrap;"><a href="{{ url_for('user_updates', username=thread.sender) }}">{{ thread.sender }}</a></td>
+    <td style="white-space: nowrap;"><a href="{{ url_for('frontend.user_updates', username=thread.sender) }}">{{ thread.sender }}</a></td>
     <td style="width:10px; padding-right: 0px">
     {% if thread.encryption != 'plain' %}
      <img src="{{ url_for('static', filename='img/lock.png') }}" />
     {% endif %}
     </td>
     <td style="width:100%">
-    <a href="{{ url_for('view_thread', thread_id=thread.key) }}">
+    <a href="{{ url_for('frontend.view_thread', thread_id=thread.key) }}">
     {{ thread.subject }}</a>
     </td>
 
     <td class="opts" style="width: 20px">
-      <a href="{{ url_for('del_thread', thread_id=thread.key) }}">x</a>
-      <a href="{{ url_for('unsubscribe_thread', thread_id=thread.key) }}">u</a>
+      <a href="{{ url_for('frontend.del_thread', thread_id=thread.key) }}">x</a>
+      <a href="{{ url_for('frontend.unsubscribe_thread', thread_id=thread.key) }}">u</a>
     </td>
     </tr>
     {% endfor %}
@@ -52,5 +52,5 @@
 
 </article>
 <article>
-<p><a href="{{ url_for('mark_all_read') }}">Mark all as read</a></p></article>
+<p><a href="{{ url_for('frontend.mark_all_read') }}">Mark all as read</a></p></article>
 {% endblock %}

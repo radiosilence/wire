@@ -9,7 +9,7 @@
 <p>This will be used to auto-complete when sending messages.</p>
  <table class="contacts">
   <tr>
-   <form class="add_contact" action="{{ url_for('add_contact_post') }}" method="POST">
+   <form class="add_contact" action="{{ url_for('frontend.add_contact_post') }}" method="POST">
    <td>
     <input type="text" name="username" placeholder="Ex. mrcheese"/>
    </td>
@@ -22,10 +22,10 @@
   {% for contact in contacts %}
   <tr>
    <td style="width: 100%">
-   <a href="{{ url_for('user_updates', username=contact) }}">{{ contact }}</a>
+   <a href="{{ url_for('frontend.user_updates', username=contact) }}">{{ contact }}</a>
    </td>
    <td class="opts">
-    <a href="{{ url_for('del_contact', contact=contact) }}">x</a>
+    <a href="{{ url_for('frontend.del_contact', contact=contact) }}">x</a>
    </td>
   </tr>
   {% endfor %}

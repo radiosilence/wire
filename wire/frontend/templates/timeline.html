@@ -1,9 +1,9 @@
 {% macro button(type, contact) %}
   {% if type == 'add' %}
-    {% set href = url_for('add_contact_t',contact=contact) %}
+    {% set href = url_for('frontend.add_contact_t',contact=contact) %}
     {% set text = 'Follow' %}
   {% elif type == 'remove' %}
-    {% set href = url_for('del_contact_t', contact=contact) %}
+    {% set href = url_for('frontend.del_contact_t', contact=contact) %}
     {% set text = 'Unfollow' %}
   {% endif %}
   <a href="{{ href }}" class="button">{{ text }}</a>
@@ -45,7 +45,7 @@
 <h1 style="margin-top: 0px">{{ title }}</h1>
 {% if user and g.user.key != user.key %}
 <img src="{{ url_for('static', filename='img/avatar/%s' % user.avatar) }}" class="avatar userpageavatar" style="float:left"/>
-<p>This user is {% if g.user.username not in user.contacts %} not{% endif %} following you. <a class="button" href="{{ url_for('send_message_recipient', recipient=user.username) }}">Send Message</a></p>
+<p>This user is {% if g.user.username not in user.contacts %} not{% endif %} following you. <a class="button" href="{{ url_for('frontend.send_message_recipient', recipient=user.username) }}">Send Message</a></p>
 <article>
   {{ contact_bar(state, user.username) }}
 
@@ -69,17 +69,17 @@
     <header>
       <div class="opts">
         {% if g.user.username == update.user.username %}
-          <a href="{{ url_for('delete_update', update_id=update.key) }}">x</a>
+          <a href="{{ url_for('frontend.delete_update', update_id=update.key) }}">x</a>
         {% endif %}
-        <a href="{{ url_for('respond_update', update_id=update.key) }}">Reply</a>
+        <a href="{{ url_for('frontend.respond_update', update_id=update.key) }}">Reply</a>
       </div>
-      <a href="{{ url_for('user_updates', username=update.user.username) }}" class="user">{{ update.user.username }}</a> {{ update.data['date'] }} at {{ update.data['time'] }}
+      <a href="{{ url_for('frontend.user_updates', username=update.user.username) }}" class="user">{{ update.user.username }}</a> {{ update.data['date'] }} at {{ update.data['time'] }}
 
     {%-if update.respond -%}
-     {{ ' ' }}<em>In reply to <a href="{{ url_for('conversation', conversation_id=update.conversation) }}">#{{ update.respond }}</a></em>
+     {{ ' ' }}<em>In reply to <a href="{{ url_for('frontend.conversation', conversation_id=update.conversation) }}">#{{ update.respond }}</a></em>
     {%-endif-%}
     {%-if update.event-%}
-     {{ ' ' }}<em>On event "<a href="{{ url_for('view_event', event_id=update.event) }}">{{ update.data['event_name'] }}</a></em>"
+     {{ ' ' }}<em>On event "<a href="{{ url_for('frontend.view_event', event_id=update.event) }}">{{ update.data['event_name'] }}</a></em>"
     {%-endif-%}
 
     </header>

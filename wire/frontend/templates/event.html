@@ -1,12 +1,12 @@
 {% macro button(type, event_id) %}
   {% if type == 'attend' %}
-    {% set href = url_for('event_set_attend', event_id=event_id) %}
+    {% set href = url_for('frontend.event_set_attend', event_id=event_id) %}
     {% set text = 'Attend Event' %}
   {% elif type == 'maybe' %}
-    {% set href = url_for('event_set_maybe', event_id=event_id) %}
+    {% set href = url_for('frontend.event_set_maybe', event_id=event_id) %}
     {% set text = 'Maybe Attend' %}
   {% else %}
-    {% set href = url_for('event_set_unattend', event_id=event_id) %}
+    {% set href = url_for('frontend.event_set_unattend', event_id=event_id) %}
     {% set text = 'Unattending' %}
   {% endif %}
   <a href="{{ href }}" class="button">{{ text }}</a>
@@ -50,7 +50,7 @@
 <article class="event">
   {{ attend_bar(state, event.key) }}
   {{ flashes() }}
-  <a href="{{ url_for('view_event', event_id=event.key) }}"><img src="{{ url_for('static', filename='img/event/%s' % event.data['image']) }}" class="event"/></a>
+  <a href="{{ url_for('frontend.view_event', event_id=event.key) }}"><img src="{{ url_for('static', filename='img/event/%s' % event.data['image']) }}" class="event"/></a>
   <header>
   <strong>{{ event.attendees_count }}</strong> attendee(s), <strong>{{ event.maybes_count }}</strong> maybe(s)
   </header>
@@ -58,7 +58,7 @@
   <div style="float:right">
     <g:plusone></g:plusone>
   </div>
-  <h1><a href="{{ url_for('view_event', event_id=event.key) }}">{{ event.data['name'] }}</a></h1>
+  <h1><a href="{{ url_for('frontend.view_event', event_id=event.key) }}">{{ event.data['name'] }}</a></h1>
   <div class="box" style="padding-top: .5em">
     <p class="field">
      <label>When</label>
@@ -80,9 +80,9 @@
     {% endif %}<p class="field">
      <label>Creator</label>
       {% if g.user.username == event.data['creator'] %}
-        You (<em><a href="{{ url_for('edit_event', event_id=event.key) }}">Edit this event</a>)</em>
+        You (<em><a href="{{ url_for('frontend.edit_event', event_id=event.key) }}">Edit this event</a>)</em>
       {% else %}
-        <a href="{{ url_for('user_updates', username=event.data['creator']) }}">{{ event.data['creator'] }}</a>
+        <a href="{{ url_for('frontend.user_updates', username=event.data['creator']) }}">{{ event.data['creator'] }}</a>
       {% endif %}
     </p>
     <p class="field"><label>What</label><br/>
@@ -101,11 +101,11 @@
         <header>
           <div class="opts">
             {% if g.user.username == comment.user.username or g.user.username == event.data['creator'] %}
-            <a href="{{ url_for('delete_update', update_id=comment.key) }}">x</a>
+            <a href="{{ url_for('frontend.delete_update', update_id=comment.key) }}">x</a>
             {% endif %}
-            <a href="{{ url_for('event_add_reply', update_id=comment.key, event_id=event.key) }}">Reply</a>
+            <a href="{{ url_for('frontend.event_add_reply', update_id=comment.key, event_id=event.key) }}">Reply</a>
           </div>
-          <a href="{{ url_for('user_updates', username=comment.user.username) }}" class="user">{{ comment.user.username }}</a> {{ comment.data['date'] }} at {{ comment.data['time'] }}
+          <a href="{{ url_for('frontend.user_updates', username=comment.user.username) }}" class="user">{{ comment.user.username }}</a> {{ comment.data['date'] }} at {{ comment.data['time'] }}
         </header>
         <div class="message">
         <p>{{ comment.text|markdown }}</p>
@@ -117,7 +117,7 @@
     {% endif %}
 
     {% if session.logged_in %}
-    <form action="{{ url_for('event_add_comment', event_id=event.key) }}" method="POST">
+    <form action="{{ url_for('frontend.event_add_comment', event_id=event.key) }}" method="POST">
       <h2>Add Comment</h2>
       <p><textarea name="text" style="width:97%"></textarea></p>
       <p><input type="submit" value="Add"/></p>

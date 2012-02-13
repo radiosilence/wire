@@ -14,9 +14,9 @@
 {%-macro update_box(update=None, event_id=None) %}
 <form method="POST" action="
   {%- if event_id -%}
-    {{ url_for('event_add_comment', event_id=event_id) }}
+    {{ url_for('frontend.event_add_comment', event_id=event_id) }}
   {%- else -%}
-    {{ url_for('post_update') }}
+    {{ url_for('frontend.post_update') }}
   {%- endif -%}">
   <p style="text-align: right"><textarea class="fullwidth" name="text" placeholder="Post something interesting...">{%-if update-%}
     @{{ update.user.username }}{{ ' ' }} 
@@ -83,15 +83,15 @@
       </div>
       <nav class="grid_9">
        <ul>
-        <li id="news"><a href="{{ url_for('news_articles') }}">News</a></li>
-        <li id="events"><a href="{{ url_for('list_events') }}">Events</a></li>
+        <li id="news"><a href="{{ url_for('frontend.news_articles') }}">News</a></li>
+        <li id="events"><a href="{{ url_for('frontend.list_events') }}">Events</a></li>
           {% if session.logged_in %}
-            <li id="create-event"><a href="{{ url_for('new_event') }}">Create Event</a></li>
-            <li id="send"><a href="{{ url_for('send_message') }}">Send a Message</a></li>
+            <li id="create-event"><a href="{{ url_for('frontend.new_event') }}">Create Event</a></li>
+            <li id="send"><a href="{{ url_for('frontend.send_message') }}">Send a Message</a></li>
           {% else %}
-            <li id="sign_up"><a href="{{ url_for('new_user') }}">Sign Up</a></li>
+            <li id="sign_up"><a href="{{ url_for('frontend.new_user') }}">Sign Up</a></li>
           {% endif %}
-        <li id="developers"><a href="{{ url_for('developers') }}">Developers &amp; Sysadmins</a></li>
+        <li id="developers"><a href="{{ url_for('frontend.developers') }}">Developers &amp; Sysadmins</a></li>
        </ul>
       </nav>
      </div>
@@ -106,32 +106,32 @@
       {% if session.logged_in %}
         <img src="{{ url_for('static', filename='img/avatar/%s' % g.user.avatar) }}" class="avatar" style="float: right;"/>
         <h1>{{ g.user.username }}</h1>
-        <form action="{{ url_for('logout') }}" method="post">
+        <form action="{{ url_for('frontend.logout') }}" method="post">
         <p><ul>
-         <li><a href="{{ url_for('inbox') }}"
+         <li><a href="{{ url_for('frontend.inbox') }}"
           {%- if g.unread_count > 0 %} class="inbox_unread"
           {%- endif %}>Inbox ({{ g.unread_count }})</a></li>
-         <li><a href="{{ url_for('contacts') }}">Address Book</a></li>
-         <li><a href="{{ url_for('edit_user') }}">Edit Profile</a></li>
-         <li><a href="{{ url_for('timeline') }}">Timeline</a></li>
-         <li><a href="{{ url_for('mentions') }}"
+         <li><a href="{{ url_for('frontend.contacts') }}">Address Book</a></li>
+         <li><a href="{{ url_for('frontend.edit_user') }}">Edit Profile</a></li>
+         <li><a href="{{ url_for('frontend.timeline') }}">Timeline</a></li>
+         <li><a href="{{ url_for('frontend.mentions') }}"
           {%- if g.user.unread_mentions > 0 -%}
             {{ ' ' }}class="inbox_unread"
           
           {%- endif -%}
           >Mentions ({{ g.user.unread_mentions }})</a></li>
-         <li><a href="{{ url_for('user_updates', username=g.user.username) }}">Updates</a></li>
+         <li><a href="{{ url_for('frontend.user_updates', username=g.user.username) }}">Updates</a></li>
         </ul></p>
         <p><button id="logout_submit">Log Out</button></p>
         </form>
       {% elif not hide_login %}
         <h1>Login</h1>
           {{ flashes() }}
-          <form method="POST" action="{{ url_for('login') }}">
+          <form method="POST" action="{{ url_for('frontend.login') }}">
           <input type="hidden" name="uri" value="{{ request.path }}" />
           <p><input type="text" name="username" id="login_username" placeholder="Username" class="login_field"/></p>
           <p><input type="password" name="password" id="login_password" placeholder="Password"  class="login_field"/></p>
-          <p><button id="login_submit" action="{{ url_for('login') }}">Log In</button></p>
+          <p><button id="login_submit" action="{{ url_for('frontend.login') }}">Log In</button></p>
           </form>
       {% endif %}
       {% endblock %}
