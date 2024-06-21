@@ -1,4 +1,5 @@
-# [DEFUNCT - do not use, insecure!] Communication for the 21st century activist
+[DEFUNCT - do not use, insecure!] Communication for the 21st century activist
+=====
 
 wire
 ====
