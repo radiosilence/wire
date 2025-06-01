@@ -1,0 +1,100 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: wire-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-changeme}
+    volumes:
+      - redis-data:/data
+    ports:
+      - "127.0.0.1:6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-changeme}", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - wire-network
+
+  wire:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: wire-app
+    restart: unless-stopped
+    depends_on:
+      redis:
+        condition: service_healthy
+    ports:
+      - "${WIRE_PORT:-8000}:8000"
+    environment:
+      - WIRE_SECRET_KEY=${WIRE_SECRET_KEY:-please-change-this-secret-key}
+      - WIRE_ENVIRONMENT=${WIRE_ENVIRONMENT:-production}
+      - WIRE_REDIS_HOST=redis
+      - WIRE_REDIS_PORT=6379
+      - WIRE_REDIS_PASSWORD=${REDIS_PASSWORD:-changeme}
+      - WIRE_REDIS_DB=0
+      - WIRE_DEBUG=false
+      - WIRE_SESSION_COOKIE_SECURE=true
+      - WIRE_CSRF_ENABLED=true
+      - WIRE_RATE_LIMIT_ENABLED=true
+      - WIRE_CORS_ORIGINS=${WIRE_CORS_ORIGINS:-http://localhost:3000}
+    volumes:
+      - wire-uploads:/app/uploads
+      - ./logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - wire-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.wire.rule=Host(`${WIRE_DOMAIN:-wire.local}`)"
+      - "traefik.http.routers.wire.tls=true"
+      - "traefik.http.routers.wire.tls.certresolver=letsencrypt"
+      - "traefik.http.services.wire.loadbalancer.server.port=8000"
+
+  # Optional: Traefik reverse proxy for HTTPS
+  traefik:
+    image: traefik:v2.11
+    container_name: wire-traefik
+    restart: unless-stopped
+    profiles:
+      - production
+    command:
+      - "--api.insecure=false"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.letsencrypt.acme.email=${LETSENCRYPT_EMAIL}"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik-certificates:/letsencrypt
+    networks:
+      - wire-network
+
+volumes:
+  redis-data:
+    driver: local
+  wire-uploads:
+    driver: local
+  traefik-certificates:
+    driver: local
+
+networks:
+  wire-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
